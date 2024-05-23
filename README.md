@@ -86,7 +86,7 @@ To get started with the Attendance Management System, follow these steps:
         dotnet add package Microsoft.EntityFrameworkCore.Tools
     ```
 4. Build the project to resolve any dependencies.
-5. Run the application to start using the Attendance Management System.
+5. Run the application to start using the Travel Website System.
 
 ## Team Members:
 
