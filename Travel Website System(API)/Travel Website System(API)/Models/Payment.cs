@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models;
@@ -23,7 +24,11 @@ public partial class Payment
     [Required]
     [StringLength(50)]
     [Unicode(false)]
-    public string Method { get; set; }
+
+    [AllowNull]
+    public string  Method { get; set; }
+    [AllowNull]
+    public string Currencey { get; set; } = "USD";
 
     public int? BookingPackageId { get; set; }
 

@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
+using Travel_Website_System_API_.UnitWork;
 
 namespace Travel_Website_System_API_
 {
@@ -13,6 +14,9 @@ namespace Travel_Website_System_API_
             // Add services to the container.
 
             builder.Services.AddControllers();
+            // inject unit of work
+            builder.Services.AddScoped<UnitOFWork>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models;
@@ -20,10 +21,12 @@ public partial class Package
     public string Name { get; set; }
 
     [Column(TypeName = "text")]
+    [AllowNull] 
     public string Description { get; set; }
 
     [StringLength(255)]
     [Unicode(false)]
+    [AllowNull]
     public string Image { get; set; }
 
     [Column(TypeName = "decimal(10, 2)")]
