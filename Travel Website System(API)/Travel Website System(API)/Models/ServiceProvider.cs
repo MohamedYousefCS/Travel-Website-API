@@ -6,27 +6,17 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-public partial class ServiceProvider
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int serviceProviderId { get; set; }
+    public partial class ServiceProvider
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Logo { get; set; }
+        public bool isDeleted { get; set; }
 
-    [Required]
-    [StringLength(100)]
-    [Unicode(false)]
-    public string Name { get; set; }
-
-    [Column(TypeName = "text")]
-    public string Description { get; set; }
-
-    [StringLength(255)]
-    [Unicode(false)]
-    public string Logo { get; set; }
-
-    public bool? isDeleted { get; set; }
-
-    [InverseProperty("serviceProvider")]
-    public virtual ICollection<Service> Services { get; set; } = new List<Service>();
+        public virtual ICollection<Service> Services { get; set; } = new HashSet<Service>();
+    }
 }
+

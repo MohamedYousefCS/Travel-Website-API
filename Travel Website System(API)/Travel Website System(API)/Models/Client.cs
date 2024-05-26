@@ -6,32 +6,20 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Table("Client")]
-public partial class Client
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int clientId { get; set; }
+    public partial class Client
+    {
 
-    public int userId { get; set; }
+        [ForeignKey("Chat")]
+        public int chatId;
+        public virtual Chat Chat { get; set; }
 
-    [InverseProperty("client")]
-    public virtual ICollection<BookingPackage> BookingPackages { get; set; } = new List<BookingPackage>();
+        [ForeignKey("ApplicationUser")]
+        public string Id { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
+    }
 
-    [InverseProperty("client")]
-    public virtual ICollection<BookingService> BookingServices { get; set; } = new List<BookingService>();
-
-    [InverseProperty("client")]
-    public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
-
-    [InverseProperty("client")]
-    public virtual ICollection<LovePackage> LovePackages { get; set; } = new List<LovePackage>();
-
-    [InverseProperty("client")]
-    public virtual ICollection<LoveService> LoveServices { get; set; } = new List<LoveService>();
-
-    [ForeignKey("userId")]
-    [InverseProperty("Clients")]
-    public virtual User user { get; set; }
 }
+
+

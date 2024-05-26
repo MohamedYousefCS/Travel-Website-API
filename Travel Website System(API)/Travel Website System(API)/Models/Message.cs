@@ -6,27 +6,17 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Table("Message")]
-public partial class Message
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int messageId { get; set; }
+    public partial class Message
+    {
+        public int Id { get; set; }
+        public string status { get; set; }
+        public string sender { get; set; }
+        public bool isDeleted { get; set; }
 
-    [StringLength(50)]
-    [Unicode(false)]
-    public string status { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
-    public string sender { get; set; }
-
-    public bool? isDeleted { get; set; }
-
-    public int? chatId { get; set; }
-
-    [ForeignKey("chatId")]
-    [InverseProperty("Messages")]
-    public virtual Chat chat { get; set; }
+        [ForeignKey("Chat")]
+        public int? chatId { get; set; }
+        public virtual Chat Chat { get; set; }
+    }
 }

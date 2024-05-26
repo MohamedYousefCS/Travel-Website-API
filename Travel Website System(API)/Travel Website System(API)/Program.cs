@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
 
@@ -18,6 +19,15 @@ namespace Travel_Website_System_API_
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<ApplicationDBContext>(op=>op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            })
+             .AddEntityFrameworkStores<ApplicationDBContext>()
+             .AddDefaultTokenProviders();
+
+
 
             var app = builder.Build();
 
