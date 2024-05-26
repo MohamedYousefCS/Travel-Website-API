@@ -16,7 +16,7 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpGet]
-        public List<User> GetAll()
+        public List<ApplicationUser> GetAll()
         {
             return db.Users.ToList();
         }

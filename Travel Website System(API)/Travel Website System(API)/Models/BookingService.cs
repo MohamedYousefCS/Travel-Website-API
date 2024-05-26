@@ -6,34 +6,30 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Table("BookingService")]
-public partial class BookingService
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int BookingServiceId { get; set; }
+    public partial class BookingService
+    {
+        public int Id { get; set; }
+        public int? Quantity { get; set; }
+        public DateTime? Data { get; set; }
 
-    public int? Quantity { get; set; }
+        public DateTime? allowingTime { get; set; }
+        public bool IsDeleted { get; set; }
 
-    [Column(TypeName = "date")]
-    public DateTime? Data { get; set; }
 
-    public int? clientId { get; set; }
+        public virtual Payment Payment { get; set; }
 
-    public int? serviceId { get; set; }
 
-    [Column(TypeName = "date")]
-    public DateTime? allowingTime { get; set; }
+        [ForeignKey("client")]
+        public string? clientId { get; set; }
+        public virtual Client client { get; set; }
+      
+        
+        [ForeignKey("service")]
+        public int? serviceId { get; set; }
+        public virtual Service service { get; set; }
 
-    [InverseProperty("BookingService")]
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
-    [ForeignKey("clientId")]
-    [InverseProperty("BookingServices")]
-    public virtual Client client { get; set; }
-
-    [ForeignKey("serviceId")]
-    [InverseProperty("BookingServices")]
-    public virtual Service service { get; set; }
+    }
 }

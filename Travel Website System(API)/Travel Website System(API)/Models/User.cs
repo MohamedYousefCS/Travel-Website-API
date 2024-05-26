@@ -4,52 +4,25 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Index("SSN", Name = "UQ__Users__CA1E8E3C7CEBD894", IsUnique = true)]
-public partial class User
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int userId { get; set; }
+   
+    public partial class ApplicationUser : IdentityUser
+    {
+        public string Fname { get; set; }
+        public string Lname { get; set; }
+        public string Gender { get; set; }
+        public string SSN { get; set; }
+        public string Role { get; set; }
+        public Admin? Admin { get; set; }
+        public Client? client { get; set; }
+        public bool IsDeleted { get; set; }
 
-    [Required]
-    [StringLength(50)]
-    [Unicode(false)]
-    public string UserName { get; set; }
+        public CustomerService? customerService { get; set; }
 
-    [StringLength(50)]
-    [Unicode(false)]
-    public string Fname { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
-    public string Lname { get; set; }
-
-    [StringLength(1)]
-    [Unicode(false)]
-    public string Gender { get; set; }
-
-    [StringLength(15)]
-    [Unicode(false)]
-    public string SSN { get; set; }
-
-    [Required]
-    [StringLength(255)]
-    [Unicode(false)]
-    public string Password { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
-    public string Role { get; set; }
-
-    [InverseProperty("user")]
-    public virtual ICollection<Admin> Admins { get; set; } = new List<Admin>();
-
-    [InverseProperty("user")]
-    public virtual ICollection<Client> Clients { get; set; } = new List<Client>();
-
-    [InverseProperty("user")]
-    public virtual ICollection<CustomerService> CustomerServices { get; set; } = new List<CustomerService>();
+    }
 }
+
