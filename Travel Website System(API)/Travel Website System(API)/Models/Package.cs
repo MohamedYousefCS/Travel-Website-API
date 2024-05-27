@@ -38,7 +38,7 @@ public partial class Package
     public DateTime? startDate { get; set; }
 
     public int? Duration { get; set; }
-    public int? BookingQuantity { get; set; } = 2;
+    public int? QuantityAvailable { get; set; } = 2;
 
     public int? adminId { get; set; }
 

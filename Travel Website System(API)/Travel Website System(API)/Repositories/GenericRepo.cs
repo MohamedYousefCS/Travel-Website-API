@@ -28,11 +28,12 @@ namespace Travel_Website_System_API_.Repositories
         {
             db.Set<TEntity>().Add(entity);
         }
-
+        // this is hard delete
         public void Delete(int id)
         {
-            db.Set<TEntity>().Remove(GetById(id));
+            db.Set<TEntity>().Remove(GetById(id));// take entity
         }
+       
     }
 }
 

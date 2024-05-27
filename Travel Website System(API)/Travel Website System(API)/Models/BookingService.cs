@@ -14,7 +14,7 @@ public partial class BookingService
     [Key]
     public int BookingServiceId { get; set; }
 
-    public int? Quantity { get; set; }
+    public int? Quantity { get; set; }// the actual number of booking for a specific service
 
     [Column(TypeName = "date")]
     public DateTime? Date { get; set; }

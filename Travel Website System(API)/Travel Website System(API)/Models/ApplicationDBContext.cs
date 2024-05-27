@@ -69,9 +69,20 @@ public partial class ApplicationDBContext : DbContext
 
             entity.Property(e => e.BookingPackageId).ValueGeneratedNever();
 
-            entity.HasOne(d => d.client).WithMany(p => p.BookingPackages).HasConstraintName("FK__BookingPa__clien__59063A47");
+            entity.HasOne(d => d.client)
+                .WithMany(p => p.BookingPackages)
+                .HasForeignKey(d => d.clientId)
+                .OnDelete(DeleteBehavior.Cascade)  // Cascade delete
+                .HasConstraintName("FK__BookingPa__clien__59063A47");
 
-            entity.HasOne(d => d.package).WithMany(p => p.BookingPackages).HasConstraintName("FK__BookingPa__packa__59FA5E80");
+            entity.HasOne(d => d.package)
+                .WithMany(p => p.BookingPackages)
+                .HasForeignKey(d => d.packageId)
+                .OnDelete(DeleteBehavior.Cascade)  // Cascade delete, if package is deleted the booking package will be deteted
+                .HasConstraintName("FK__BookingPa__packa__59FA5E80");
+
+            // Add the unique constraint on clientId and packageId
+            entity.HasIndex(e => new { e.clientId, e.packageId }).IsUnique();
         });
 
         modelBuilder.Entity<BookingService>(entity =>
@@ -80,9 +91,20 @@ public partial class ApplicationDBContext : DbContext
 
             entity.Property(e => e.BookingServiceId).ValueGeneratedNever();
 
-            entity.HasOne(d => d.client).WithMany(p => p.BookingServices).HasConstraintName("FK__BookingSe__clien__5535A963");
+            entity.HasOne(d => d.client)
+                .WithMany(p => p.BookingServices)
+                .HasForeignKey(d => d.clientId)
+                .OnDelete(DeleteBehavior.Cascade)  // Cascade delete
+                .HasConstraintName("FK__BookingSe__clien__5535A963");
 
-            entity.HasOne(d => d.service).WithMany(p => p.BookingServices).HasConstraintName("FK__BookingSe__servi__5629CD9C");
+            entity.HasOne(d => d.service)
+                .WithMany(p => p.BookingServices)
+                .HasForeignKey(d => d.serviceId)
+                .OnDelete(DeleteBehavior.Cascade)  // Cascade delete
+                .HasConstraintName("FK__BookingSe__servi__5629CD9C");
+
+            // Add the unique constraint on clientId and serviceId
+            entity.HasIndex(e => new { e.clientId, e.serviceId }).IsUnique();
         });
 
         modelBuilder.Entity<Category>(entity =>

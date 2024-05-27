@@ -22,7 +22,8 @@ namespace Travel_Website_System_API_
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<ApplicationDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+            builder.Services.AddDbContext<ApplicationDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("Connection"))
+                                                                        .UseLazyLoadingProxies());
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -32,6 +33,7 @@ namespace Travel_Website_System_API_
             }
             // Add CORS policy
             app.UseCors(policy =>
+
             {
                 policy.AllowAnyOrigin()
                       .AllowAnyMethod()

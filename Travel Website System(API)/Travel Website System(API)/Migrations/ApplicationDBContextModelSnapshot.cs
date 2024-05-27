@@ -19,6 +19,9 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder
                 .UseCollation("Arabic_CI_AS")
                 .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -78,9 +81,11 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasKey("BookingPackageId")
                         .HasName("PK__BookingP__F74867E239B1827B");
 
-                    b.HasIndex("clientId");
-
                     b.HasIndex("packageId");
+
+                    b.HasIndex("clientId", "packageId")
+                        .IsUnique()
+                        .HasFilter("[clientId] IS NOT NULL AND [packageId] IS NOT NULL");
 
                     b.ToTable("BookingPackage");
                 });
@@ -108,9 +113,11 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasKey("BookingServiceId")
                         .HasName("PK__BookingS__43F55CB10F4AF1E4");
 
-                    b.HasIndex("clientId");
-
                     b.HasIndex("serviceId");
+
+                    b.HasIndex("clientId", "serviceId")
+                        .IsUnique()
+                        .HasFilter("[clientId] IS NOT NULL AND [serviceId] IS NOT NULL");
 
                     b.ToTable("BookingService");
                 });
@@ -273,9 +280,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int>("packageId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BookingQuantity")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -292,6 +296,9 @@ namespace Travel_Website_System_API_.Migrations
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<int?>("QuantityAvailable")
+                        .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")
                         .HasColumnType("decimal(10, 2)");
@@ -507,11 +514,13 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
                         .WithMany("BookingPackages")
                         .HasForeignKey("clientId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK__BookingPa__clien__59063A47");
 
                     b.HasOne("Travel_Website_System_API.Models.Package", "package")
                         .WithMany("BookingPackages")
                         .HasForeignKey("packageId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK__BookingPa__packa__59FA5E80");
 
                     b.Navigation("client");
@@ -524,11 +533,13 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
                         .WithMany("BookingServices")
                         .HasForeignKey("clientId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK__BookingSe__clien__5535A963");
 
                     b.HasOne("Travel_Website_System_API.Models.Service", "service")
                         .WithMany("BookingServices")
                         .HasForeignKey("serviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK__BookingSe__servi__5629CD9C");
 
                     b.Navigation("client");
