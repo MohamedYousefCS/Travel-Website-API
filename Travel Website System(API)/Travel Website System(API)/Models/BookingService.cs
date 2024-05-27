@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-    public partial class BookingService
+    public class BookingService
     {
         public int Id { get; set; }
         public int? Quantity { get; set; }

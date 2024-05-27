@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-    public partial class Admin
+    public class Admin
     {
         [ForeignKey("ApplicationUser")]
         public string Id { get; set; }

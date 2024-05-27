@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-    public partial class LoveService
+    public class LoveService
     {
         public int Id { get; set; }
         public DateTime? date { get; set; }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-    public partial class Message
+    public class Message
     {
         public int Id { get; set; }
         public string status { get; set; }

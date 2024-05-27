@@ -9,11 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Travel_Website_System_API.Models
 {
 
-
-
-    [PrimaryKey("clientId", "packageId")]
-    [Table("LovePackage")]
-    public partial class LovePackage
+    public class LovePackage
     {
         public int Id { get; set; }
         public DateTime? date { get; set; }

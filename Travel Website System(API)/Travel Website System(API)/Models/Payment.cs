@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-    public partial class Payment
+    public class Payment
     {
         public int Id { get; set; }
         public decimal Amount { get; set; }
