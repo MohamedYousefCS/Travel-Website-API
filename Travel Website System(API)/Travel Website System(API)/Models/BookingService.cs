@@ -24,8 +24,8 @@ namespace Travel_Website_System_API.Models
         [ForeignKey("client")]
         public string? clientId { get; set; }
         public virtual Client client { get; set; }
-      
-        
+
+
         [ForeignKey("service")]
         public int? serviceId { get; set; }
         public virtual Service service { get; set; }
