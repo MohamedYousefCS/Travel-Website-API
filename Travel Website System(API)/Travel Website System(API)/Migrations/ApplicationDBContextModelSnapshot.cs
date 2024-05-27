@@ -60,7 +60,7 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int>("BookingPackageId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Data")
+                    b.Property<DateTime?>("Date")
                         .HasColumnType("date");
 
                     b.Property<DateTime?>("allowingTime")
@@ -90,7 +90,7 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int>("BookingServiceId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Data")
+                    b.Property<DateTime?>("Date")
                         .HasColumnType("date");
 
                     b.Property<int?>("Quantity")
@@ -271,6 +271,9 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.Package", b =>
                 {
                     b.Property<int>("packageId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BookingQuantity")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")

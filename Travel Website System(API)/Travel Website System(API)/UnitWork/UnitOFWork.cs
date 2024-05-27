@@ -4,15 +4,16 @@ using Travel_Website_System_API_.Repositories;
 namespace Travel_Website_System_API_.UnitWork
 {
     // register all repos objects here 
-    
+
     public class UnitOFWork
     {
-        ApplicationDBContext db;
-        // these are fields not properties
+       public ApplicationDBContext db;
         IGenericRepo<Payment> paymentRepo;
         IGenericRepo<BookingPackage> bookingPackageRepo;
         IGenericRepo<BookingService> bookingServiceRepo;
-        public UnitOFWork(ApplicationDBContext db) { 
+        IBookingPackageRepo custombookingPackageRepo;
+        public UnitOFWork(ApplicationDBContext db)
+        {
             this.db = db;
         }
         // declaring public properties for repos , and enable get only 
@@ -52,6 +53,20 @@ namespace Travel_Website_System_API_.UnitWork
                 return bookingServiceRepo;
             }
         }
-
+        public IBookingPackageRepo CustombookingPackageRepo
+        {
+            get
+            {
+                if (custombookingPackageRepo == null)// to check there is only one object of the repo
+                {
+                    custombookingPackageRepo = new BookingPackageRepo(db);
+                }
+                return custombookingPackageRepo;
+            }
+        }
+        public void save()
+        {
+            db.SaveChanges();
+        }
     }
 }

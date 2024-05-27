@@ -15,7 +15,7 @@ public partial class BookingPackage
     public int BookingPackageId { get; set; }
 
     [Column(TypeName = "date")]
-    public DateTime? Data { get; set; }
+    public DateTime? Date { get; set; }
 
     public int? quantity { get; set; }
 

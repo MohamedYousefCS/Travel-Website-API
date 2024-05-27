@@ -22,12 +22,12 @@ public partial class Package
 
     [Column(TypeName = "text")]
     [AllowNull] 
-    public string Description { get; set; }
+    public string ?Description { get; set; }
 
     [StringLength(255)]
     [Unicode(false)]
     [AllowNull]
-    public string Image { get; set; }
+    public string ?Image { get; set; }
 
     [Column(TypeName = "decimal(10, 2)")]
     public decimal? TotalPrice { get; set; }
@@ -38,6 +38,7 @@ public partial class Package
     public DateTime? startDate { get; set; }
 
     public int? Duration { get; set; }
+    public int? BookingQuantity { get; set; } = 2;
 
     public int? adminId { get; set; }
 

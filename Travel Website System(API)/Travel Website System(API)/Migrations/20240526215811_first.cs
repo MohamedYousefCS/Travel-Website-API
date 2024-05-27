@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Travel_Website_System_API_.Migrations
 {
     /// <inheritdoc />
-    public partial class update_IN_Payment : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -150,6 +150,7 @@ namespace Travel_Website_System_API_.Migrations
                     isDeleted = table.Column<bool>(type: "bit", nullable: true),
                     startDate = table.Column<DateTime>(type: "date", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
+                    BookingQuantity = table.Column<int>(type: "int", nullable: true),
                     adminId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -242,7 +243,7 @@ namespace Travel_Website_System_API_.Migrations
                 columns: table => new
                 {
                     BookingPackageId = table.Column<int>(type: "int", nullable: false),
-                    Data = table.Column<DateTime>(type: "date", nullable: true),
+                    Date = table.Column<DateTime>(type: "date", nullable: true),
                     quantity = table.Column<int>(type: "int", nullable: true),
                     clientId = table.Column<int>(type: "int", nullable: true),
                     packageId = table.Column<int>(type: "int", nullable: true),

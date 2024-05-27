@@ -17,7 +17,7 @@ public partial class BookingService
     public int? Quantity { get; set; }
 
     [Column(TypeName = "date")]
-    public DateTime? Data { get; set; }
+    public DateTime? Date { get; set; }
 
     public int? clientId { get; set; }
 
