@@ -6,54 +6,32 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-public partial class Service
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int serviceId { get; set; }
 
-    [Required]
-    [StringLength(100)]
-    [Unicode(false)]
-    public string Name { get; set; }
+    public class Service
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Image { get; set; }
+        public int? QuantityAvailable { get; set; }
+        public DateTime? StartDate { get; set; }
+        public decimal? price { get; set; }
+        public bool? isDeleted { get; set; }
+     
+        public virtual ICollection<BookingService> BookingServices { get; set; } = new HashSet<BookingService>();
 
-    [Column(TypeName = "text")]
-    public string Description { get; set; }
+        public virtual ICollection<LoveService> LoveServices { get; set; } = new HashSet<LoveService>();
 
-    [StringLength(255)]
-    [Unicode(false)]
-    public string Image { get; set; }
+        [ForeignKey("category")]
+        public int? categoryId { get; set; }
+        public virtual Category category { get; set; }
 
-    public int? QuantityAvailable { get; set; }
-
-    [Column(TypeName = "date")]
-    public DateTime? StartDate { get; set; }
-
-    [Column(TypeName = "decimal(10, 2)")]
-    public decimal? price { get; set; }
-
-    public bool? isDeleted { get; set; }
-
-    public int? serviceProviderId { get; set; }
-
-    public int? categoryId { get; set; }
-
-    [InverseProperty("service")]
-    public virtual ICollection<BookingService> BookingServices { get; set; } = new List<BookingService>();
-
-    [InverseProperty("service")]
-    public virtual ICollection<LoveService> LoveServices { get; set; } = new List<LoveService>();
-
-    [ForeignKey("categoryId")]
-    [InverseProperty("Services")]
-    public virtual Category category { get; set; }
-
-    [ForeignKey("serviceProviderId")]
-    [InverseProperty("Services")]
-    public virtual ServiceProvider serviceProvider { get; set; }
-
-    [ForeignKey("serviceId")]
-    [InverseProperty("services")]
-    public virtual ICollection<Package> packages { get; set; } = new List<Package>();
+        [ForeignKey("serviceProvider")]
+        public int? serviceProviderId { get; set; }
+        public virtual ServiceProvider serviceProvider { get; set; }
+              
+        public virtual ICollection<Package> packages { get; set; } = new HashSet<Package>();
+    }
 }

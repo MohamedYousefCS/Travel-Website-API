@@ -12,7 +12,7 @@ namespace Travel_Website_System_API_.DTO
         [Column(TypeName = "date")]
         public DateTime? Date { get; set; }
         public int? ServiceId { get; set; }
-        public int? ClientId { get; set; }
+        public string? ClientId { get; set; }
         // I ADD clientName for testing get relative data
         //public string ? ClientName {  get; set; }   
 

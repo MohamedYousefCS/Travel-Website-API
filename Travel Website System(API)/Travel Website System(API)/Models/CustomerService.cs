@@ -6,20 +6,15 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Table("CustomerService")]
-public partial class CustomerService
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int customerServiceId { get; set; }
+    public class CustomerService
+    {
+        [ForeignKey("ApplicationUser")]
+        public string Id { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
 
-    public int? userId { get; set; }
-
-    [InverseProperty("customerService")]
-    public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
-
-    [ForeignKey("userId")]
-    [InverseProperty("CustomerServices")]
-    public virtual User user { get; set; }
+        public virtual ICollection<Chat> Chats { get; set; } = new HashSet<Chat>();
+      
+    }
 }

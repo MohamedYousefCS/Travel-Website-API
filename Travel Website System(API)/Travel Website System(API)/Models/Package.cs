@@ -4,55 +4,30 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Table("Package")]
-public partial class Package
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int packageId { get; set; }
+    public class Package
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Image { get; set; }
+        public decimal? TotalPrice { get; set; }
+        public bool isDeleted { get; set; }
+        public DateTime? startDate { get; set; }
+        public int? Duration { get; set; }
 
-    [Required]
-    [StringLength(100)]
-    [Unicode(false)]
-    public string Name { get; set; }
+        public virtual ICollection<BookingPackage> BookingPackages { get; set; } = new HashSet<BookingPackage>();
+        public virtual ICollection<LovePackage> LovePackages { get; set; } = new HashSet<LovePackage>();
 
-    [Column(TypeName = "text")]
-    [AllowNull] 
-    public string ?Description { get; set; }
+        [ForeignKey("admin")]
+        public string? adminId { get; set; }
+        public virtual Admin admin { get; set; }
 
-    [StringLength(255)]
-    [Unicode(false)]
-    [AllowNull]
-    public string ?Image { get; set; }
-
-    [Column(TypeName = "decimal(10, 2)")]
-    public decimal? TotalPrice { get; set; }
-
-    public bool? isDeleted { get; set; }
-
-    [Column(TypeName = "date")]
-    public DateTime? startDate { get; set; }
-
-    public int? Duration { get; set; }
-    public int? QuantityAvailable { get; set; } = 2;
-
-    public int? adminId { get; set; }
-
-    [InverseProperty("package")]
-    public virtual ICollection<BookingPackage> BookingPackages { get; set; } = new List<BookingPackage>();
-
-    [InverseProperty("package")]
-    public virtual ICollection<LovePackage> LovePackages { get; set; } = new List<LovePackage>();
-
-    [ForeignKey("adminId")]
-    [InverseProperty("Packages")]
-    public virtual Admin admin { get; set; }
-
-    [ForeignKey("packageId")]
-    [InverseProperty("packages")]
-    public virtual ICollection<Service> services { get; set; } = new List<Service>();
+        [ForeignKey("packageId")]
+        [InverseProperty("packages")]
+        public virtual ICollection<Service> services { get; set; } = new List<Service>();
+    }
 }

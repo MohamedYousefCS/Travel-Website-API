@@ -25,7 +25,7 @@ namespace Travel_Website_System_API_.Controllers
                 return BadRequest("the bookingService order cant be null ");
             }
             var existBookService = unitOFWork.BookingServiceRepo.GetAll()
-                .FirstOrDefault(b=>b.clientId==bookingServiceDTO.ClientId && b.serviceId ==bookingServiceDTO.ClientId);
+                .FirstOrDefault(b => b.clientId == bookingServiceDTO.ClientId);//&& b.serviceId == bookingServiceDTO.ClientId);
             // to check uniueness of clientId and serviceId
             if (existBookService != null) { 
                 return BadRequest("A booking service with the same ClientId and ServiceId already exists.");
@@ -34,15 +34,15 @@ namespace Travel_Website_System_API_.Controllers
             bookingServiceDTO.allowingTime = DateTime.Now.AddDays(20);// will be added by admin 
             bookingServiceDTO.Date = DateTime.Now;
             var bookingService = new BookingService(){ 
-                BookingServiceId = bookingServiceDTO.BookingServiceId,
+                Id = bookingServiceDTO.BookingServiceId,
                 allowingTime = bookingServiceDTO.allowingTime,
-                Date = DateTime.Now,
+                Data = DateTime.Now,
                 clientId = bookingServiceDTO.ClientId,
                 serviceId = bookingServiceDTO.ServiceId,
                 Quantity = bookingServiceDTO.Quantity,
             };
             unitOFWork.BookingServiceRepo.Add(bookingService);
-            var service = unitOFWork.db.Services.SingleOrDefault(s => s.serviceId == bookingServiceDTO.ServiceId);
+            var service = unitOFWork.db.Services.SingleOrDefault(s => s.Id == bookingServiceDTO.ServiceId);
             if (service != null)
             {
                 service.QuantityAvailable--;
@@ -69,12 +69,12 @@ namespace Travel_Website_System_API_.Controllers
             }
             BookingServiceDTO bookingServiceDTO = new BookingServiceDTO()
             {
-                BookingServiceId = bookingService.BookingServiceId,
+                BookingServiceId = bookingService.Id,
                 ClientId = bookingService.clientId,
                 ServiceId = bookingService.serviceId,
                 Quantity = bookingService.Quantity,
                 allowingTime = bookingService.allowingTime,
-                Date = bookingService.Date,
+                Date = bookingService.Data,
                 //ClientName = bookingService.client?.user?.Fname ?? "unknown"
             };
             return Ok(bookingServiceDTO);
@@ -107,13 +107,13 @@ namespace Travel_Website_System_API_.Controllers
             if(bookingService.allowingTime != null && bookingService.allowingTime < DateTime.Now)
             {
                 // get the current service in booking row
-                var service = unitOFWork.db.Services.SingleOrDefault(s => s.serviceId == bookingService.serviceId);
+                var service = unitOFWork.db.Services.SingleOrDefault(s => s.Id == bookingService.serviceId);
                 // if i declared servicerepo
                 //var service = unitOFWork.serviceRepo.getAll().SingleOrDefault(s => s.serviceId == bookingService.serviceId); 
                 service.QuantityAvailable++;
                 unitOFWork.db.Services.Update(service);// serviceRepo.update(service)
                 bookingService.Quantity--;
-                unitOFWork.BookingServiceRepo.Delete(bookingService.BookingServiceId);
+                unitOFWork.BookingServiceRepo.Delete(bookingService.Id);
                 unitOFWork.save();
                 return Ok("removed");// or bookingServiceDTO
             }

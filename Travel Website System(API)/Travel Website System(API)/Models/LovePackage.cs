@@ -6,26 +6,21 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[PrimaryKey("clientId", "packageId")]
-[Table("LovePackage")]
-public partial class LovePackage
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int clientId { get; set; }
 
-    [Key]
-    public int packageId { get; set; }
+    public class LovePackage
+    {
+        public int Id { get; set; }
+        public DateTime? date { get; set; }
+        public bool IsDeleted { get; set; }
 
-    [Column(TypeName = "date")]
-    public DateTime? date { get; set; }
+        [ForeignKey("client")]
+        public string clientId { get; set; }
+        public virtual Client client { get; set; }
 
-    [ForeignKey("clientId")]
-    [InverseProperty("LovePackages")]
-    public virtual Client client { get; set; }
-
-    [ForeignKey("packageId")]
-    [InverseProperty("LovePackages")]
-    public virtual Package package { get; set; }
+        [ForeignKey("package")]
+        public int packageId { get; set; }
+        public virtual Package package { get; set; }
+    }
 }

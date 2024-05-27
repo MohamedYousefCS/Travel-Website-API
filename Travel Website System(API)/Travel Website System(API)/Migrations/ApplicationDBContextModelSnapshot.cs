@@ -17,60 +17,271 @@ namespace Travel_Website_System_API_.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseCollation("Arabic_CI_AS")
                 .HasAnnotation("ProductVersion", "8.0.5")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PackageService", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
-                    b.Property<int>("serviceId")
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("PackageService", b =>
+                {
                     b.Property<int>("packageId")
                         .HasColumnType("int");
 
-                    b.HasKey("serviceId", "packageId")
-                        .HasName("PK__PackageS__DFF8A2D34D1E9D41");
+                    b.Property<int>("servicesId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("packageId");
+                    b.HasKey("packageId", "servicesId");
 
-                    b.ToTable("PackageService", (string)null);
+                    b.HasIndex("servicesId");
+
+                    b.ToTable("PackageService");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Admin", b =>
                 {
-                    b.Property<int>("adminId")
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("userId")
-                        .HasColumnType("int");
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("adminId")
-                        .HasName("PK__Admin__AD0500A6EB9C0073");
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
-                    b.HasIndex("userId");
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
-                    b.ToTable("Admin");
+                    b.Property<string>("Fname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Lname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SSN")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingPackage", b =>
                 {
-                    b.Property<int>("BookingPackageId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("date");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("allowingTime")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("clientId")
-                        .HasColumnType("int");
+                    b.Property<string>("clientId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("packageId")
                         .HasColumnType("int");
@@ -78,255 +289,266 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int?>("quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("BookingPackageId")
-                        .HasName("PK__BookingP__F74867E239B1827B");
+                    b.HasKey("Id");
+
+                    b.HasIndex("clientId");
 
                     b.HasIndex("packageId");
 
-                    b.HasIndex("clientId", "packageId")
-                        .IsUnique()
-                        .HasFilter("[clientId] IS NOT NULL AND [packageId] IS NOT NULL");
-
-                    b.ToTable("BookingPackage");
+                    b.ToTable("BookingPackages");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingService", b =>
                 {
-                    b.Property<int>("BookingServiceId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("date");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("allowingTime")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("clientId")
-                        .HasColumnType("int");
+                    b.Property<string>("clientId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("serviceId")
                         .HasColumnType("int");
 
-                    b.HasKey("BookingServiceId")
-                        .HasName("PK__BookingS__43F55CB10F4AF1E4");
+                    b.HasKey("Id");
+
+                    b.HasIndex("clientId");
 
                     b.HasIndex("serviceId");
 
-                    b.HasIndex("clientId", "serviceId")
-                        .IsUnique()
-                        .HasFilter("[clientId] IS NOT NULL AND [serviceId] IS NOT NULL");
-
-                    b.ToTable("BookingService");
+                    b.ToTable("BookingServices");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Category", b =>
                 {
-                    b.Property<int>("categoryId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("categoryId")
-                        .HasName("PK__Category__23CAF1D8310AC031");
+                    b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Chat", b =>
                 {
-                    b.Property<int>("chatId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Logo")
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("clientId")
-                        .HasColumnType("int");
+                    b.Property<string>("clientId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("customerServiceId")
-                        .HasColumnType("int");
+                    b.Property<string>("customerServiceId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("chatId")
-                        .HasName("PK__Chat__826385ADEA62FC88");
+                    b.HasKey("Id");
 
-                    b.HasIndex("clientId");
+                    b.HasIndex("clientId")
+                        .IsUnique()
+                        .HasFilter("[clientId] IS NOT NULL");
 
                     b.HasIndex("customerServiceId");
 
-                    b.ToTable("Chat");
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
                 {
-                    b.Property<int>("clientId")
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("userId")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("clientId")
-                        .HasName("PK__Client__81A2CBE1E24ECB7F");
-
-                    b.HasIndex("userId");
-
-                    b.ToTable("Client");
+                    b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
                 {
-                    b.Property<int>("customerServiceId")
-                        .HasColumnType("int");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("userId")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("customerServiceId")
-                        .HasName("PK__Customer__408B6EB754B8A0FE");
-
-                    b.HasIndex("userId");
-
-                    b.ToTable("CustomerService");
+                    b.ToTable("CustomerServices");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.LovePackage", b =>
                 {
-                    b.Property<int>("clientId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("clientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("date")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("packageId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("date")
-                        .HasColumnType("date");
+                    b.HasKey("Id");
 
-                    b.HasKey("clientId", "packageId")
-                        .HasName("PK__LovePack__1B0A19EDAB436C1A");
+                    b.HasIndex("clientId");
 
                     b.HasIndex("packageId");
 
-                    b.ToTable("LovePackage");
+                    b.ToTable("LovePackages");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.LoveService", b =>
                 {
-                    b.Property<int>("clientId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("clientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("date")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("serviceId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("date")
-                        .HasColumnType("date");
+                    b.HasKey("Id");
 
-                    b.HasKey("clientId", "serviceId")
-                        .HasName("PK__LoveServ__65F7CCEC15E2A4A1");
+                    b.HasIndex("clientId");
 
                     b.HasIndex("serviceId");
 
-                    b.ToTable("LoveService");
+                    b.ToTable("LoveServices");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Message", b =>
                 {
-                    b.Property<int>("messageId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("chatId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("isDeleted")
+                    b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("sender")
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("status")
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("messageId")
-                        .HasName("PK__Message__4808B993CF62E7D5");
+                    b.HasKey("Id");
 
                     b.HasIndex("chatId");
 
-                    b.ToTable("Message");
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Package", b =>
                 {
-                    b.Property<int>("packageId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Duration")
                         .HasColumnType("int");
 
                     b.Property<string>("Image")
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<int?>("QuantityAvailable")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("TotalPrice")
-                        .HasColumnType("decimal(10, 2)");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("adminId")
-                        .HasColumnType("int");
+                    b.Property<string>("adminId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool?>("isDeleted")
+                    b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("startDate")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("packageId")
-                        .HasName("PK__Package__AA8D20C8A785F2B5");
+                    b.HasKey("Id");
 
                     b.HasIndex("adminId");
 
-                    b.ToTable("Package");
+                    b.ToTable("Packages");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Payment", b =>
                 {
-                    b.Property<int>("PaymentID")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(10, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("BookingPackageId")
                         .HasColumnType("int");
@@ -334,52 +556,50 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int?>("BookingServiceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Currencey")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("date");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Method")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("PaymentID")
-                        .HasName("PK__Payment__9B556A58D50CDE2C");
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
 
-                    b.HasIndex("BookingPackageId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("BookingServiceId");
+                    b.HasIndex("BookingPackageId")
+                        .IsUnique()
+                        .HasFilter("[BookingPackageId] IS NOT NULL");
 
-                    b.ToTable("Payment");
+                    b.HasIndex("BookingServiceId")
+                        .IsUnique()
+                        .HasFilter("[BookingServiceId] IS NOT NULL");
+
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Service", b =>
                 {
-                    b.Property<int>("serviceId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("QuantityAvailable")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("categoryId")
                         .HasColumnType("int");
@@ -388,13 +608,12 @@ namespace Travel_Website_System_API_.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("price")
-                        .HasColumnType("decimal(10, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("serviceProviderId")
                         .HasColumnType("int");
 
-                    b.HasKey("serviceId")
-                        .HasName("PK__Services__455070DF92061F6A");
+                    b.HasKey("Id");
 
                     b.HasIndex("categoryId");
 
@@ -405,83 +624,78 @@ namespace Travel_Website_System_API_.Migrations
 
             modelBuilder.Entity("Travel_Website_System_API.Models.ServiceProvider", b =>
                 {
-                    b.Property<int>("serviceProviderId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Logo")
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("isDeleted")
+                    b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("serviceProviderId")
-                        .HasName("PK__ServiceP__00FEF614563FA657");
+                    b.HasKey("Id");
 
                     b.ToTable("ServiceProviders");
                 });
 
-            modelBuilder.Entity("Travel_Website_System_API.Models.User", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.Property<int>("userId")
-                        .HasColumnType("int");
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Property<string>("Fname")
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Property<string>("Gender")
-                        .HasMaxLength(1)
-                        .IsUnicode(false)
-                        .HasColumnType("char(1)")
-                        .IsFixedLength();
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Property<string>("Lname")
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Property<string>("Role")
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("SSN")
-                        .HasMaxLength(15)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(15)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("userId")
-                        .HasName("PK__Users__CB9A1CFF129F083A");
-
-                    b.HasIndex(new[] { "SSN" }, "UQ__Users__CA1E8E3C7CEBD894")
-                        .IsUnique()
-                        .HasFilter("[SSN] IS NOT NULL");
-
-                    b.ToTable("Users");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PackageService", b =>
@@ -489,39 +703,36 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasOne("Travel_Website_System_API.Models.Package", null)
                         .WithMany()
                         .HasForeignKey("packageId")
-                        .IsRequired()
-                        .HasConstraintName("FK__PackageSe__packa__52593CB8");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Travel_Website_System_API.Models.Service", null)
                         .WithMany()
-                        .HasForeignKey("serviceId")
-                        .IsRequired()
-                        .HasConstraintName("FK__PackageSe__servi__5165187F");
+                        .HasForeignKey("servicesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Admin", b =>
                 {
-                    b.HasOne("Travel_Website_System_API.Models.User", "user")
-                        .WithMany("Admins")
-                        .HasForeignKey("userId")
-                        .HasConstraintName("FK__Admin__userId__47DBAE45");
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("Admin")
+                        .HasForeignKey("Travel_Website_System_API.Models.Admin", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("user");
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingPackage", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
-                        .WithMany("BookingPackages")
-                        .HasForeignKey("clientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK__BookingPa__clien__59063A47");
+                        .WithMany()
+                        .HasForeignKey("clientId");
 
                     b.HasOne("Travel_Website_System_API.Models.Package", "package")
                         .WithMany("BookingPackages")
-                        .HasForeignKey("packageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK__BookingPa__packa__59FA5E80");
+                        .HasForeignKey("packageId");
 
                     b.Navigation("client");
 
@@ -531,16 +742,12 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingService", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
-                        .WithMany("BookingServices")
-                        .HasForeignKey("clientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK__BookingSe__clien__5535A963");
+                        .WithMany()
+                        .HasForeignKey("clientId");
 
                     b.HasOne("Travel_Website_System_API.Models.Service", "service")
                         .WithMany("BookingServices")
-                        .HasForeignKey("serviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK__BookingSe__servi__5629CD9C");
+                        .HasForeignKey("serviceId");
 
                     b.Navigation("client");
 
@@ -550,14 +757,12 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.Chat", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
-                        .WithMany("Chats")
-                        .HasForeignKey("clientId")
-                        .HasConstraintName("FK__Chat__clientId__6EF57B66");
+                        .WithOne("Chat")
+                        .HasForeignKey("Travel_Website_System_API.Models.Chat", "clientId");
 
                     b.HasOne("Travel_Website_System_API.Models.CustomerService", "customerService")
                         .WithMany("Chats")
-                        .HasForeignKey("customerServiceId")
-                        .HasConstraintName("FK__Chat__customerSe__6E01572D");
+                        .HasForeignKey("customerServiceId");
 
                     b.Navigation("client");
 
@@ -566,38 +771,37 @@ namespace Travel_Website_System_API_.Migrations
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
                 {
-                    b.HasOne("Travel_Website_System_API.Models.User", "user")
-                        .WithMany("Clients")
-                        .HasForeignKey("userId")
-                        .IsRequired()
-                        .HasConstraintName("FK__Client__userId__3A81B327");
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("client")
+                        .HasForeignKey("Travel_Website_System_API.Models.Client", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("user");
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
                 {
-                    b.HasOne("Travel_Website_System_API.Models.User", "user")
-                        .WithMany("CustomerServices")
-                        .HasForeignKey("userId")
-                        .HasConstraintName("FK__CustomerS__userI__6B24EA82");
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("customerService")
+                        .HasForeignKey("Travel_Website_System_API.Models.CustomerService", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("user");
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.LovePackage", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
-                        .WithMany("LovePackages")
-                        .HasForeignKey("clientId")
-                        .IsRequired()
-                        .HasConstraintName("FK__LovePacka__clien__60A75C0F");
+                        .WithMany()
+                        .HasForeignKey("clientId");
 
                     b.HasOne("Travel_Website_System_API.Models.Package", "package")
                         .WithMany("LovePackages")
                         .HasForeignKey("packageId")
-                        .IsRequired()
-                        .HasConstraintName("FK__LovePacka__packa__619B8048");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("client");
 
@@ -607,16 +811,14 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.LoveService", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
-                        .WithMany("LoveServices")
-                        .HasForeignKey("clientId")
-                        .IsRequired()
-                        .HasConstraintName("FK__LoveServi__clien__6477ECF3");
+                        .WithMany()
+                        .HasForeignKey("clientId");
 
                     b.HasOne("Travel_Website_System_API.Models.Service", "service")
                         .WithMany("LoveServices")
                         .HasForeignKey("serviceId")
-                        .IsRequired()
-                        .HasConstraintName("FK__LoveServi__servi__656C112C");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("client");
 
@@ -625,20 +827,18 @@ namespace Travel_Website_System_API_.Migrations
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Message", b =>
                 {
-                    b.HasOne("Travel_Website_System_API.Models.Chat", "chat")
+                    b.HasOne("Travel_Website_System_API.Models.Chat", "Chat")
                         .WithMany("Messages")
-                        .HasForeignKey("chatId")
-                        .HasConstraintName("FK__Message__chatId__71D1E811");
+                        .HasForeignKey("chatId");
 
-                    b.Navigation("chat");
+                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Package", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Admin", "admin")
                         .WithMany("Packages")
-                        .HasForeignKey("adminId")
-                        .HasConstraintName("FK__Package__adminId__4D94879B");
+                        .HasForeignKey("adminId");
 
                     b.Navigation("admin");
                 });
@@ -646,14 +846,12 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.Payment", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.BookingPackage", "BookingPackage")
-                        .WithMany("Payments")
-                        .HasForeignKey("BookingPackageId")
-                        .HasConstraintName("FK__Payment__Booking__5CD6CB2B");
+                        .WithOne("Payment")
+                        .HasForeignKey("Travel_Website_System_API.Models.Payment", "BookingPackageId");
 
                     b.HasOne("Travel_Website_System_API.Models.BookingService", "BookingService")
-                        .WithMany("Payments")
-                        .HasForeignKey("BookingServiceId")
-                        .HasConstraintName("FK__Payment__Booking__5DCAEF64");
+                        .WithOne("Payment")
+                        .HasForeignKey("Travel_Website_System_API.Models.Payment", "BookingServiceId");
 
                     b.Navigation("BookingPackage");
 
@@ -664,13 +862,11 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     b.HasOne("Travel_Website_System_API.Models.Category", "category")
                         .WithMany("Services")
-                        .HasForeignKey("categoryId")
-                        .HasConstraintName("FK__Services__catego__4222D4EF");
+                        .HasForeignKey("categoryId");
 
                     b.HasOne("Travel_Website_System_API.Models.ServiceProvider", "serviceProvider")
                         .WithMany("Services")
-                        .HasForeignKey("serviceProviderId")
-                        .HasConstraintName("FK__Services__servic__412EB0B6");
+                        .HasForeignKey("serviceProviderId");
 
                     b.Navigation("category");
 
@@ -682,14 +878,23 @@ namespace Travel_Website_System_API_.Migrations
                     b.Navigation("Packages");
                 });
 
+            modelBuilder.Entity("Travel_Website_System_API.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Admin");
+
+                    b.Navigation("client");
+
+                    b.Navigation("customerService");
+                });
+
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingPackage", b =>
                 {
-                    b.Navigation("Payments");
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingService", b =>
                 {
-                    b.Navigation("Payments");
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Category", b =>
@@ -704,15 +909,7 @@ namespace Travel_Website_System_API_.Migrations
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
                 {
-                    b.Navigation("BookingPackages");
-
-                    b.Navigation("BookingServices");
-
-                    b.Navigation("Chats");
-
-                    b.Navigation("LovePackages");
-
-                    b.Navigation("LoveServices");
+                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
@@ -737,15 +934,6 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.ServiceProvider", b =>
                 {
                     b.Navigation("Services");
-                });
-
-            modelBuilder.Entity("Travel_Website_System_API.Models.User", b =>
-                {
-                    b.Navigation("Admins");
-
-                    b.Navigation("Clients");
-
-                    b.Navigation("CustomerServices");
                 });
 #pragma warning restore 612, 618
         }

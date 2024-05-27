@@ -6,37 +6,28 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Table("Chat")]
-public partial class Chat
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int chatId { get; set; }
+    public class Chat
+    {
+       
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Description { get; set; }
+        public string Logo { get; set; }
+        public bool IsDeleted { get; set; }
 
-    [StringLength(100)]
-    [Unicode(false)]
-    public string Name { get; set; }
 
-    [Column(TypeName = "text")]
-    public string Description { get; set; }
+        public virtual ICollection<Message> Messages { get; set; } = new HashSet<Message>();
 
-    [StringLength(255)]
-    [Unicode(false)]
-    public string Logo { get; set; }
+        [ForeignKey("customerService")]
+        public string? customerServiceId { get; set; }
+        public virtual CustomerService customerService { get; set; }
+       
+        [ForeignKey("client")]
+        public string? clientId { get; set; }
+        public virtual Client client { get; set; }
 
-    public int? customerServiceId { get; set; }
-
-    public int? clientId { get; set; }
-
-    [InverseProperty("chat")]
-    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
-
-    [ForeignKey("clientId")]
-    [InverseProperty("Chats")]
-    public virtual Client client { get; set; }
-
-    [ForeignKey("customerServiceId")]
-    [InverseProperty("Chats")]
-    public virtual CustomerService customerService { get; set; }
+    }
 }

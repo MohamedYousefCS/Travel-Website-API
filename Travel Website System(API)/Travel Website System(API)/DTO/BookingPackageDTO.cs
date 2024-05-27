@@ -14,7 +14,7 @@ namespace Travel_Website_System_API_.DTO
 
         public int? quantity { get; set; }
 
-        public int? clientId { get; set; }
+        public string? clientId { get; set; }
         // i add it to  test relative data
        // public string? clientName { get; set; }
         public decimal? Bookingprice { get; set; }

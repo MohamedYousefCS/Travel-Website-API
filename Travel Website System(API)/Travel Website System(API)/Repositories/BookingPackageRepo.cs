@@ -12,12 +12,12 @@ namespace Travel_Website_System_API_.Repositories
         }
         public List<BookingPackage> selectAll()
         {
-            return db.BookingPackages.Include(b=>b.Payments).Include(b=>b.client).Include(b=>b.package).ToList();
+            return db.BookingPackages.Include(b=>b.Payment).Include(b=>b.client).Include(b=>b.package).ToList();
         }
 
         public BookingPackage GetById(int id)
         {
-          return  db.BookingPackages.Include(b => b.Payments).Include(b => b.client).ThenInclude(c=>c.user).Include(b => b.package).SingleOrDefault(b =>b.packageId == id);
+          return  db.BookingPackages.Include(b => b.Payment).Include(b => b.client).ThenInclude(c=>c.ApplicationUser).Include(b => b.package).SingleOrDefault(b =>b.packageId == id);
         }
      
     }

@@ -6,20 +6,15 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Travel_Website_System_API.Models;
-
-[Table("Admin")]
-public partial class Admin
+namespace Travel_Website_System_API.Models
 {
-    [Key]
-    public int adminId { get; set; }
-
-    public int? userId { get; set; }
-
-    [InverseProperty("admin")]
-    public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
-
-    [ForeignKey("userId")]
-    [InverseProperty("Admins")]
-    public virtual User user { get; set; }
+    public class Admin
+    {
+        [ForeignKey("ApplicationUser")]
+        public string Id { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
+        public virtual ICollection<Package> Packages { get; set; } = new HashSet<Package>();
+    }
 }
+
+
