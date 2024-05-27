@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
@@ -17,6 +18,8 @@ namespace Travel_Website_System_API.Models
         public bool isDeleted { get; set; }
 
         public virtual ICollection<Service> Services { get; set; } = new HashSet<Service>();
+
+       
     }
 }
 
