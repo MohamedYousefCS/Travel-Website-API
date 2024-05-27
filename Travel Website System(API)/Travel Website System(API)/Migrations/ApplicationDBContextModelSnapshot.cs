@@ -363,6 +363,9 @@ namespace Travel_Website_System_API_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -383,7 +386,9 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("clientId");
+                    b.HasIndex("clientId")
+                        .IsUnique()
+                        .HasFilter("[clientId] IS NOT NULL");
 
                     b.HasIndex("customerServiceId");
 
@@ -395,13 +400,7 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("chatId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("chatId")
-                        .IsUnique();
 
                     b.ToTable("Clients");
                 });
@@ -418,26 +417,31 @@ namespace Travel_Website_System_API_.Migrations
 
             modelBuilder.Entity("Travel_Website_System_API.Models.LovePackage", b =>
                 {
-                    b.Property<string>("clientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("packageId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("clientId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime?>("date")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("clientId", "packageId");
+                    b.Property<int>("packageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("clientId");
 
                     b.HasIndex("packageId");
 
-                    b.ToTable("LovePackage");
+                    b.ToTable("LovePackages");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.LoveService", b =>
@@ -753,8 +757,8 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.Chat", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
-                        .WithMany()
-                        .HasForeignKey("clientId");
+                        .WithOne("Chat")
+                        .HasForeignKey("Travel_Website_System_API.Models.Chat", "clientId");
 
                     b.HasOne("Travel_Website_System_API.Models.CustomerService", "customerService")
                         .WithMany("Chats")
@@ -773,15 +777,7 @@ namespace Travel_Website_System_API_.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Travel_Website_System_API.Models.Chat", "Chat")
-                        .WithOne()
-                        .HasForeignKey("Travel_Website_System_API.Models.Client", "chatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
@@ -799,9 +795,7 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
                         .WithMany()
-                        .HasForeignKey("clientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("clientId");
 
                     b.HasOne("Travel_Website_System_API.Models.Package", "package")
                         .WithMany("LovePackages")
@@ -911,6 +905,11 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.Chat", b =>
                 {
                     b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
+                {
+                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>

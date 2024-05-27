@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Travel_Website_System_API.Models
 {
    
-    public partial class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         public string Fname { get; set; }
         public string Lname { get; set; }

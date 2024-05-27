@@ -8,11 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-    public partial class Client
+    public class Client
     {
 
-        [ForeignKey("Chat")]
-        public int chatId;
         public virtual Chat Chat { get; set; }
 
         [ForeignKey("ApplicationUser")]
