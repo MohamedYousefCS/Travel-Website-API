@@ -14,7 +14,7 @@ namespace Travel_Website_System_API_.DTO
         public int? ServiceId { get; set; }
         public int? ClientId { get; set; }
         // I ADD clientName for testing get relative data
-        public string ? ClientName {  get; set; }   
+        //public string ? ClientName {  get; set; }   
 
         [Column(TypeName = "date")]
         public DateTime? allowingTime { get; set; }

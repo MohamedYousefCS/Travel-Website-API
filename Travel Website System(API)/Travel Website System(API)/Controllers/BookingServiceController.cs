@@ -75,7 +75,7 @@ namespace Travel_Website_System_API_.Controllers
                 Quantity = bookingService.Quantity,
                 allowingTime = bookingService.allowingTime,
                 Date = bookingService.Date,
-                ClientName = bookingService.client?.user?.Fname ?? "unknown"
+                //ClientName = bookingService.client?.user?.Fname ?? "unknown"
             };
             return Ok(bookingServiceDTO);
         }
