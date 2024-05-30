@@ -23,6 +23,13 @@ namespace Travel_Website_System_API.Models
 
         public CustomerService? customerService { get; set; }
 
+
+        public override string UserName
+        {
+            get => Email;
+            set => base.UserName = Email;
+        }
+
     }
 }
 
