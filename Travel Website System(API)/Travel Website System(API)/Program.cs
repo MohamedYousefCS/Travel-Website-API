@@ -36,6 +36,8 @@ namespace Travel_Website_System_API_
              .AddDefaultTokenProviders();
 
             builder.Services.AddScoped<IGenericRepo<Client>, GenericRepo<Client>>();
+            builder.Services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
+            builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
 
 
 
