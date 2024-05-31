@@ -11,11 +11,14 @@ namespace Travel_Website_System_API.Models
     public class Payment
     {
         public int Id { get; set; }
-        public decimal Amount { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public string Method { get; set; }
-        public bool IsDeleted { get; set; }
+        public decimal? Amount { get; set; }
+        public DateTime? PaymentDate { get; set; }
 
+        public string ?Method { get; set; }
+        public bool ?IsDeleted { get; set; } = false;
+        //The status of the payment (e.g., "Created", "Completed", "Failed").
+        public string ?PaymentStatus { get; set; }
+        public string? PayPalOrderId { get; set; }
 
         [ForeignKey("BookingPackage")]
         public int? BookingPackageId { get; set; }

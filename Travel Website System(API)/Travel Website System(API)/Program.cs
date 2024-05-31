@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
+using Travel_Website_System_API_.DTO.PaymentClasses;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.UnitWork;
 
@@ -26,6 +27,7 @@ namespace Travel_Website_System_API_
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<ApplicationDBContext>(op=>op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+            builder.Services.Configure<PayPalSettings>(builder.Configuration.GetSection("PayPal"));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -57,7 +59,6 @@ namespace Travel_Website_System_API_
             }
 
 
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -74,11 +75,13 @@ namespace Travel_Website_System_API_
             });
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.MapControllers();
+
 
             app.Run();
         }
