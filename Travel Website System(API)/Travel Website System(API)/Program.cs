@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO.PaymentClasses;
+using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.UnitWork;
 
 namespace Travel_Website_System_API_
@@ -30,14 +31,34 @@ namespace Travel_Website_System_API_
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
+                options.User.RequireUniqueEmail = true;
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             })
              .AddEntityFrameworkStores<ApplicationDBContext>()
              .AddDefaultTokenProviders();
 
+            builder.Services.AddScoped<IGenericRepo<Client>, GenericRepo<Client>>();
+            builder.Services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
+            builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
+
+
 
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var serviceProvider = scope.ServiceProvider;
+
+                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                // Now, you can use roleManager within this using block
+                // For example, you can seed roles here
+                var seed = new DataSeed(roleManager);
+                seed.SeedRolesAsync().GetAwaiter().GetResult();
+            }
+
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

@@ -8,5 +8,6 @@
         public void Update(TEntity entity);
         public void Delete(int id);
         public void Add(TEntity entity);
+        public void Save();
     }
 }

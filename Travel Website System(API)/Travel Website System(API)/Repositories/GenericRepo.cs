@@ -33,7 +33,12 @@ namespace Travel_Website_System_API_.Repositories
         {
             db.Set<TEntity>().Remove(GetById(id));// take entity
         }
-       
+
+        public void Save()
+        {
+            db.SaveChanges();
+        }
+
     }
 }
 
