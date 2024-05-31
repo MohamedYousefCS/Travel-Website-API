@@ -5,7 +5,7 @@ namespace Travel_Website_System_API_.DTO
     public class ClientRegisterDto
     {
         [Required(ErrorMessage = "first name is required")]
-        [StringLength(10, MinimumLength = 2, ErrorMessage = "The first must not be more than 10 characters and not less than 2 characters")]
+        [StringLength(25, MinimumLength = 2, ErrorMessage = "The name must not be more than 25 characters and not less than 2 characters")]
         public string Name { get; set; }
        
        
@@ -24,7 +24,7 @@ namespace Travel_Website_System_API_.DTO
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Password mismatch")]
         public string ConfirmPassword { get; set; }
-       // public string Role { get; set; }
+        public string Role { get; set; }
 
     }
 
