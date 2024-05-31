@@ -14,15 +14,15 @@ namespace Travel_Website_System_API_.DTO
 
         public int? quantity { get; set; }
 
-        public string? clientId { get; set; }
         // i add it to  test relative data
-       // public string? clientName { get; set; }
-        public decimal? Bookingprice { get; set; }
-
+        // public string? clientName { get; set; }
+        public string? clientId { get; set; }
+     
         public int? packageId { get; set; }
 
         [Column(TypeName = "date")]
         public DateTime? allowingTime { get; set; }
+        public decimal ? price { get; set; }    
 
     }
 }

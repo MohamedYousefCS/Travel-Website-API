@@ -25,12 +25,21 @@ namespace Travel_Website_System_API_.Controllers
                 return BadRequest("the bookingService order cant be null ");
             }
             var existBookService = unitOFWork.BookingServiceRepo.GetAll()
-                .FirstOrDefault(b => b.clientId == bookingServiceDTO.ClientId);//&& b.serviceId == bookingServiceDTO.ClientId);
-            // to check uniueness of clientId and serviceId
+                .FirstOrDefault(b => b.clientId == bookingServiceDTO.ClientId && b.serviceId == bookingServiceDTO.ServiceId);
+            // to check uniqeness of clientId and serviceId
             if (existBookService != null) { 
                 return BadRequest("A booking service with the same ClientId and ServiceId already exists.");
-            } 
-            bookingServiceDTO.Quantity = unitOFWork.BookingServiceRepo.GetAll().Count(s=>s.serviceId ==bookingServiceDTO.ServiceId)+1;
+            }
+            var service = unitOFWork.db.Services.SingleOrDefault(s => s.Id == bookingServiceDTO.ServiceId);
+            // in this the package is removed if its quantity is =0
+            if (service.QuantityAvailable ==0)
+            {
+                service.isDeleted = true;
+                return BadRequest("sorry this service is not valid for booking now");
+            }
+            // when adding bookingService object the quantity is increased by 1 and the available quantity for the service will be decreased by 1
+            bookingServiceDTO.Quantity = unitOFWork.BookingServiceRepo.GetAll()
+                .Count(s=>s.serviceId ==bookingServiceDTO.ServiceId)+1;
             bookingServiceDTO.allowingTime = DateTime.Now.AddDays(20);// will be added by admin 
             bookingServiceDTO.Date = DateTime.Now;
             var bookingService = new BookingService(){ 
@@ -42,20 +51,17 @@ namespace Travel_Website_System_API_.Controllers
                 Quantity = bookingServiceDTO.Quantity,
             };
             unitOFWork.BookingServiceRepo.Add(bookingService);
-            var service = unitOFWork.db.Services.SingleOrDefault(s => s.Id == bookingServiceDTO.ServiceId);
-            if (service != null)
-            {
-                service.QuantityAvailable--;
-                // when adding bookingService object the quantity is increased by 1 and the available quantity for the service 
-                // is decreased by 1, and the vise of deleting bookingservice 
-            }
+            // when adding bookingService object the quantity is increased by 1 and the available quantity for the service 
+            // is decreased by 1, and the vise of deleting bookingservice
+            service.QuantityAvailable--;
             unitOFWork.db.Services.Update(service);
             unitOFWork.save();
-            // will return objcect in response where i can get it id in ui to pass it in payment
-           return CreatedAtAction(nameof(GetByID), new { id = bookingServiceDTO.BookingServiceId }, bookingServiceDTO);
-         //  return Created();// not will return data in response
+            // will return object in response where i can get it id in ui to pass it in payment
+           return CreatedAtAction(nameof(GetByID), new { id = bookingServiceDTO.BookingServiceId }, bookingService);
         }
-        [HttpGet] public IActionResult GetByID(int id)
+
+        [HttpGet("{id}")] 
+        public IActionResult GetByID(int id)// return Dto
         {
             if(id == 0)
             {
@@ -75,6 +81,7 @@ namespace Travel_Website_System_API_.Controllers
                 Quantity = bookingService.Quantity,
                 allowingTime = bookingService.allowingTime,
                 Date = bookingService.Data,
+                price = bookingService?.service?.price ?? 0
                 //ClientName = bookingService.client?.user?.Fname ?? "unknown"
             };
             return Ok(bookingServiceDTO);
