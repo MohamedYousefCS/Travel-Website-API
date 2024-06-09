@@ -1,6 +1,9 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO.PaymentClasses;
 using Travel_Website_System_API_.Repositories;
@@ -42,6 +45,32 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
 
 
+            //[Authorize] used JWT token in check authentication 
+            // JWT Authentication configuration
+           
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:ValidIssuer"],
+                    ValidAudience = builder.Configuration["Jwt:ValidAudience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+                };
+            });
+
+
 
 
             var app = builder.Build();
@@ -75,12 +104,15 @@ namespace Travel_Website_System_API_
             });
 
             app.UseHttpsRedirection();
+            app.UseRouting();
+
+            app.UseAuthentication();//check JWT token
+           
             app.UseAuthorization();
             app.MapControllers();
             app.UseStaticFiles();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.MapControllers();
+           
+           
 
 
             app.Run();
