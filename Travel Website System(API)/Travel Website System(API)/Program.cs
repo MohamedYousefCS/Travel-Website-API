@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.UnitWork;
 
@@ -23,6 +24,15 @@ namespace Travel_Website_System_API_
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            //builder.Services.AddSwaggerGen(op=>
+            //op.SwaggerDoc("Version 1",new Microsoft.OpenApi.Models.OpenApiInfo()
+            //{
+            //                    Version = "v2",
+            //                     Title = "Web API Travel Website",
+            //                     Description = "This is a web api for Travel Website"
+
+            //})
+            //);
 
             builder.Services.AddDbContext<ApplicationDBContext>(op=>op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
 
