@@ -9,6 +9,8 @@ using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO.PaymentClasses;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.UnitWork;
+using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
+
 
 namespace Travel_Website_System_API_
 {
@@ -29,6 +31,15 @@ namespace Travel_Website_System_API_
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            //builder.Services.AddSwaggerGen(op=>
+            //op.SwaggerDoc("Version 1",new Microsoft.OpenApi.Models.OpenApiInfo()
+            //{
+            //                    Version = "v2",
+            //                     Title = "Web API Travel Website",
+            //                     Description = "This is a web api for Travel Website"
+
+            //})
+            //);
 
             builder.Services.AddDbContext<ApplicationDBContext>(op=>op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
             builder.Services.Configure<PayPalSettings>(builder.Configuration.GetSection("PayPal"));
@@ -46,9 +57,13 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
             builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+            builder.Services.AddScoped<GenericRepository<Service>>();
+            builder.Services.AddScoped<GenericRepository<Package>>();
+            builder.Services.AddScoped<GenericRepository<ServiceProvider>>();
+
             //[Authorize] used JWT token in check authentication 
             // JWT Authentication configuration
-           
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

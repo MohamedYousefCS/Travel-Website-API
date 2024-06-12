@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
@@ -15,8 +14,9 @@ namespace Travel_Website_System_API.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public string Logo { get; set; }
+      
         public bool isDeleted { get; set; }
-
+        // [JsonIgnore(Condition =JsonIgnoreCondition.WhenWritingNull)]
         public virtual ICollection<Service> Services { get; set; } = new HashSet<Service>();
 
        
