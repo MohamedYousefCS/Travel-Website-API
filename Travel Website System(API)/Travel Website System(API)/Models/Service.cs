@@ -13,9 +13,9 @@ namespace Travel_Website_System_API.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
-        public string Image { get; set; }
-        public int? QuantityAvailable { get; set; }
+        public string ?Description { get; set; }
+        public string ?Image { get; set; }
+        public int? QuantityAvailable { get; set; } = 4;
         public DateTime? StartDate { get; set; }
         public decimal? price { get; set; }
         public bool? isDeleted { get; set; }

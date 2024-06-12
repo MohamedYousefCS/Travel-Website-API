@@ -520,8 +520,11 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("TotalPrice")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("QuantityAvailable")
+                        .HasColumnType("int");
 
                     b.Property<string>("adminId")
                         .HasColumnType("nvarchar(450)");
@@ -547,7 +550,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Amount")
+                    b.Property<decimal?>("Amount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("BookingPackageId")
@@ -556,14 +559,20 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int?>("BookingServiceId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
+                    b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("PaymentDate")
+                    b.Property<string>("PayPalOrderId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

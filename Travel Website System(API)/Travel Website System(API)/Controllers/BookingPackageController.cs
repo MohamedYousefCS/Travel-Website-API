@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
@@ -23,28 +24,51 @@ namespace Travel_Website_System_API_.Controllers
         [HttpPost]
         [Consumes("application/json")]
         // public ActionResult Add([FromBody]BookingPackage bookingPackage )
-        public ActionResult Add(BookingPackage bookingPackage ) {// get client id , package id , 
-            // if i added all bookingPackage not the bookingPackageDTO
-            // in api we must add navigation properties not as mvc if the there is an foreign key it load all navproperty object data 
-            // by default so in add new object i only give value for the forign key only in mvc
-            var client = unitOFWork.db.Clients.Include(c=>c.ApplicationUser).SingleOrDefault(c=>c.Id==bookingPackage.clientId);
-           var package = unitOFWork.db.Packages.Include(c=>c.BookingPackages).SingleOrDefault(p=>p.Id== bookingPackage.packageId);
-            bookingPackage.Data = DateTime.Now;
-           bookingPackage.allowingTime = DateTime.Now.AddDays(20);
-            //  count the number of bookings for the specified package.
-            var bookingCountForPackage = unitOFWork.db.BookingPackages.Count(bp => bp.packageId == bookingPackage.packageId);
-            bookingPackage.quantity = bookingCountForPackage + 1;
-            // this will calculate the all booking package
-            //  bookingPackage.quantity = unitOFWork.BookingPackageRepo.GetAll().Count()+1;
-            // in api must add explicity relative data objects to allow nulls
-            bookingPackage.client=client;
-            bookingPackage.package = package;
-            unitOFWork.BookingPackageRepo.Add(bookingPackage);
-            // after adding new booking for the specific package the availablequantity in package table will decreased by 1
-           // package.QuantityAvailable--;
-            unitOFWork.db.Packages.Update(package);
-            unitOFWork.save();
-            return CreatedAtAction(nameof(GetBookingPackageById), new { id = bookingPackage.packageId }, bookingPackage);
+        public ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
+            if(ModelState.IsValid)
+            {
+                // to check the client has booked this package before or not
+                var model = unitOFWork.BookingPackageRepo.GetAll()
+                    .FirstOrDefault(p=>p.clientId==bookingPackageDTO.clientId&& p.packageId==bookingPackageDTO.packageId);
+                if(model!=null)//if exists
+                {
+                    return BadRequest("this booking for the same client and this package is found before");
+                }
+                var package = unitOFWork.db.Packages.SingleOrDefault(p => p.Id == bookingPackageDTO.packageId);
+                if(package.QuantityAvailable == 0)
+                {
+                    package.isDeleted = true;// package will be not in website and you cant booking it
+                    return BadRequest("this package is not availabe now ");
+                }
+                bookingPackageDTO.Date = DateTime.Now;
+                bookingPackageDTO.allowingTime = DateTime.Now.AddDays(20);
+                //  count the number of bookings for the specified package
+                var bookingCountForPackage = unitOFWork.db.BookingPackages.Count(bp => bp.packageId == bookingPackageDTO.packageId);
+                bookingPackageDTO.quantity = bookingCountForPackage + 1;
+                var bookingPackage = new BookingPackage
+                {
+                    //Id = bookingPackageDTO.BookingPackageId,// is i dentity
+                    clientId = bookingPackageDTO.clientId,
+                    quantity = bookingPackageDTO.quantity,
+                    Data = bookingPackageDTO.Date,
+                    allowingTime = bookingPackageDTO.allowingTime,
+                    packageId = bookingPackageDTO.packageId,
+                };
+                unitOFWork.BookingPackageRepo.Add(bookingPackage);
+                // after adding new booking for the specific package the availablequantity in package table will decreased by 1
+                package.QuantityAvailable--;
+                unitOFWork.db.Packages.Update(package);
+                unitOFWork.save();
+                // will return object in response where i can get it id in ui to pass it in payment
+                return CreatedAtAction(nameof(GetBookingPackageById), new { id = bookingPackage.packageId }, bookingPackage);
+                // i returned bookingPackage not dto as when i returned dto the booking id was =0 and not changed 
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "invalid data provided");
+                return BadRequest(ModelState);
+            }
+      
         }
 
         [HttpGet("{id}")]
@@ -63,7 +87,7 @@ namespace Travel_Website_System_API_.Controllers
                 packageId = bookingPackage.packageId,
                 allowingTime = bookingPackage.allowingTime,
                // clientName = clientName,// i get it for testing only i dont need it now
-                Bookingprice = bookingPackage.package?.TotalPrice
+                price = bookingPackage.package?.Price ?? 0,
             };
             return Ok(bookingPackageDTO);
         }
