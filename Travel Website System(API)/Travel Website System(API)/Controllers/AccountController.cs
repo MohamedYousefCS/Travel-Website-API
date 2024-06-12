@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
@@ -26,8 +27,9 @@ namespace Travel_Website_System_API_.Controllers
         private readonly IGenericRepo<Admin> adminGenericRepo;
         private readonly IGenericRepo<CustomerService> cusSerGenericRepo;
         private readonly IConfiguration configuration;
+        private readonly IEmailSender emailSender;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDBContext context, IGenericRepo<Client> clientGenericRepo, IGenericRepo<Admin> adminGenericRepo, IGenericRepo<CustomerService> cusSerGenericRepo,IConfiguration configuration)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDBContext context, IGenericRepo<Client> clientGenericRepo, IGenericRepo<Admin> adminGenericRepo, IGenericRepo<CustomerService> cusSerGenericRepo,IConfiguration configuration,IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -36,6 +38,7 @@ namespace Travel_Website_System_API_.Controllers
             this.adminGenericRepo = adminGenericRepo;
             this.cusSerGenericRepo = cusSerGenericRepo;
             this.configuration = configuration;
+            this.emailSender = emailSender;
         }
 
         [HttpPost("register")]
@@ -184,21 +187,21 @@ namespace Travel_Website_System_API_.Controllers
                 ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                 {
-                    return Ok(new { message = "email dosnt exist" });
+                    return Ok(new { message = "email not found" });
                 }
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var resetLink = Url.Action("ResetPassword", "Account", new { token = token, email = model.Email }, Request.Scheme);
-
-
-                model.IsEmailSent = true;
-                return Ok(new { message = "If your email exists in our system, you will receive a password reset link." });
+               // var resetLink = Url.Action("ResetPassword", "Account", new { token = token, email = model.Email }, Request.Scheme);
+               var resetLink = $"{model.url}?email={model.Email}&token={token}";
+                await emailSender.SendEmailAsync(model.Email, "Password Reset", $"Please reset your password by clicking <a href='{resetLink}'>here</a>.");
+                
+                return Ok(new { message = " you received a password reset link on your email." });
             }
-            return BadRequest(ModelState);
+            return BadRequest("can't send Email");
         }
 
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
         {
             if (ModelState.IsValid)
             {

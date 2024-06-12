@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -43,7 +44,7 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IGenericRepo<Client>, GenericRepo<Client>>();
             builder.Services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
             builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
-
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
 
             //[Authorize] used JWT token in check authentication 
             // JWT Authentication configuration
