@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
+using Travel_Website_System_API_.Repositories;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -11,18 +12,19 @@ namespace Travel_Website_System_API_.Controllers
     {
 
 
-        ApplicationDBContext db;
+        GenericRepository<Service> serviceRepo;
+        
 
-        public ServiceController(ApplicationDBContext db)
+        public ServiceController(GenericRepository<Service> serviceRepo)
         {
-            this.db = db;
+            this.serviceRepo = serviceRepo;
         }
 
         [HttpGet]
         //[Produces("application/json")]
         public ActionResult GetAllServices()
         {
-            List<Service> services = db.Services.ToList();
+            List<Service> services = serviceRepo.GetAll();
 
             List<ServiceDTO> servicesDTO = new List<ServiceDTO>();
 
@@ -38,24 +40,22 @@ namespace Travel_Website_System_API_.Controllers
                     StartDate = service.StartDate,
                     price = service.price,
                     isDeleted = service.isDeleted,
-                    BookingServices = service.BookingServices.ToList(),
-                    LoveServices = service.LoveServices.ToList(),
-                    category = service.category,
-                    serviceProvider = service.serviceProvider,
-                    packages = service.packages
+                    categoryId = service.categoryId,
+                    serviceProviderId = service.serviceProviderId,
 
                 });
             
             
             }
             return Ok(servicesDTO);
+
         }
 
 
         [HttpGet("{id}")]
         public ActionResult GetById(int id)
         {
-            Service service = db.Services.Find(id);
+            Service service = serviceRepo.GetById(id);
             if (service == null) return NotFound();
             else
             {
@@ -69,12 +69,8 @@ namespace Travel_Website_System_API_.Controllers
                 StartDate = service.StartDate,
                 price=service.price,
                 isDeleted = service.isDeleted,
-                BookingServices = service.BookingServices.ToList(),
-                LoveServices = service.LoveServices.ToList(),
-                category=service.category,
-                serviceProvider=service.serviceProvider,
-                packages=service.packages
-                
+                categoryId=service.categoryId,
+                serviceProviderId=service.serviceProviderId,
                 };
                 return Ok(serviceDTO);
 
@@ -83,24 +79,52 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddService(Service service)
+        public ActionResult AddService(ServiceDTO serviceDTO)
         {
-            if (service == null) return BadRequest();
+            if (serviceDTO == null) return BadRequest();
             if(!ModelState.IsValid) return BadRequest();
-            db.Services.Add(service);
-            db.SaveChanges();
-            return Ok(service);
+            Service service=new Service() { 
+            Id= serviceDTO.Id,
+            Name = serviceDTO.Name,
+            Description = serviceDTO.Description,
+            Image= serviceDTO.Image,
+            QuantityAvailable = serviceDTO.QuantityAvailable,
+            StartDate = serviceDTO.StartDate,
+            price=serviceDTO.price,
+            isDeleted = serviceDTO.isDeleted,
+            categoryId=serviceDTO.categoryId,
+            serviceProviderId= serviceDTO.serviceProviderId
+            };
+            serviceRepo.Add(service);
+            serviceRepo.Save();
+            return Ok(serviceDTO);
+
+
+
         }
 
         [HttpPut("{id}")]
 
-        public ActionResult PutService(Service service,int id)
+        public ActionResult EditService(ServiceDTO serviceDTO,int id)
         {
-            if(service == null) return BadRequest();
-            if(service.Id !=id) return BadRequest();
+            if(serviceDTO == null) return BadRequest();
+            if(serviceDTO.Id !=id) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
-            db.Entry(service).State=Microsoft.EntityFrameworkCore.EntityState.Modified;
-            db.SaveChanges();
+            Service service = new Service()
+            {
+                Id = serviceDTO.Id,
+                Name = serviceDTO.Name,
+                Description = serviceDTO.Description,
+                Image = serviceDTO.Image,
+                QuantityAvailable = serviceDTO.QuantityAvailable,
+                StartDate = serviceDTO.StartDate,
+                price = serviceDTO.price,
+                isDeleted = serviceDTO.isDeleted,
+                categoryId = serviceDTO.categoryId,
+                serviceProviderId = serviceDTO.serviceProviderId
+            };
+            serviceRepo.Edit(service);
+            serviceRepo.Save();
             return NoContent();
 
         }
@@ -108,10 +132,10 @@ namespace Travel_Website_System_API_.Controllers
         [HttpDelete]
         public ActionResult DeleteService(int id) {
         
-         Service service = db.Services.Find(id);
+         Service service = serviceRepo.GetById(id);
             if (service == null) return NotFound();
-            db.Services.Remove(service);
-            db.SaveChanges();
+            serviceRepo.Remove(service); 
+            serviceRepo.Save();
             return Ok(service);
         
         }

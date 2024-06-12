@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
+using Travel_Website_System_API_.Repositories;
+using Travel_Website_System_API_.DTO;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -13,95 +15,129 @@ namespace Travel_Website_System_API_.Controllers
     [ApiController]
     public class PackagesController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
+        GenericRepository<Package> packageRepo;
 
-        public PackagesController(ApplicationDBContext context)
+
+        public PackagesController( GenericRepository<Package> packageRepo)
         {
-            _context = context;
+            this.packageRepo = packageRepo;
         }
 
         // GET: api/Packages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Package>>> GetPackages()
+        public ActionResult GetPackages()
         {
-            return await _context.Packages.ToListAsync();
+          List<Package>packages= packageRepo.GetAll();
+            List<PackageDTO> packageDTOs = new List<PackageDTO>();
+            foreach (Package package in packages)
+            {
+                packageDTOs.Add(new PackageDTO
+                {
+                    Id = package.Id,
+                    Name = package.Name,
+                    Description = package.Description,
+                    Image = package.Image,
+                    QuantityAvailable = package.QuantityAvailable,
+                    Price = package.Price,
+                    isDeleted = package.isDeleted,
+                    startDate = package.startDate,
+                    Duration = package.Duration,
+                    adminId = package.adminId
+                });
+
+            }
+            return Ok(packageDTOs);
+
         }
 
         // GET: api/Packages/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Package>> GetPackage(int id)
+        public ActionResult GetPackageById(int id)
         {
-            var package = await _context.Packages.FindAsync(id);
+            var package = packageRepo.GetById(id);
 
-            if (package == null)
+            if (package == null) return NotFound();
+            else
             {
-                return NotFound();
+                PackageDTO packageDTO = new PackageDTO() {
+                    Id = package.Id,
+                    Name = package.Name,
+                    Description = package.Description,
+                    Image = package.Image,
+                    QuantityAvailable = package.QuantityAvailable,
+                    Price = package.Price,
+                    isDeleted = package.isDeleted,
+                    startDate = package.startDate,
+                    Duration = package.Duration,
+                    adminId = package.adminId
+                };
+                return Ok(packageDTO);
             }
-
-            return package;
         }
 
-        // PUT: api/Packages/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPackage(int id, Package package)
-        {
-            if (id != package.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(package).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PackageExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
 
         // POST: api/Packages
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Package>> PostPackage(Package package)
+        public ActionResult AddPackage(PackageDTO packageDTO)
         {
-            _context.Packages.Add(package);
-            await _context.SaveChangesAsync();
+            if (packageDTO == null) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest();
+            Package package = new Package() {
+                Id = packageDTO.Id,
+                Name = packageDTO.Name,
+                Description = packageDTO.Description,
+                Image = packageDTO.Image,
+                QuantityAvailable = packageDTO.QuantityAvailable,
+                Price = packageDTO.Price,
+                isDeleted = packageDTO.isDeleted,
+                startDate = packageDTO.startDate,
+                Duration = packageDTO.Duration,
+                adminId = packageDTO.adminId
+            };
+            packageRepo.Add(package);
+            packageRepo.Save();
+            // return Ok(packageDTO);
+            return CreatedAtAction("GetPackageById", new { id = package.Id }, packageDTO);
 
-            return CreatedAtAction("GetPackage", new { id = package.Id }, package);
         }
 
-        // DELETE: api/Packages/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePackage(int id)
+
+        // PUT: api/Packages/5
+        [HttpPut("{id}")]
+        public ActionResult EditPackage(int id, PackageDTO packageDTO)
         {
-            var package = await _context.Packages.FindAsync(id);
-            if (package == null)
+            if (packageDTO == null) return BadRequest();
+            if (packageDTO.Id != id) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest();
+            Package package = new Package()
             {
-                return NotFound();
-            }
-
-            _context.Packages.Remove(package);
-            await _context.SaveChangesAsync();
-
+                Id = packageDTO.Id,
+                Name = packageDTO.Name,
+                Description = packageDTO.Description,
+                Image = packageDTO.Image,
+                QuantityAvailable = packageDTO.QuantityAvailable,
+                Price = packageDTO.Price,
+                isDeleted = packageDTO.isDeleted,
+                startDate = packageDTO.startDate,
+                Duration = packageDTO.Duration,
+                adminId = packageDTO.adminId
+            };
+            packageRepo.Edit(package);
+            packageRepo.Save();
             return NoContent();
         }
 
-        private bool PackageExists(int id)
+        
+        // DELETE: api/Packages/5
+        [HttpDelete("{id}")]
+        public IActionResult DeletePackage(int id)
         {
-            return _context.Packages.Any(e => e.Id == id);
+            Package package = packageRepo.GetById(id);
+            if (package == null) return NotFound();
+            packageRepo.Remove(package);
+            packageRepo.Save();
+            return Ok(package);
         }
+
     }
 }

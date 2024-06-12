@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_Website_System_API.Models;
+using Travel_Website_System_API_.Repositories;
+using Travel_Website_System_API_.DTO;
 using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace Travel_Website_System_API_.Controllers
 {
     [Route("api/[controller]")]
@@ -9,19 +13,38 @@ namespace Travel_Website_System_API_.Controllers
     public class ServiceProviderController : ControllerBase
     {
         ApplicationDBContext db;
+        GenericRepository<ServiceProvider> ServProviderRepo;
 
-        public ServiceProviderController(ApplicationDBContext db)
+
+        public ServiceProviderController(ApplicationDBContext db, GenericRepository<ServiceProvider> servProviderRepo)
         {
             this.db = db;
+            this.ServProviderRepo = servProviderRepo;
         }
 
 
 
         //Get All ServiceProviders
         [HttpGet]
-        public List<ServiceProvider> GetServiceProviders()
+        public ActionResult GetServiceProviders()
         {
-            return db.ServiceProviders.ToList();
+            List<ServiceProvider> serviceProviders = ServProviderRepo.GetAll();
+
+            List<ServiceProviderDTO> serviceProvidDTOs = new List<ServiceProviderDTO>();
+            
+            foreach (ServiceProvider serviceProvider in serviceProviders)
+            {
+                serviceProvidDTOs.Add(new ServiceProviderDTO()
+                {
+                        Id = serviceProvider.Id,
+                        Name = serviceProvider.Name,
+                        Description = serviceProvider.Description,
+                        Logo = serviceProvider.Logo,
+                        isDeleted=serviceProvider.isDeleted,
+                        Services=serviceProvider.Services.Select(n=>n.Name).ToList()
+                });
+            }
+            return Ok(serviceProvidDTOs);
         }
 
 
@@ -30,25 +53,36 @@ namespace Travel_Website_System_API_.Controllers
 
         public ActionResult GetById(int id)
         {
-            ServiceProvider SP= db.ServiceProviders.FirstOrDefault(x => x.Id == id);
-            if (SP == null)return NotFound();
-            else return Ok(SP);
+            ServiceProvider serviceProvider = ServProviderRepo.GetById(id);
+            if (serviceProvider == null)return NotFound();
+            else
+            {
+                ServiceProviderDTO serviceProviderDTO = new ServiceProviderDTO() {
+
+                    Id = serviceProvider.Id,
+                    Name = serviceProvider.Name,
+                    Description = serviceProvider.Description,
+                    Logo = serviceProvider.Logo,
+                    isDeleted = serviceProvider.isDeleted,
+                    Services = serviceProvider.Services.Select(n => n.Name).ToList()
+                };
+                return Ok(serviceProviderDTO);
+            }
         }
 
 
-        //Get ServiceProvider By Name
 
         //[HttpGet("/api/SPS/{name}")]
 
-        [HttpGet("{name:alpha}")]
+        //[HttpGet("{name:alpha}")]
 
-        public ActionResult GetByName(string name) {
+        //public ActionResult GetByName(string name) {
 
-            ServiceProvider SP = db.ServiceProviders.FirstOrDefault(x=>x.Name == name);
-            if (SP == null) return NotFound();
-            else return Ok(SP);
+        //    ServiceProvider SP = db.ServiceProviders.FirstOrDefault(x=>x.Name == name);
+        //    if (SP == null) return NotFound();
+        //    else return Ok(SP);
 
-        }
+        //}
 
 
 

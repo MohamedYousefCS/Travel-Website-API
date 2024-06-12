@@ -9,6 +9,8 @@ using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO.PaymentClasses;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.UnitWork;
+using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
+
 
 namespace Travel_Website_System_API_
 {
@@ -55,9 +57,13 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
             builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+            builder.Services.AddScoped<GenericRepository<Service>>();
+            builder.Services.AddScoped<GenericRepository<Package>>();
+            builder.Services.AddScoped<GenericRepository<ServiceProvider>>();
+
             //[Authorize] used JWT token in check authentication 
             // JWT Authentication configuration
-           
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

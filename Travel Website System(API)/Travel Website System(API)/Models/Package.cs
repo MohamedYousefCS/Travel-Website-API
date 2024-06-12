@@ -14,7 +14,7 @@ namespace Travel_Website_System_API.Models
         public string Name { get; set; }
         public string? Description { get; set; }
         public string? Image { get; set; }
-        public int? QuantityAvailable { get; set; } = 4;
+        public int? QuantityAvailable { get; set; }
         public decimal? Price { get; set; }
         public bool isDeleted { get; set; }
         public DateTime? startDate { get; set; }
