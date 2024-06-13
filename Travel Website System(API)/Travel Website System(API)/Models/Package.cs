@@ -31,5 +31,6 @@ namespace Travel_Website_System_API.Models
         [InverseProperty("packages")]
         public virtual ICollection<Service> services { get; set; } = new List<Service>();
         // signalR commit test
+        // fffffffffffff
     }
 }
