@@ -12,6 +12,7 @@ namespace Travel_Website_System_API.Models
    
     public class ApplicationUser : IdentityUser
     {
+
         public string Fname { get; set; }
         public string Lname { get; set; }
         public string Gender { get; set; }
@@ -23,6 +24,8 @@ namespace Travel_Website_System_API.Models
 
         public CustomerService? customerService { get; set; }
 
+        //for chat signalR
+        public ICollection<Message> Messages { get; set; }
 
         public override string UserName
         {

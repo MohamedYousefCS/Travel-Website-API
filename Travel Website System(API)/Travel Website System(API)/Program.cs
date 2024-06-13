@@ -1,5 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO.PaymentClasses;
+using Travel_Website_System_API_.Hubs;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.UnitWork;
 using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
@@ -41,7 +44,7 @@ namespace Travel_Website_System_API_
             //})
             //);
 
-            builder.Services.AddDbContext<ApplicationDBContext>(op=>op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+            builder.Services.AddDbContext<ApplicationDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
             builder.Services.Configure<PayPalSettings>(builder.Configuration.GetSection("PayPal"));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -123,18 +126,77 @@ namespace Travel_Website_System_API_
             app.UseRouting();
 
             app.UseAuthentication();//check JWT token
-           
+
             app.UseAuthorization();
             app.MapControllers();
             app.UseStaticFiles();
-           
-           
-
-
             app.Run();
+
         }
 
+
+        // signalR Configuration
+        public IConfiguration Configuration { get; }
+
+        public Program(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Add SignalR services
+            services.AddSignalR();
+
+            // other services like Identity, DbContext
+            services.AddDbContext<ApplicationDBContext>(options =>
+               options.UseSqlServer(Configuration.GetConnectionString("Data Source=.;Initial Catalog=Traveling;Integrated Security=True;TrustServerCertificate=True")));
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+               .AddEntityFrameworkStores<ApplicationDBContext>()
+               .AddDefaultTokenProviders();
+
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            // Middleware for handling authentication and authorization
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            // Configure SignalR
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+            });
+
+        }
+
+
     }
-            
-    }
+
+}
+
+
 

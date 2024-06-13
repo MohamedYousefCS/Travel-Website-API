@@ -11,6 +11,10 @@ namespace Travel_Website_System_API.Models
     public class Message
     {
         public int Id { get; set; }
+
+        //for chat
+        public string SSN { get; set; }
+
         public string status { get; set; }
         public string sender { get; set; }
         public bool isDeleted { get; set; }
@@ -18,5 +22,9 @@ namespace Travel_Website_System_API.Models
         [ForeignKey("Chat")]
         public int? chatId { get; set; }
         public virtual Chat Chat { get; set; }
+
+        //for chat
+        [ForeignKey(nameof(SSN))]
+        public ApplicationUser User { get; set; } // Navigation property to ApplicationUser
     }
 }

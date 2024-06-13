@@ -481,6 +481,9 @@ namespace Travel_Website_System_API_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("SSN")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("chatId")
                         .HasColumnType("int");
 
@@ -494,6 +497,8 @@ namespace Travel_Website_System_API_.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SSN");
 
                     b.HasIndex("chatId");
 
@@ -836,11 +841,17 @@ namespace Travel_Website_System_API_.Migrations
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Message", b =>
                 {
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "User")
+                        .WithMany("Messages")
+                        .HasForeignKey("SSN");
+
                     b.HasOne("Travel_Website_System_API.Models.Chat", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("chatId");
 
                     b.Navigation("Chat");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Package", b =>
@@ -890,6 +901,8 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Admin");
+
+                    b.Navigation("Messages");
 
                     b.Navigation("client");
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Travel_Website_System_API_.Migrations
 {
     /// <inheritdoc />
-    public partial class creatdatabase : Migration
+    public partial class createdatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -470,6 +470,7 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    SSN = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     sender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -478,6 +479,11 @@ namespace Travel_Website_System_API_.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_AspNetUsers_SSN",
+                        column: x => x.SSN,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Messages_Chats_chatId",
                         column: x => x.chatId,
@@ -610,6 +616,11 @@ namespace Travel_Website_System_API_.Migrations
                 name: "IX_Messages_chatId",
                 table: "Messages",
                 column: "chatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_SSN",
+                table: "Messages",
+                column: "SSN");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Packages_adminId",
