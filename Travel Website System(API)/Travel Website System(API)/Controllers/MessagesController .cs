@@ -31,6 +31,8 @@ namespace Travel_Website_System_API_.Controllers
             await _hubContext.Clients.User(notification.User).SendAsync("ReceiveNotification", notification.Content);
             return Ok();
         }
+
+
     }
 
    
