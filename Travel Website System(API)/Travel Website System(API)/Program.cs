@@ -52,10 +52,12 @@ namespace Travel_Website_System_API_
              .AddEntityFrameworkStores<ApplicationDBContext>()
              .AddDefaultTokenProviders();
 
+            builder.Services.AddScoped<UserRepo>();
             builder.Services.AddScoped<IGenericRepo<Client>, GenericRepo<Client>>();
             builder.Services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
             builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
             builder.Services.AddScoped<IEmailSender, EmailSender>();
+
 
             builder.Services.AddScoped<GenericRepository<Service>>();
             builder.Services.AddScoped<GenericRepository<Package>>();
