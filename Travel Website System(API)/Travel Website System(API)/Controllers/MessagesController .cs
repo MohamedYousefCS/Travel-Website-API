@@ -32,6 +32,17 @@ namespace Travel_Website_System_API_.Controllers
             return Ok();
         }
 
+        [HttpGet("GetMessages")]
+        public IActionResult GetMessages()
+        {
+            // This method should retrieve messages from your database
+            // Return a list of messages
+            var messages = new List<MessageDto> {
+            new MessageDto { User = "User1", Content = "Hello" },
+            new MessageDto { User = "User2", Content = "Hi there!" }
+        };
+            return Ok(messages);
+        }
 
     }
 

@@ -8,8 +8,9 @@
         // Method to broadcast messages to all connected clients
         public async Task SendMessage(string user, string message)
         {
-            // Clients.All.SendAsync("ReceiveMessage", user, message);
-            // Uncomment the above line if you want to send the message to all clients including the sender.
+            // send the message to all clients including the sender.
+
+            Clients.All.SendAsync("ReceiveMessage", user, message);
 
             // Send the message to all clients except the sender
             await Clients.Others.SendAsync("ReceiveMessage", user, message);
@@ -17,13 +18,19 @@
 
         public override async Task OnConnectedAsync()
         {
-            // Implement your logic when a client connects
+            // Example: Notify all clients about the new connection
+            string user = Context.User.Identity.Name; // Get the username or identifier of the connected user
+            await Clients.All.SendAsync("UserConnected", user);
+
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            // Implement your logic when a client disconnects
+            // Example: Notify all clients about the disconnection
+            string user = Context.User.Identity.Name; // Get the username or identifier of the disconnected user
+            await Clients.All.SendAsync("UserDisconnected", user);
+
             await base.OnDisconnectedAsync(exception);
         }
         public async Task NotifyUser(string user, string message)
