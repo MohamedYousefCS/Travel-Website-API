@@ -77,7 +77,7 @@ namespace Travel_Website_System_API_
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
-            app.UseStaticFiles();
+            app.UseStaticFiles();//  for www
             app.UseRouting();
             app.UseAuthorization();
             app.MapControllers();
