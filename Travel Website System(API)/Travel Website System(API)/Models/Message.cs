@@ -12,8 +12,6 @@ namespace Travel_Website_System_API.Models
     {
         public int Id { get; set; }
 
-        //for chat
-        public string SSN { get; set; }
 
         public string status { get; set; }
         public string sender { get; set; }
@@ -23,8 +21,13 @@ namespace Travel_Website_System_API.Models
         public int? chatId { get; set; }
         public virtual Chat Chat { get; set; }
 
-        //for chat
-        [ForeignKey(nameof(SSN))]
+        //for chat signalr
+        [ForeignKey(nameof(Id))]
         public ApplicationUser User { get; set; } // Navigation property to ApplicationUser
+
+        public object Timestamp { get;  set; }
+        public string Content { get;  set; }
+        ///        //for chat signalr
+
     }
 }
