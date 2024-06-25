@@ -9,6 +9,7 @@ using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.DTO;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -120,6 +121,8 @@ namespace Travel_Website_System_API_.Controllers
         [HttpPut("{id}")]
         public ActionResult EditPackage(int id, PackageDTO packageDTO)
         {
+           // var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (userId !=packageDTO.adminId) return BadRequest("this admin can not update this Package");
             if (packageDTO == null) return BadRequest();
             if (packageDTO.Id != id) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
