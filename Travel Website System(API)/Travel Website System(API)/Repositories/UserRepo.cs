@@ -56,12 +56,17 @@ namespace Travel_Website_System_API_.Repositories
                       .Select(c => c.ApplicationUser)
                       .ToList();
         }
-       
 
-        public List<CustomerService> GetAllcustomerServices()
+
+        public List<ApplicationUser> GetAllcustomerServices()
         {
-            return _db.CustomerServices.ToList();
+            return _db.CustomerServices
+                      .Include(cus => cus.ApplicationUser)
+                      .Select(cus => cus.ApplicationUser)
+                      .ToList();
         }
+
+
 
         public new void SoftDelete(string id)
         {

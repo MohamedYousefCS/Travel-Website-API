@@ -90,6 +90,21 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
+
+        [HttpGet("customerService")]
+        [Authorize(Roles = "superAdmin")]
+        public ActionResult<IEnumerable<Admin>> GetCustomerServices()
+        {
+            var cus = _userRepo.GetAllcustomerServices();
+            if (cus == null || !cus.Any())
+            {
+                return NotFound(new { message = "No customer services found" });
+            }
+            return Ok(cus);
+        }
+
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ApplicationUser>> GetUserDetails(string id)
         {
