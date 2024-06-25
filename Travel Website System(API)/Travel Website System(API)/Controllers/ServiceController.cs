@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
@@ -8,6 +9,9 @@ namespace Travel_Website_System_API_.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+    //[Authorize(Roles = "superAdmin, admin")]
+
     public class ServiceController : ControllerBase
     {
 
@@ -112,8 +116,6 @@ namespace Travel_Website_System_API_.Controllers
             serviceRepo.Add(service);
             serviceRepo.Save();
             return Ok(serviceDTO);
-
-
 
         }
 

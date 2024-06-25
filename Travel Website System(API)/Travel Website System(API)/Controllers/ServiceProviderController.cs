@@ -5,11 +5,15 @@ using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.DTO;
 using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Travel_Website_System_API_.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+   // [Authorize(Roles = "superAdmin, admin")]
+
     public class ServiceProviderController : ControllerBase
     {
         ApplicationDBContext db;
