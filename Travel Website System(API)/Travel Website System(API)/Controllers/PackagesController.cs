@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -25,10 +26,12 @@ namespace Travel_Website_System_API_.Controllers
 
         // GET: api/Packages
         [HttpGet]
-        public ActionResult GetPackages()
+        public ActionResult GetPackages(int pageNumber = 1, int pageSize = 10)
         {
-          List<Package>packages= packageRepo.GetAll();
+            List<Package> packages = packageRepo.GetAllWithPaginiation(pageNumber, pageSize);
+            int totalPackages = packageRepo.GetTotalCount();
             List<PackageDTO> packageDTOs = new List<PackageDTO>();
+
             foreach (Package package in packages)
             {
                 packageDTOs.Add(new PackageDTO
@@ -44,11 +47,20 @@ namespace Travel_Website_System_API_.Controllers
                     Duration = package.Duration,
                     adminId = package.adminId
                 });
-
             }
-            return Ok(packageDTOs);
 
+            var response = new PaginatedResponse<PackageDTO>
+            {
+                TotalCount = totalPackages,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Data = packageDTOs
+            };
+
+            return Ok(response);
         }
+
+
 
         // GET: api/Packages/5
         [HttpGet("{id}")]
@@ -77,6 +89,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // POST: api/Packages
+        [Authorize(Roles = "superAdmin, admin")]
         [HttpPost]
         public ActionResult AddPackage(PackageDTO packageDTO)
         {
@@ -103,6 +116,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // PUT: api/Packages/5
+        [Authorize(Roles = "superAdmin, admin")]
         [HttpPut("{id}")]
         public ActionResult EditPackage(int id, PackageDTO packageDTO)
         {
@@ -127,8 +141,9 @@ namespace Travel_Website_System_API_.Controllers
             return NoContent();
         }
 
-        
+
         // DELETE: api/Packages/5
+        [Authorize(Roles = "superAdmin, admin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePackage(int id)
         {
