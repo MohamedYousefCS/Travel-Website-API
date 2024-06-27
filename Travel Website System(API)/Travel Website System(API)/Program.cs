@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Website_System_API.Models;
@@ -92,6 +93,31 @@ namespace Travel_Website_System_API_
             });
 
 
+            builder.Services.AddAuthentication()
+            .AddGoogle(options =>
+            {
+                IConfigurationSection googleAuthNSection =
+                   builder.Configuration.GetSection("Authentication:Google");
+
+                options.ClientId = googleAuthNSection["ClientId"];
+                options.ClientSecret = googleAuthNSection["ClientSecret"];
+            })
+            .AddFacebook(options =>
+            {
+                IConfigurationSection fbAuthNSection =
+                    builder.Configuration.GetSection("Authentication:Facebook");
+
+                options.AppId = fbAuthNSection["AppId"];
+                options.AppSecret = fbAuthNSection["AppSecret"];
+            })
+            .AddTwitter(options =>
+            {
+                IConfigurationSection twitterAuthNSection =
+                    builder.Configuration.GetSection("Authentication:Twitter");
+
+                options.ConsumerKey = twitterAuthNSection["ConsumerKey"];
+                options.ConsumerSecret = twitterAuthNSection["ConsumerSecret"];
+            });
 
 
             var app = builder.Build();

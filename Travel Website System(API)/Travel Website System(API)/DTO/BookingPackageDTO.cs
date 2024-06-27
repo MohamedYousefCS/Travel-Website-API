@@ -6,8 +6,8 @@ namespace Travel_Website_System_API_.DTO
     // in Dto i can have only properties which i need from model and i can add another properties which i need in uI
     public class BookingPackageDTO
     {
-        [Key]
-        public int BookingPackageId { get; set; }
+       /* [Key]
+        public int BookingPackageId { get; set; }*/
 
         [Column(TypeName = "date")]
         public DateTime? Date { get; set; }
