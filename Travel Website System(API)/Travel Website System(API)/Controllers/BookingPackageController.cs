@@ -80,7 +80,7 @@ namespace Travel_Website_System_API_.Controllers
            // var clientName = bookingPackage.client?.user?.Fname ?? "Unknown";
             var bookingPackageDTO = new BookingPackageDTO
             {
-                BookingPackageId = bookingPackage.Id,
+               // BookingPackageId = bookingPackage.Id,
                 Date = bookingPackage.Data,
                 quantity = bookingPackage.quantity,
                 clientId = bookingPackage.clientId,
