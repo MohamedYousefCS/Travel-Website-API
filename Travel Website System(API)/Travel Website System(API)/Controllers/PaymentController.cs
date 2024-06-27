@@ -59,8 +59,8 @@ namespace Travel_Website_System_API_.Controllers
                 ApplicationContext = new ApplicationContext
                 {
                     // Replace with your actual return and cancel URLs
-                    ReturnUrl = "http://localhost:5200/api/Payment/capture",// approval url
-                    CancelUrl = "http://localhost:5200/api/Payment/cancel"
+                    ReturnUrl = "http://localhost:5141/api/Payment/capture",// approval url
+                    CancelUrl = "http://localhost:5141/api/Payment/cancel"
                 }
             });
 

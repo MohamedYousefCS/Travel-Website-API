@@ -40,7 +40,7 @@ namespace Travel_Website_System_API_.Controllers
             // when adding bookingService object the quantity is increased by 1 and the available quantity for the service will be decreased by 1
             bookingServiceDTO.Quantity = unitOFWork.BookingServiceRepo.GetAll()
                 .Count(s=>s.serviceId ==bookingServiceDTO.ServiceId)+1;
-            bookingServiceDTO.allowingTime = DateTime.Now.AddDays(20);// will be added by admin 
+            bookingServiceDTO.allowingTime = DateTime.Now.AddDays(service.BookingTimeAllowed ?? 0 );// will be added by admin 
             bookingServiceDTO.Date = DateTime.Now;
             var bookingService = new BookingService(){ 
                 Id = bookingServiceDTO.BookingServiceId,

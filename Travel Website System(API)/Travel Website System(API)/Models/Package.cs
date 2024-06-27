@@ -14,11 +14,12 @@ namespace Travel_Website_System_API.Models
         public string Name { get; set; }
         public string? Description { get; set; }
         public string? Image { get; set; }
-        public int? QuantityAvailable { get; set; } = 4;
+        public int? QuantityAvailable { get; set; }
         public decimal? Price { get; set; }
         public bool isDeleted { get; set; }
         public DateTime? startDate { get; set; }
         public int? Duration { get; set; }
+        public int ?BookingTimeAllowed { get; set; }
 
         public virtual ICollection<BookingPackage> BookingPackages { get; set; } = new HashSet<BookingPackage>();
         public virtual ICollection<LovePackage> LovePackages { get; set; } = new HashSet<LovePackage>();

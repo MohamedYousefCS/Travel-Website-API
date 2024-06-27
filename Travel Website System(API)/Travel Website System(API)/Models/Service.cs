@@ -19,7 +19,8 @@ namespace Travel_Website_System_API.Models
         public DateTime? StartDate { get; set; }
         public decimal? price { get; set; }
         public bool? isDeleted { get; set; }
-     
+        public int ? BookingTimeAllowed { get; set; }
+
         public virtual ICollection<BookingService> BookingServices { get; set; } = new HashSet<BookingService>();
 
         public virtual ICollection<LoveService> LoveServices { get; set; } = new HashSet<LoveService>();

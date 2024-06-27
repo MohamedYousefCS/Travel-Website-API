@@ -23,7 +23,6 @@ namespace Travel_Website_System_API_.Controllers
         // i will try by adding with DTO
         [HttpPost]
         [Consumes("application/json")]
-        // public ActionResult Add([FromBody]BookingPackage bookingPackage )
         public ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
             if(ModelState.IsValid)
             {
@@ -41,7 +40,8 @@ namespace Travel_Website_System_API_.Controllers
                     return BadRequest("this package is not availabe now ");
                 }
                 bookingPackageDTO.Date = DateTime.Now;
-                bookingPackageDTO.allowingTime = DateTime.Now.AddDays(20);
+                // bookingPackageDTO.allowingTime = DateTime.Now.AddDays(20);
+                bookingPackageDTO.allowingTime = DateTime.Now.AddDays(package.BookingTimeAllowed ??0);
                 //  count the number of bookings for the specified package
                 var bookingCountForPackage = unitOFWork.db.BookingPackages.Count(bp => bp.packageId == bookingPackageDTO.packageId);
                 bookingPackageDTO.quantity = bookingCountForPackage + 1;
@@ -60,7 +60,7 @@ namespace Travel_Website_System_API_.Controllers
                 unitOFWork.db.Packages.Update(package);
                 unitOFWork.save();
                 // will return object in response where i can get it id in ui to pass it in payment
-                return CreatedAtAction(nameof(GetBookingPackageById), new { id = bookingPackage.packageId }, bookingPackage);
+                return CreatedAtAction(nameof(GetBookingPackageById), new { id = bookingPackage.packageId }, bookingPackageDTO);
                 // i returned bookingPackage not dto as when i returned dto the booking id was =0 and not changed 
             }
             else
