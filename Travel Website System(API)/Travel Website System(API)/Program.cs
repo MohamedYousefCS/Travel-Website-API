@@ -65,6 +65,9 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<GenericRepository<ServiceProvider>>();
             builder.Services.AddScoped<GenericRepository<LoveService>>();
             builder.Services.AddScoped<GenericRepository<LovePackage>>();
+            builder.Services.AddScoped<GenericRepository<Category>>();
+
+
 
 
             //[Authorize] used JWT token in check authentication 
