@@ -16,6 +16,7 @@ namespace Travel_Website_System_API.Models
         [ForeignKey("ApplicationUser")]
         public string Id { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
+
     }
 
 }

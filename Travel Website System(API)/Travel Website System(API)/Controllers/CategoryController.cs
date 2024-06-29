@@ -1,27 +1,36 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
+using Travel_Website_System_API_.Repositories;
 
 namespace Travel_Website_System_API_.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+    //[Authorize(Roles = "superAdmin, admin")]
+
     public class CategoryController : ControllerBase
     {
 
         ApplicationDBContext db;
 
-        public CategoryController(ApplicationDBContext db)
+        GenericRepository<Category> categortRepo;
+
+
+        public CategoryController(ApplicationDBContext db,GenericRepository<Category> CategoryRepo)
         {
             this.db = db;
+            this.categortRepo = CategoryRepo;
         }
 
         [HttpGet]
 
-        public ActionResult GetAllCategory() {
-        
-            List<Category> categories = db.Categories.ToList();
+        public ActionResult GetAllCategory()
+        {
+            List<Category> categories = categortRepo.GetAll();
 
             List<CategoryDTO> categoryDTOs = new List<CategoryDTO>();
 
@@ -33,9 +42,8 @@ namespace Travel_Website_System_API_.Controllers
                     Name = category.Name,
                     Description = category.Description,
                     IsDeleted = category.IsDeleted,
-                    Services = category.Services,
+                    ServiceNames = category.Services.Select(s => s.Name).ToList() // Add this line
                 });
-                
             }
 
             return Ok(categoryDTOs);
@@ -45,9 +53,22 @@ namespace Travel_Website_System_API_.Controllers
 
         public ActionResult GetCategoryById(int id) {
 
-            Category category = db.Categories.Find(id);
+            Category category = categortRepo.GetById(id);
             if(category == null) return NotFound();
-            else return Ok(category);
+            else
+            {
+                CategoryDTO categoryDTO = new CategoryDTO()
+                {
+                    Id = category.Id,
+                    Name = category.Name,
+                    Description = category.Description,
+                    IsDeleted = category.IsDeleted,
+                    ServiceNames = category.Services.Select(s => s.Name).ToList() // Add this line
+
+                };
+                return Ok(categoryDTO);
+
+            }
         }
 
         [HttpGet("{name:alpha}")]
@@ -61,23 +82,36 @@ namespace Travel_Website_System_API_.Controllers
 
         [HttpPost]
 
-        public ActionResult AddCategory(Category category) {
-            if(category == null) return BadRequest();
+        public ActionResult AddCategory(CategoryDTO categoryDTO) {
+            if(categoryDTO == null) return BadRequest();
             if(!ModelState.IsValid) return BadRequest();
-            db.Categories.Add(category);
-            db.SaveChanges();
+            Category category = new Category() {
+            Name= categoryDTO.Name,
+            Description= categoryDTO.Description,
+            IsDeleted=categoryDTO.IsDeleted,
+            };
+            categortRepo.Add(category);
+            categortRepo.Save();
+          
             return CreatedAtAction("GetCategoryById", new {id=category.Id},category);
         
         }
 
         [HttpPut("{id}")]
 
-        public ActionResult EditCategory(Category category,int id) { 
-            if (category == null) return BadRequest();
+        public ActionResult EditCategory(CategoryDTO categoryDTO,int id) { 
+            if (categoryDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
-            if(category.Id != id) return BadRequest();
-            db.Entry(category).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            db.SaveChanges();
+            if(categoryDTO.Id != id) return BadRequest();
+            Category category = new Category()
+            {
+                Name = categoryDTO.Name,
+                Description = categoryDTO.Description,
+                IsDeleted = categoryDTO.IsDeleted,
+
+            };
+            categortRepo.Edit(category);
+            categortRepo.Save();
             return NoContent();
             
         }
@@ -86,10 +120,10 @@ namespace Travel_Website_System_API_.Controllers
 
         public ActionResult DeleteCategory(int id)
         {
-            Category category = db.Categories.Find(id);
+            Category category =categortRepo.GetById(id);
             if(category == null) return NotFound();
-            db.Categories.Remove(category);
-            db.SaveChanges();
+           categortRepo.Remove(category);
+            categortRepo.Save();
             return Ok(category);
         }
 

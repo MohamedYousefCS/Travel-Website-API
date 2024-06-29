@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
@@ -8,6 +9,9 @@ namespace Travel_Website_System_API_.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+    //[Authorize(Roles = "superAdmin, admin")]
+
     public class ServiceController : ControllerBase
     {
 
@@ -22,15 +26,18 @@ namespace Travel_Website_System_API_.Controllers
 
         [HttpGet]
         //[Produces("application/json")]
-        public ActionResult GetAllServices()
+        public ActionResult GetAllServices(int pageNumber = 1, int pageSize = 10)
         {
-            List<Service> services = serviceRepo.GetAll();
+            List<Service> services = serviceRepo.GetAllWithPagination(pageNumber, pageSize);
+            int totalServices = serviceRepo.GetTotalCount();
 
             List<ServiceDTO> servicesDTO = new List<ServiceDTO>();
 
-            foreach (var service in services) {
+            foreach (var service in services)
+            {
 
-                servicesDTO.Add(new ServiceDTO {
+                servicesDTO.Add(new ServiceDTO
+                {
 
                     Id = service.Id,
                     Name = service.Name,
@@ -44,10 +51,21 @@ namespace Travel_Website_System_API_.Controllers
                     serviceProviderId = service.serviceProviderId,
 
                 });
-            
-            
+
+
             }
-            return Ok(servicesDTO);
+
+            var response = new PaginatedResponse<ServiceDTO>
+            {
+                TotalCount = totalServices,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Data = servicesDTO
+            };
+
+            return Ok(response);
+
+
 
         }
 
@@ -84,7 +102,7 @@ namespace Travel_Website_System_API_.Controllers
             if (serviceDTO == null) return BadRequest();
             if(!ModelState.IsValid) return BadRequest();
             Service service=new Service() { 
-            Id= serviceDTO.Id,
+            //Id= serviceDTO.Id,
             Name = serviceDTO.Name,
             Description = serviceDTO.Description,
             Image= serviceDTO.Image,
@@ -98,8 +116,6 @@ namespace Travel_Website_System_API_.Controllers
             serviceRepo.Add(service);
             serviceRepo.Save();
             return Ok(serviceDTO);
-
-
 
         }
 
@@ -134,7 +150,16 @@ namespace Travel_Website_System_API_.Controllers
         
          Service service = serviceRepo.GetById(id);
             if (service == null) return NotFound();
-            serviceRepo.Remove(service); 
+            if(service.QuantityAvailable==0)
+            {
+                service.isDeleted=true;
+                serviceRepo.Edit(service);
+            }
+            else
+            {
+                serviceRepo.Remove(service);
+
+            }
             serviceRepo.Save();
             return Ok(service);
         
