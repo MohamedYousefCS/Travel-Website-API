@@ -33,6 +33,15 @@ namespace Travel_Website_System_API.Models
             set => base.UserName = Email;
         }
 
+
+        //for chat signalR
+
+        public object ProfilePictureUrl { get;  set; }
+
+        public string Status { get;  set; }
+        public DateTime LastSeen { get;  set; }
+        public ApplicationUser User { get;  set; }
+        //////////////
     }
 }
 

@@ -144,7 +144,7 @@ namespace Travel_Website_System_API_
         }
 
 
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services , IApplicationBuilder app)
         {
             // Add SignalR services
             services.AddSignalR();

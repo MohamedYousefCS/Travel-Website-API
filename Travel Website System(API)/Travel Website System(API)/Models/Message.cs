@@ -14,7 +14,7 @@ namespace Travel_Website_System_API.Models
 
 
         public string status { get; set; }
-        public string sender { get; set; }
+        public virtual ApplicationUser Sender { get; set; }
         public bool isDeleted { get; set; }
 
         [ForeignKey("Chat")]
@@ -27,6 +27,9 @@ namespace Travel_Website_System_API.Models
 
         public object Timestamp { get;  set; }
         public string Content { get;  set; }
+        public bool IsRead { get;  set; }
+        public virtual ApplicationUser Receiver { get;  set; }
+        
         ///        //for chat signalr
 
     }
