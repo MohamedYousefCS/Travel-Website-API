@@ -26,7 +26,7 @@ namespace Travel_Website_System_API_.Controllers
             if (!ModelState.IsValid) return BadRequest();
             LoveService loveservice = new LoveService()
             {
-                Id =loveserviceDTO.Id,
+                //Id =loveserviceDTO.Id,
                 date = DateTime.Now,
                 IsDeleted = loveserviceDTO.IsDeleted,
                 clientId=loveserviceDTO.clientId,

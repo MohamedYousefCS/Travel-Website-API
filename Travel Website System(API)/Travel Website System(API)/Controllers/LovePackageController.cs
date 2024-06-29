@@ -24,7 +24,7 @@ namespace Travel_Website_System_API_.Controllers
             if (!ModelState.IsValid) return BadRequest();
             LovePackage lovePackage = new LovePackage()
             {
-                Id = lovePackageDTO.Id,
+                //Id = lovePackageDTO.Id,
                 date = DateTime.Now,
                 IsDeleted = lovePackageDTO.IsDeleted,
                 clientId = lovePackageDTO.clientId,

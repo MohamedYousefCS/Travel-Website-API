@@ -29,7 +29,7 @@ namespace Travel_Website_System_API_.Controllers
         [HttpGet]
         public ActionResult GetPackages(int pageNumber = 1, int pageSize = 10)
         {
-            List<Package> packages = packageRepo.GetAllWithPaginiation(pageNumber, pageSize);
+            List<Package> packages = packageRepo.GetAllWithPagination(pageNumber, pageSize);
             int totalPackages = packageRepo.GetTotalCount();
             List<PackageDTO> packageDTOs = new List<PackageDTO>();
 
@@ -46,7 +46,9 @@ namespace Travel_Website_System_API_.Controllers
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
-                    adminId = package.adminId
+                    adminId = package.adminId,
+                    ServiceNames = package.services.Select(s => s.Name).ToList() // Include service names
+
                 });
             }
 
@@ -82,7 +84,9 @@ namespace Travel_Website_System_API_.Controllers
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
-                    adminId = package.adminId
+                    adminId = package.adminId,
+                    ServiceNames = package.services.Select(s => s.Name).ToList() // Include service names
+
                 };
                 return Ok(packageDTO);
             }
@@ -97,7 +101,7 @@ namespace Travel_Website_System_API_.Controllers
             if (packageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
             Package package = new Package() {
-                Id = packageDTO.Id,
+                //Id = packageDTO.Id,
                 Name = packageDTO.Name,
                 Description = packageDTO.Description,
                 Image = packageDTO.Image,
@@ -146,16 +150,27 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // DELETE: api/Packages/5
-        [Authorize(Roles = "superAdmin, admin")]
+        //[Authorize(Roles = "superAdmin, admin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePackage(int id)
         {
             Package package = packageRepo.GetById(id);
             if (package == null) return NotFound();
-            packageRepo.Remove(package);
+
+            if (package.QuantityAvailable == 0)
+            {
+                package.isDeleted = true;
+                packageRepo.Edit(package); 
+            }
+            else
+            {
+                packageRepo.Remove(package);
+            }
+
             packageRepo.Save();
             return Ok(package);
         }
+
 
     }
 }

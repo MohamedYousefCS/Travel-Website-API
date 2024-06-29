@@ -28,7 +28,7 @@ namespace Travel_Website_System_API_.Controllers
         //[Produces("application/json")]
         public ActionResult GetAllServices(int pageNumber = 1, int pageSize = 10)
         {
-            List<Service> services = serviceRepo.GetAllWithPaginiation(pageNumber, pageSize);
+            List<Service> services = serviceRepo.GetAllWithPagination(pageNumber, pageSize);
             int totalServices = serviceRepo.GetTotalCount();
 
             List<ServiceDTO> servicesDTO = new List<ServiceDTO>();
@@ -102,7 +102,7 @@ namespace Travel_Website_System_API_.Controllers
             if (serviceDTO == null) return BadRequest();
             if(!ModelState.IsValid) return BadRequest();
             Service service=new Service() { 
-            Id= serviceDTO.Id,
+            //Id= serviceDTO.Id,
             Name = serviceDTO.Name,
             Description = serviceDTO.Description,
             Image= serviceDTO.Image,
@@ -150,7 +150,16 @@ namespace Travel_Website_System_API_.Controllers
         
          Service service = serviceRepo.GetById(id);
             if (service == null) return NotFound();
-            serviceRepo.Remove(service); 
+            if(service.QuantityAvailable==0)
+            {
+                service.isDeleted=true;
+                serviceRepo.Edit(service);
+            }
+            else
+            {
+                serviceRepo.Remove(service);
+
+            }
             serviceRepo.Save();
             return Ok(service);
         
