@@ -106,7 +106,7 @@ namespace Travel_Website_System_API_.Controllers
             if (!ModelState.IsValid) return BadRequest("Please Enter Vaild Data");
             ServiceProvider serviceProvider = new ServiceProvider()
             {
-                Id = serviceProviderDTO.Id,
+                //Id = serviceProviderDTO.Id,
                 Name= serviceProviderDTO.Name,
                 Description = serviceProviderDTO.Description,
                 Logo = serviceProviderDTO.Logo,

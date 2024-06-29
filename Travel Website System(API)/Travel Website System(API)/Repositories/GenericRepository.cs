@@ -20,13 +20,15 @@ namespace Travel_Website_System_API_.Repositories
         }
 
 
-        public List<TEntity> GetAllWithPaginiation(int pageNumber, int pageSize)
+        public List<TEntity> GetAllWithPagination(int pageNumber, int pageSize)
         {
             return db.Set<TEntity>()
+                     .Where(e => EF.Property<bool>(e, "isDeleted") == false)
                      .Skip((pageNumber - 1) * pageSize)
                      .Take(pageSize)
                      .ToList();
         }
+
 
         public int GetTotalCount()
         {
