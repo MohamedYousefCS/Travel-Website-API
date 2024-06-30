@@ -17,7 +17,7 @@ namespace Travel_Website_System_API_.DTO
         public int? Duration { get; set; }
         public string? adminId { get; set; }
 
-        public List<string> ServiceNames { get; set; }
+        public List<string> ServiceNames { get; set; } = new List<string>(); // Initialize the list
 
 
 

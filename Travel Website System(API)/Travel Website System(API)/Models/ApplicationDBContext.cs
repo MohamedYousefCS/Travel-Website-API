@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Travel_Website_System_API_.Models;
 
 namespace Travel_Website_System_API.Models
 {
@@ -30,8 +31,28 @@ namespace Travel_Website_System_API.Models
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<ServiceProvider> ServiceProviders { get; set; }
 
+        public virtual DbSet<PackageService> PackageService { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<PackageService>()
+                .HasKey(ps => new { ps.PackageId, ps.ServiceId });
+
+            modelBuilder.Entity<PackageService>()
+                .HasOne(ps => ps.Package)
+                .WithMany(p => p.PackageServices)
+                .HasForeignKey(ps => ps.PackageId);
+
+            modelBuilder.Entity<PackageService>()
+                .HasOne(ps => ps.Service)
+                .WithMany(s => s.PackageServices)
+                .HasForeignKey(ps => ps.ServiceId);
+
+            modelBuilder.Entity<PackageService>()
+                .Property(ps => ps.AddedOn)
+                .HasDefaultValueSql("GETDATE()");
+
             base.OnModelCreating(modelBuilder);
         }
     }

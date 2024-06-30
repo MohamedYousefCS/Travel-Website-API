@@ -444,21 +444,22 @@ namespace Travel_Website_System_API_.Migrations
                 name: "PackageService",
                 columns: table => new
                 {
-                    packageId = table.Column<int>(type: "int", nullable: false),
-                    servicesId = table.Column<int>(type: "int", nullable: false)
+                    PackageId = table.Column<int>(type: "int", nullable: false),
+                    ServiceId = table.Column<int>(type: "int", nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PackageService", x => new { x.packageId, x.servicesId });
+                    table.PrimaryKey("PK_PackageService", x => new { x.PackageId, x.ServiceId });
                     table.ForeignKey(
-                        name: "FK_PackageService_Packages_packageId",
-                        column: x => x.packageId,
+                        name: "FK_PackageService_Packages_PackageId",
+                        column: x => x.PackageId,
                         principalTable: "Packages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PackageService_Services_servicesId",
-                        column: x => x.servicesId,
+                        name: "FK_PackageService_Services_ServiceId",
+                        column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -617,9 +618,9 @@ namespace Travel_Website_System_API_.Migrations
                 column: "adminId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PackageService_servicesId",
+                name: "IX_PackageService_ServiceId",
                 table: "PackageService",
-                column: "servicesId");
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_BookingPackageId",

@@ -34,10 +34,13 @@ namespace Travel_Website_System_API_.Controllers
         {
             List<Package> packages = packageRepo.GetAllWithPagination(pageNumber, pageSize);
             int totalPackages = packageRepo.GetTotalCount();
+
             List<PackageDTO> packageDTOs = new List<PackageDTO>();
 
             foreach (Package package in packages)
             {
+                var serviceNames = package.PackageServices.Select(ps => ps.Service.Name).ToList();
+
                 packageDTOs.Add(new PackageDTO
                 {
                     Id = package.Id,
@@ -50,8 +53,7 @@ namespace Travel_Website_System_API_.Controllers
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
-                    ServiceNames = package.services.Select(s => s.Name).ToList() // Include service names
-
+                    ServiceNames = serviceNames // Include service names
                 });
             }
 
@@ -77,6 +79,9 @@ namespace Travel_Website_System_API_.Controllers
             if (package == null) return NotFound();
             else
             {
+                // Ensure that related services are loaded
+                var serviceNames = package.PackageServices.Select(ps => ps.Service.Name).ToList();
+
                 PackageDTO packageDTO = new PackageDTO() {
                     Id = package.Id,
                     Name = package.Name,
@@ -88,7 +93,7 @@ namespace Travel_Website_System_API_.Controllers
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
-                    ServiceNames = package.services.Select(s => s.Name).ToList() // Include service names
+                    ServiceNames = serviceNames // Include service names
 
                 };
                 return Ok(packageDTO);
