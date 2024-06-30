@@ -36,7 +36,7 @@ namespace Travel_Website_System_API.Models
 
         //for chat signalR
 
-        public object ProfilePictureUrl { get;  set; }
+        public string ProfilePictureUrl { get;  set; }
 
         public string Status { get;  set; }
         public DateTime LastSeen { get;  set; }

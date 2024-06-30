@@ -178,10 +178,18 @@ namespace Travel_Website_System_API_
         }
 
 
-        public void ConfigureServices(IServiceCollection services , IApplicationBuilder app)
+        public void ConfigureServices(IServiceCollection services)
         {
             // Add SignalR services
+            var builder = WebApplication.CreateBuilder();
+
+            var app = builder.Build();
+
+            // Add services to the container.
+            builder.Services.AddControllersWithViews();
             services.AddSignalR();
+
+            //   services.AddSingleton(new ChatHub(Configuration.GetConnectionString("DefaultConnection")));
 
             // other services like Identity, DbContext
             services.AddDbContext<ApplicationDBContext>(options =>
@@ -224,6 +232,7 @@ namespace Travel_Website_System_API_
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
 
         }
 

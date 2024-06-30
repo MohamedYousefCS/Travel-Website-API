@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Travel_Website_System_API_.Models;
 
 namespace Travel_Website_System_API.Models
 {
@@ -28,12 +29,20 @@ namespace Travel_Website_System_API.Models
         public virtual DbSet<Package> Packages { get; set; }
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Service> Services { get; set; }
+        public DbSet<ClientConnection> ClientConnections { get; set; }
+
         public virtual DbSet<ServiceProvider> ServiceProviders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Define the relationship between ApplicationUser and Message
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Messages)
+                .WithOne(m => m.User)
+                .HasForeignKey(m => m.UserId); // Assuming you have a UserId property in the Message class
         }
     }
+    }
 
-}

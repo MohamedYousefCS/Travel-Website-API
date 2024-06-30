@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.SignalR;
+    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using System.Threading.Tasks;
     using Travel_Website_System_API.Models;
@@ -10,12 +11,21 @@
     public class ChatHub : Hub
     {
         private readonly ApplicationDBContext _context;
+        private readonly string _connectionString;
+        //private string v;
 
-        public ChatHub(ApplicationDBContext context)
+        public ChatHub(ApplicationDBContext context , string connectionString)
         {
             _context = context;
+            _connectionString = connectionString;
+;
         }
 
+        ////for connection
+        //public ChatHub(string v)
+        //{
+        //    this.v = v;
+        //}
 
         public async Task SendMessageToClient(ApplicationUser user, string message, string connectionId)
         {
@@ -54,7 +64,7 @@
         {
             var newMessage = new Message
             {
-                User = user,
+                //User = user,
                 Content = message,
                 Timestamp = DateTime.UtcNow,
                 IsRead = false,
@@ -134,20 +144,23 @@
             }
         }
 
+
         public override async Task OnConnectedAsync()
         {
+            var clientId = Context.UserIdentifier; // Assuming you use authentication and UserIdentifier is set
+            var connectionId = Context.ConnectionId;
 
-            // Get the username or identifier of the connected user
-
-            string user = Context.User.Identity.Name; 
-
-            // Notify all clients about the new connection
-
-            await Clients.All.SendAsync("UserConnected", user);
-
-            // Add the client to a group named after the user (optional)
-
-            await Groups.AddToGroupAsync(Context.ConnectionId, user);
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                var command = new SqlCommand(
+                    "INSERT INTO ClientConnections (ClientId, ConnectionId, IsConnected, LastUpdated) VALUES (@ClientId, @ConnectionId, 1, GETDATE())",
+                    connection
+                );
+                command.Parameters.AddWithValue("@ClientId", clientId);
+                command.Parameters.AddWithValue("@ConnectionId", connectionId);
+                await command.ExecuteNonQueryAsync();
+            }
 
             await base.OnConnectedAsync();
         }
@@ -155,17 +168,18 @@
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            // Get the username or identifier of the disconnected user
+            var connectionId = Context.ConnectionId;
 
-            string user = Context.User.Identity.Name; 
-
-            // Notify all clients about the disconnection
-
-            await Clients.All.SendAsync("UserDisconnected", user);
-
-            // Remove the client from all groups they were part of
-             
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, user);
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                var command = new SqlCommand(
+                    "UPDATE ClientConnections SET IsConnected = 0, LastUpdated = GETDATE() WHERE ConnectionId = @ConnectionId",
+                    connection
+                );
+                command.Parameters.AddWithValue("@ConnectionId", connectionId);
+                await command.ExecuteNonQueryAsync();
+            }
 
             await base.OnDisconnectedAsync(exception);
         }
@@ -187,7 +201,8 @@
                 .OrderBy(m => m.Timestamp)
                 .Select(m => new MessageDto
                 {
-                    User = m.User,
+                   Sender  = m.Sender.Fname,
+                   Receiver = m.Receiver.Fname,
                     Content = m.Content,
                     Timestamp = m.Timestamp
                 })
