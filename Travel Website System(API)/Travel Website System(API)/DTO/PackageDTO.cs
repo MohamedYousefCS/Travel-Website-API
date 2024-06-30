@@ -8,7 +8,8 @@ namespace Travel_Website_System_API_.DTO
         public int Id { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public string? Image { get; set; }
+        public IFormFile? Image { get; set; }// For image upload
+        public string? ImageUrl { get; set; }  // For returning the image URL
         public int? QuantityAvailable { get; set; }
         public decimal? Price { get; set; }
         public bool isDeleted { get; set; }
@@ -16,7 +17,7 @@ namespace Travel_Website_System_API_.DTO
         public int? Duration { get; set; }
         public string? adminId { get; set; }
 
-        public List<string> ServiceNames { get; set; }
+        public List<string> ServiceNames { get; set; } = new List<string>(); // Initialize the list
 
 
 

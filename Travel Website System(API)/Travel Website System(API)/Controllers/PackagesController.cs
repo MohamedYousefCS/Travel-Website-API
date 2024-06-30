@@ -10,6 +10,7 @@ using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.DTO;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -18,11 +19,13 @@ namespace Travel_Website_System_API_.Controllers
     public class PackagesController : ControllerBase
     {
         GenericRepository<Package> packageRepo;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
 
-        public PackagesController( GenericRepository<Package> packageRepo)
+        public PackagesController(GenericRepository<Package> packageRepo, IWebHostEnvironment webHostEnvironment)
         {
             this.packageRepo = packageRepo;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: api/Packages
@@ -31,24 +34,26 @@ namespace Travel_Website_System_API_.Controllers
         {
             List<Package> packages = packageRepo.GetAllWithPagination(pageNumber, pageSize);
             int totalPackages = packageRepo.GetTotalCount();
+
             List<PackageDTO> packageDTOs = new List<PackageDTO>();
 
             foreach (Package package in packages)
             {
+                var serviceNames = package.PackageServices.Select(ps => ps.Service.Name).ToList();
+
                 packageDTOs.Add(new PackageDTO
                 {
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    Image = package.Image,
+                    ImageUrl = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
-                    ServiceNames = package.services.Select(s => s.Name).ToList() // Include service names
-
+                    ServiceNames = serviceNames // Include service names
                 });
             }
 
@@ -74,18 +79,21 @@ namespace Travel_Website_System_API_.Controllers
             if (package == null) return NotFound();
             else
             {
+                // Ensure that related services are loaded
+                var serviceNames = package.PackageServices.Select(ps => ps.Service.Name).ToList();
+
                 PackageDTO packageDTO = new PackageDTO() {
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    Image = package.Image,
+                    ImageUrl = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
-                    ServiceNames = package.services.Select(s => s.Name).ToList() // Include service names
+                    ServiceNames = serviceNames // Include service names
 
                 };
                 return Ok(packageDTO);
@@ -94,17 +102,20 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // POST: api/Packages
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
         [HttpPost]
         public ActionResult AddPackage(PackageDTO packageDTO)
         {
             if (packageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
+
+            string uniqueFileName = UploadImage(packageDTO.Image);
+
             Package package = new Package() {
                 //Id = packageDTO.Id,
                 Name = packageDTO.Name,
                 Description = packageDTO.Description,
-                Image = packageDTO.Image,
+                Image = uniqueFileName,
                 QuantityAvailable = packageDTO.QuantityAvailable,
                 Price = packageDTO.Price,
                 isDeleted = packageDTO.isDeleted,
@@ -120,6 +131,43 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
+        //implement image any problem call helmy 
+        private string UploadImage(IFormFile file)
+        {
+
+            if (file != null && file.Length > 0)
+            {
+
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/packages");
+
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // Generate a unique filename for the uploaded file
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+
+                // Combine the uploads folder path with the unique filename
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Save the file to the specified path
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(fileStream);
+                }
+
+                // Return the unique filename
+                return uniqueFileName;
+            }
+
+            // If file is null or has no content, return null
+            return null;
+        }
+
+
+
         // PUT: api/Packages/5
         [Authorize(Roles = "superAdmin, admin")]
         [HttpPut("{id}")]
@@ -130,12 +178,14 @@ namespace Travel_Website_System_API_.Controllers
             if (packageDTO == null) return BadRequest();
             if (packageDTO.Id != id) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
+
+            string uniqueFileName = UploadImage(packageDTO.Image);
             Package package = new Package()
             {
                 Id = packageDTO.Id,
                 Name = packageDTO.Name,
                 Description = packageDTO.Description,
-                Image = packageDTO.Image,
+                Image = uniqueFileName,
                 QuantityAvailable = packageDTO.QuantityAvailable,
                 Price = packageDTO.Price,
                 isDeleted = packageDTO.isDeleted,

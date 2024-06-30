@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Travel_Website_System_API_.Models;
 
 namespace Travel_Website_System_API.Models
 {
@@ -27,10 +28,11 @@ namespace Travel_Website_System_API.Models
         public string? adminId { get; set; }
         public virtual Admin admin { get; set; }
 
-        [ForeignKey("packageId")]
-        [InverseProperty("packages")]
-        public virtual ICollection<Service> services { get; set; } = new List<Service>();
-        // signalR commit test
-        // fffffffffffff
+        //[ForeignKey("packageId")]
+        //[InverseProperty("packages")]
+       // public virtual ICollection<Service> Services { get; set; } = new List<Service>();
+
+        public virtual ICollection<PackageService> PackageServices { get; set; } = new HashSet<PackageService>();
+
     }
 }
