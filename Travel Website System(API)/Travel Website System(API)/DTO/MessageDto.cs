@@ -6,13 +6,20 @@ namespace Travel_Website_System_API_.DTO
     {
         public int Id { get; set; }
         public string Content { get; set; }
-        public object Timestamp { get;  set; }
+        public DateTime Timestamp { get;  set; }
       
-        public string ProfilePictureUrl { get;  set; }
         public bool IsRead { get;  set; }
         public string Sender { get; set; }
 
         public string Receiver { get;  set; }
+
+
+        public int? chatId { get; set; }
+
+        public string status { get; set; }
+
+
+
     }
 
 }

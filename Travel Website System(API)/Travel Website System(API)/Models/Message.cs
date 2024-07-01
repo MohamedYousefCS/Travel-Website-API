@@ -33,7 +33,7 @@ namespace Travel_Website_System_API.Models
         public ApplicationUser User { get; set; }
         public virtual ApplicationUser Receiver { get;  set; }
         
-        ///        //for chat signalr
+        
 
     }
 }

@@ -32,7 +32,7 @@ namespace Travel_Website_System_API_.Controllers
         [HttpPost("SendMessageToClient")]
         public async Task<IActionResult> SendMessageToClient([FromBody] ClientMessageDto clientMessageDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == clientMessageDto.User);
+            var user = await _context.Clients.FirstOrDefaultAsync(u => u.Id == clientMessageDto.clientId);
             if (user == null)
             {
                 return BadRequest("User not found");
@@ -43,54 +43,43 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
+        [HttpPost("SendMessageToCustomerService")]
+        public async Task<IActionResult> SendMessageToCustomerService([FromBody] ClientMessageDto clientMessageDto)
+        {
+            // Find customer service user (you may have a specific role or identifier for customer service)
+            var customerService = await _context.Users.FirstOrDefaultAsync(u => u.Role == "customerService");
+
+            if (customerService == null)
+            {
+                return BadRequest("Customer service not found");
+            }
+
+            // Send message to customer service using SignalR
+            await _hubContext.Clients.User(customerService.Id.ToString()).SendAsync("ReceiveMessageFromClient", clientMessageDto.Content, clientMessageDto.clientId);
+
+            return Ok();
+        }
+
+
 
 
         [HttpPost("SendMessageToAll")]
-        public async Task<IActionResult> SendMessageToAll([FromBody] MessageDto messageDto)
+        public async Task<IActionResult> SendMessageToAll([FromBody] List<ClientMessageDto> clientMessageDtos)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == messageDto.Receiver.ToString());
-            if (user == null)
+            foreach (var clientMessageDto in clientMessageDtos)
             {
-                return BadRequest("User not found");
+                var user = await _context.Clients.FirstOrDefaultAsync(u => u.Id == clientMessageDto.clientId);
+                if (user == null)
+                {
+                    return BadRequest($"User not found for clientId: {clientMessageDto.clientId}");
+                }
+
+                await _hubContext.Clients.Group("ChatHub").SendAsync("SendMessageToAll", user, clientMessageDto.Content);
             }
 
-            await _hubContext.Clients.Group("ChatHub").SendAsync("SendMessageToAll", user, messageDto.Content);
             return Ok();
-        }
 
-
-
-
-        [HttpPost("SendMessageToOthers")]
-        public async Task<IActionResult> SendMessageToOthers([FromBody] MessageDto messageDto)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == messageDto.Receiver.ToString());
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-
-            await _hubContext.Clients.Group("ChatHub").SendAsync("SendMessageToOthers", user, messageDto.Content);
-            return Ok();
-        }
-
-
-
-
-        [HttpPost("SendMessageToCaller")]
-        public async Task<IActionResult> SendMessageToCaller([FromBody] MessageDto messageDto)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == messageDto.Receiver.ToString());
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-
-            await _hubContext.Clients.Group("ChatHub").SendAsync("SendMessageToCaller", user, messageDto.Content);
-            return Ok();
-        }
-
-
+}
 
 
         [HttpPost("SendMessageToGroup")]
@@ -105,26 +94,6 @@ namespace Travel_Website_System_API_.Controllers
             await _hubContext.Clients.Group("ChatHub").SendAsync("SendMessageToGroup", user, groupMessageDto.Content, groupMessageDto.GroupName);
             return Ok();
         }
-
-     
-
-     
-
-        [HttpPost("SaveMessageToDatabase")]
-        public async Task<IActionResult> SaveMessageToDatabase([FromBody] MessageDto MessageDto)
-        {
-           // var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == MessageDto.User.ToString());
-            var sender = await _context.Users.FirstOrDefaultAsync(u => u.UserName == MessageDto.Sender.ToString());
-            var receiver = await _context.Users.FirstOrDefaultAsync(u => u.UserName == MessageDto.Receiver.ToString());
-            if (  sender == null || receiver == null)
-            {
-                return BadRequest("User, Sender, or Receiver not found");
-            }
-
-            await _hubContext.Clients.Group("ChatHub").SendAsync("SaveMessageToDatabase", MessageDto.Content, sender, receiver);
-            return Ok();
-        }
-
 
 
 
@@ -159,14 +128,6 @@ namespace Travel_Website_System_API_.Controllers
             }
            
 
-
-
-          //  var user = await _context.Users.FirstOrDefaultAsync(u => u.User == notification.User);
-            //if (user == null)
-            //{
-            //    return BadRequest("User not found");
-            //}
-
             foreach(var user in users)
             {
                 await _hubContext.Clients.User(user.Id.ToString()).SendAsync("ReceiveNotification", notification.Content);
@@ -178,34 +139,56 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
+        [HttpPost("Connect")]
+        public async Task<IActionResult> Connect(string userId, string connectionId)
+        {
+
+            var clientConnection = new ClientConnection
+            {
+                ClientId = userId,
+                ConnectionId = connectionId,
+                IsConnected = true,
+                LastUpdated = DateTime.UtcNow
+            };
+
+            _context.ClientConnections.Add(clientConnection);
+            await _context.SaveChangesAsync();
+            await _hubContext.Clients.Group("ChatHub").SendAsync("OnUserConnected", userId, connectionId);
+
+            return Ok();
+        }
+
+        [HttpPost("Disconnect")]
+        public async Task<IActionResult> Disconnect(string connectionId)
+        {
+            var clientConnection = await _context.ClientConnections
+                .FirstOrDefaultAsync(cc => cc.ConnectionId == connectionId);
+
+            if (clientConnection != null)
+            {
+                clientConnection.IsConnected = false;
+                clientConnection.LastUpdated = DateTime.UtcNow;
+
+                _context.ClientConnections.Update(clientConnection);
+                await _context.SaveChangesAsync();
+            }
+            await _hubContext.Clients.Group("ChatHub").SendAsync("OnUserDisconnected", clientConnection.ClientId, connectionId);
+
+            return Ok();
+        }
+
+
 
         [HttpGet("online")]
         public async Task<IActionResult> GetOnlineClients()
         {
-            var clients = new List<ClientConnection>();
-
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                var command = new SqlCommand("SELECT * FROM ClientConnections WHERE IsConnected = 1", connection);
-                var reader = await command.ExecuteReaderAsync();
-
-                while (await reader.ReadAsync())
-                {
-                    clients.Add(new ClientConnection
-                    {
-                        Id = reader.GetInt32(0),
-                        ClientId = reader.GetString(1),
-                        ConnectionId = reader.GetString(2),
-                        IsConnected = reader.GetBoolean(3),
-                        LastUpdated = reader.GetDateTime(4)
-                    });
-                }
-            }
-
+            var clients = await _context.ClientConnections
+                                        .Where(c => c.IsConnected)
+                                        .ToListAsync();
 
             return Ok(clients);
         }
+
 
 
         [HttpPost("UpdateStatus")]
@@ -286,24 +269,6 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
-        [HttpGet("GetMessages")]
-        public async Task<IActionResult> GetMessages([FromQuery] string user1, [FromQuery] string user2)
-        {
-            var messages = await _context.Messages
-                .Where(m => (m.Sender.UserName == user1 && m.Receiver.UserName == user2) ||
-                            (m.Sender.UserName == user2 && m.Receiver.UserName == user1))
-                .OrderBy(m => m.Timestamp)
-                .Select(m => new MessageDto
-                {
-                    Sender  = m.Sender.Fname,
-                    Receiver  = m.Receiver.Fname,
-                    Content = m.Content,
-                    Timestamp = m.Timestamp,
-                    ProfilePictureUrl = (string)m.Sender.ProfilePictureUrl
-                })
-                .ToListAsync();
-
-            return Ok(messages);
-        }
+        
     }
 }

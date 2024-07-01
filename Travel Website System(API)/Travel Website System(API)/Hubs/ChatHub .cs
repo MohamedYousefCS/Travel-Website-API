@@ -33,6 +33,27 @@
         }
 
 
+        // Method to send message to customer service
+        public async Task SendMessageToCustomerService(string message, string userId)
+        {
+            var customerServiceConnection = await _context.ClientConnections
+                .FirstOrDefaultAsync(cc => cc.ClientId == userId && cc.IsConnected);
+
+            if (customerServiceConnection != null)
+            {
+                await Clients.Client(customerServiceConnection.ConnectionId).SendAsync("ReceiveMessageFromClient", message);
+            }
+            else
+            {
+                // Handle case where customer service is not connected
+                // You can implement a queueing mechanism or handle appropriately
+                // For simplicity, sending a response back to client indicating no customer service available
+                await Clients.Caller.SendAsync("NoCustomerServiceAvailable");
+            }
+        }
+
+
+
         // Method to broadcast messages to all connected clients
         public async Task SendMessageToAll(ApplicationUser user, string message)
         {
@@ -150,39 +171,41 @@
             var clientId = Context.UserIdentifier; // Assuming you use authentication and UserIdentifier is set
             var connectionId = Context.ConnectionId;
 
-            using (var connection = new SqlConnection(_connectionString))
+            var clientConnection = new ClientConnection
             {
-                connection.Open();
-                var command = new SqlCommand(
-                    "INSERT INTO ClientConnections (ClientId, ConnectionId, IsConnected, LastUpdated) VALUES (@ClientId, @ConnectionId, 1, GETDATE())",
-                    connection
-                );
-                command.Parameters.AddWithValue("@ClientId", clientId);
-                command.Parameters.AddWithValue("@ConnectionId", connectionId);
-                await command.ExecuteNonQueryAsync();
-            }
+                ClientId = clientId,
+                ConnectionId = connectionId,
+                IsConnected = true,
+                LastUpdated = DateTime.UtcNow
+            };
+
+            _context.ClientConnections.Add(clientConnection);
+            await _context.SaveChangesAsync();
 
             await base.OnConnectedAsync();
         }
+
 
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             var connectionId = Context.ConnectionId;
 
-            using (var connection = new SqlConnection(_connectionString))
+            var clientConnection = await _context.ClientConnections
+                .FirstOrDefaultAsync(cc => cc.ConnectionId == connectionId);
+
+            if (clientConnection != null)
             {
-                connection.Open();
-                var command = new SqlCommand(
-                    "UPDATE ClientConnections SET IsConnected = 0, LastUpdated = GETDATE() WHERE ConnectionId = @ConnectionId",
-                    connection
-                );
-                command.Parameters.AddWithValue("@ConnectionId", connectionId);
-                await command.ExecuteNonQueryAsync();
+                clientConnection.IsConnected = false;
+                clientConnection.LastUpdated = DateTime.UtcNow;
+
+                _context.ClientConnections.Update(clientConnection);
+                await _context.SaveChangesAsync();
             }
 
             await base.OnDisconnectedAsync(exception);
         }
+
 
 
         //Notifying Users with new Receive message Notification

@@ -1,4 +1,11 @@
-﻿namespace Travel_Website_System_API_.Models
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+
+namespace Travel_Website_System_API.Models
 {
 
     public class ClientConnection

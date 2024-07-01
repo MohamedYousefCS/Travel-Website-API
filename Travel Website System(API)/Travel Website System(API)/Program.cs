@@ -1,11 +1,13 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Website_System_API.Models;
@@ -15,7 +17,6 @@ using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.UnitWork;
 using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
 
-
 namespace Travel_Website_System_API_
 {
     public class Program
@@ -23,60 +24,71 @@ namespace Travel_Website_System_API_
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            ConfigureServices(builder.Services, builder.Configuration);
 
-            // Add services to the container.
-            builder.Services.AddControllers();
-            // inject unit of work
-            builder.Services.AddScoped<UnitOFWork>();
-            builder.Services.AddControllers().AddJsonOptions(options =>
+            var app = builder.Build();
+            Configure(app);
+
+            app.Run();
+        }
+
+        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        {
+            // Add controllers
+            services.AddControllers();
+
+            // Add unit of work
+            services.AddScoped<UnitOFWork>();
+
+            // JSON options
+            services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
             });
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            //builder.Services.AddSwaggerGen(op=>
-            //op.SwaggerDoc("Version 1",new Microsoft.OpenApi.Models.OpenApiInfo()
-            //{
-            //                    Version = "v2",
-            //                     Title = "Web API Travel Website",
-            //                     Description = "This is a web api for Travel Website"
 
-            //})
-            //);
+            // Add Swagger
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<ApplicationDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
-            builder.Services.Configure<PayPalSettings>(builder.Configuration.GetSection("PayPal"));
+            // Configure DbContext
+            services.AddDbContext<ApplicationDBContext>(op => op.UseSqlServer(configuration.GetConnectionString("Connection")));
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            // Configure PayPal settings
+            services.Configure<PayPalSettings>(configuration.GetSection("PayPal"));
+
+            // Configure Identity
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             })
-             .AddEntityFrameworkStores<ApplicationDBContext>()
-             .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<ApplicationDBContext>()
+            .AddDefaultTokenProviders();
 
-            builder.Services.AddScoped<UserRepo>();
-            builder.Services.AddScoped<IGenericRepo<Client>, GenericRepo<Client>>();
-            builder.Services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
-            builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
-            builder.Services.AddScoped<IEmailSender, EmailSender>();
+            // Repositories and other services
+            services.AddScoped<UserRepo>();
+            services.AddScoped<IGenericRepo<Client>, GenericRepo<Client>>();
+            services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
+            services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
+            services.AddScoped<IEmailSender, EmailSender>();
 
+            services.AddScoped<GenericRepository<Service>>();
+            services.AddScoped<GenericRepository<Package>>();
+            services.AddScoped<GenericRepository<ServiceProvider>>();
+            services.AddScoped<GenericRepository<LoveService>>();
+            services.AddScoped<GenericRepository<LovePackage>>();
+            services.AddScoped<GenericRepository<Category>>();
 
-            builder.Services.AddScoped<GenericRepository<Service>>();
-            builder.Services.AddScoped<GenericRepository<Package>>();
-            builder.Services.AddScoped<GenericRepository<ServiceProvider>>();
-            builder.Services.AddScoped<GenericRepository<LoveService>>();
-            builder.Services.AddScoped<GenericRepository<LovePackage>>();
-            builder.Services.AddScoped<GenericRepository<Category>>();
-
-
-
-
-            //[Authorize] used JWT token in check authentication 
             // JWT Authentication configuration
+            ConfigureAuthentication(services, configuration);
 
-            builder.Services.AddAuthentication(options =>
+            // Add SignalR
+            services.AddSignalR();
+        }
+
+        private static void ConfigureAuthentication(IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -92,154 +104,80 @@ namespace Travel_Website_System_API_
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["Jwt:ValidIssuer"],
-                    ValidAudience = builder.Configuration["Jwt:ValidAudience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+                    ValidIssuer = configuration["Jwt:ValidIssuer"],
+                    ValidAudience = configuration["Jwt:ValidAudience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
                 };
-            });
-
-
-            builder.Services.AddAuthentication()
+            })
             .AddGoogle(options =>
             {
-                IConfigurationSection googleAuthNSection =
-                   builder.Configuration.GetSection("Authentication:Google");
-
+                var googleAuthNSection = configuration.GetSection("Authentication:Google");
                 options.ClientId = googleAuthNSection["ClientId"];
                 options.ClientSecret = googleAuthNSection["ClientSecret"];
             })
             .AddFacebook(options =>
             {
-                IConfigurationSection fbAuthNSection =
-                    builder.Configuration.GetSection("Authentication:Facebook");
-
+                var fbAuthNSection = configuration.GetSection("Authentication:Facebook");
                 options.AppId = fbAuthNSection["AppId"];
                 options.AppSecret = fbAuthNSection["AppSecret"];
             })
             .AddTwitter(options =>
             {
-                IConfigurationSection twitterAuthNSection =
-                    builder.Configuration.GetSection("Authentication:Twitter");
-
+                var twitterAuthNSection = configuration.GetSection("Authentication:Twitter");
                 options.ConsumerKey = twitterAuthNSection["ConsumerKey"];
                 options.ConsumerSecret = twitterAuthNSection["ConsumerSecret"];
             });
+        }
 
-
-            var app = builder.Build();
-
-            using (var scope = app.Services.CreateScope())
-            {
-                var serviceProvider = scope.ServiceProvider;
-
-                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-                // Now, you can use roleManager within this using block
-                // For example, you can seed roles here
-                var seed = new DataSeed(roleManager);
-                seed.SeedRolesAsync().GetAwaiter().GetResult();
-            }
-
-
-            // Configure the HTTP request pipeline.
+        public static void Configure(WebApplication app)
+        {
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            // Add CORS policy
-            app.UseCors(policy =>
 
+            SeedRoles(app);
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+
+            // CORS policy
+            app.UseCors(policy =>
             {
                 policy.AllowAnyOrigin()
                       .AllowAnyMethod()
                       .AllowAnyHeader();
             });
 
-            app.UseHttpsRedirection();
-            app.UseRouting();
-
-            app.UseAuthentication();//check JWT token
-
-            app.UseAuthorization();
-            app.MapControllers();
-            app.UseStaticFiles();
-            app.Run();
-
-        }
-
-
-        // signalR Configuration
-        public IConfiguration Configuration { get; }
-
-        public Program(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // Add SignalR services
-            var builder = WebApplication.CreateBuilder();
-
-            var app = builder.Build();
-
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
-            services.AddSignalR();
-
-            //   services.AddSingleton(new ChatHub(Configuration.GetConnectionString("DefaultConnection")));
-
-            // other services like Identity, DbContext
-            services.AddDbContext<ApplicationDBContext>(options =>
-               options.UseSqlServer(Configuration.GetConnectionString("Data Source=.;Initial Catalog=Traveling;Integrated Security=True;TrustServerCertificate=True")));
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-               .AddEntityFrameworkStores<ApplicationDBContext>()
-               .AddDefaultTokenProviders();
-
-            services.AddControllersWithViews();
-            services.AddRazorPages();
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            // Middleware for handling authentication and authorization
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // Configure SignalR
+            //app.MapControllers();
+            //app.MapHub<ChatHub>("/chathub");
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatHub>("/chathub");
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
+                endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/ChatHub", options =>
+                {
+                    options.Transports =
+                        HttpTransportType.WebSockets |
+                        HttpTransportType.LongPolling;
+                });
             });
-
-
+            app.Run();
         }
 
+        private static void SeedRoles(WebApplication app)
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var seed = new DataSeed(roleManager);
+                seed.SeedRolesAsync().GetAwaiter().GetResult();
+            }
+        }
 
     }
-
 }
-
-
-
