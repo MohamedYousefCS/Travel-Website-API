@@ -68,7 +68,7 @@ namespace Travel_Website_System_API_.Controllers
 
             if (roles.Contains("superAdmin"))
             {
-                var allClients = _userRepo.GetAllClients();
+                var allClients = _userRepo.GetAllClients().Where(c=>c.IsDeleted==false);
                 return Ok(allClients);
             }
             else if (roles.Contains("admin"))
