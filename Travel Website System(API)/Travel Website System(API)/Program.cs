@@ -58,6 +58,9 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
             builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
             builder.Services.AddScoped<IEmailSender, EmailSender>();
+            builder.Services.AddScoped<IServiceRepo, ServiceRepo>();
+            builder.Services.AddScoped<IPackageRepo, PackageRepo>();
+
 
 
             builder.Services.AddScoped<GenericRepository<Service>>();
