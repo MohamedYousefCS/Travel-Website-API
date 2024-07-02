@@ -165,9 +165,16 @@ namespace Travel_Website_System_API_
            
             app.UseAuthorization();
             app.MapControllers();
+
+            app.UseStaticFiles();//  for www
+            app.UseRouting();
+            app.UseAuthorization();
+            app.MapControllers();
+
             app.UseStaticFiles();
            
            
+
 
 
             app.Run();
