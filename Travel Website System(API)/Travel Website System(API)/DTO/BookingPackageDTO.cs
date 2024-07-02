@@ -7,22 +7,21 @@ namespace Travel_Website_System_API_.DTO
     public class BookingPackageDTO
     {
         [Key]
-        public int? BookingPackageId { get; set; }
+        public int? Id { get; set; }
 
         [Column(TypeName = "date")]
         public DateTime? Date { get; set; }
 
         public int? quantity { get; set; }
 
-  
         public string? clientId { get; set; }
      
         public int? packageId { get; set; }
 
         [Column(TypeName = "date")]
         public DateTime? allowingTime { get; set; }
-        //
-        public decimal ? price { get; set; }    
+        public Decimal ? price { get; set; }
+       
 
     }
 }
