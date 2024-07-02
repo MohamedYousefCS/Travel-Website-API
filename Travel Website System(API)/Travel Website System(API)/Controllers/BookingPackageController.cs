@@ -81,7 +81,7 @@ namespace Travel_Website_System_API_.Controllers
             // here i get relative data with eager Loading
             var bookingPackage = unitOFWork.CustombookingPackageRepo.GetById(id);// to get relative data 
             if(bookingPackage == null) { return NotFound(); }
-           // var clientName = bookingPackage.client?.user?.Fname ?? "Unknown";
+            // var clientName = bookingPackage.client?.user?.Fname ?? "Unknown";
             var bookingPackageDTO = new BookingPackageDTO
             {
                 Id = bookingPackage.Id,
@@ -90,8 +90,9 @@ namespace Travel_Website_System_API_.Controllers
                 clientId = bookingPackage.clientId,
                 packageId = bookingPackage.packageId,
                 allowingTime = bookingPackage.allowingTime,
-               // clientName = clientName,// i get it for testing only i dont need it now
+                // clientName = clientName,// i get it for testing only i dont need it now
                 price = bookingPackage.package?.Price ?? 0,
+                PackageImage = bookingPackage.package?.Image ?? " "
             };
             return Ok(bookingPackageDTO);
         }
