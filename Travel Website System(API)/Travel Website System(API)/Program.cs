@@ -60,6 +60,8 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IEmailSender, EmailSender>();
             builder.Services.AddScoped<IServiceRepo, ServiceRepo>();
             builder.Services.AddScoped<IPackageRepo, PackageRepo>();
+            builder.Services.AddScoped<IServiceProviderRepo, ServiceProviderRepo>();
+            builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 
 
 

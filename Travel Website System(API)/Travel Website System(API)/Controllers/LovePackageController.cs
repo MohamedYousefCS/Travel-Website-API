@@ -38,7 +38,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public ActionResult DeleteLoveService(int id)
         {
 
