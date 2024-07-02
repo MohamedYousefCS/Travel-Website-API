@@ -29,7 +29,7 @@ namespace Travel_Website_System_API_.Controllers
             var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
             if (roles.Contains("superAdmin"))
             {
-                var allUsers = _userRepo.GetAll();
+                var allUsers = _userRepo.GetAll().Where(c => c.IsDeleted == false);
                 return Ok(allUsers);
             }
             else if(roles.Contains("admin"))
@@ -38,7 +38,7 @@ namespace Travel_Website_System_API_.Controllers
                     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (adminId != null)
                 {
-                    var clients = _userRepo.GetClientsByAdminId(adminId);
+                    var clients = _userRepo.GetClientsByAdminId(adminId).Where(c => c.IsDeleted == false);
                     return Ok(clients);
                 }
             }
@@ -51,7 +51,7 @@ namespace Travel_Website_System_API_.Controllers
         [Authorize(Roles = "superAdmin")]
         public ActionResult<IEnumerable<Admin>> GetAdmins()
         {
-            var admins = _userRepo.GetAllAdmins();
+            var admins = _userRepo.GetAllAdmins().Where(c=>c.IsDeleted==false);
             if (admins == null || !admins.Any())
             {
                 return NotFound(new { message = "No admins found" });
@@ -68,7 +68,7 @@ namespace Travel_Website_System_API_.Controllers
 
             if (roles.Contains("superAdmin"))
             {
-                var allClients = _userRepo.GetAllClients();
+                var allClients = _userRepo.GetAllClients().Where(c=>c.IsDeleted==false);
                 return Ok(allClients);
             }
             else if (roles.Contains("admin"))
@@ -76,7 +76,7 @@ namespace Travel_Website_System_API_.Controllers
                 var adminId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (adminId != null)
                 {
-                    var clients = _userRepo.GetClientsByAdminId(adminId);
+                    var clients = _userRepo.GetClientsByAdminId(adminId).Where(c => c.IsDeleted == false);
                     if (clients == null || !clients.Any())
                     {
                         return NotFound(new { message = "No clients found for this admin" });
@@ -86,6 +86,21 @@ namespace Travel_Website_System_API_.Controllers
             }
 
             return Unauthorized(new { message = "Unauthorized access" });
+        }
+
+
+
+
+        [HttpGet("customerService")]
+        [Authorize(Roles = "superAdmin")]
+        public ActionResult<IEnumerable<Admin>> GetCustomerServices()
+        {
+            var cus = _userRepo.GetAllcustomerServices().Where(c => c.IsDeleted == false);
+            if (cus == null || !cus.Any())
+            {
+                return NotFound(new { message = "No customer services found" });
+            }
+            return Ok(cus);
         }
 
 

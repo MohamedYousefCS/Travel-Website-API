@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Website_System_API.Models;
@@ -57,11 +58,22 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IGenericRepo<Admin>, GenericRepo<Admin>>();
             builder.Services.AddScoped<IGenericRepo<CustomerService>, GenericRepo<CustomerService>>();
             builder.Services.AddScoped<IEmailSender, EmailSender>();
+            builder.Services.AddScoped<IServiceRepo, ServiceRepo>();
+            builder.Services.AddScoped<IPackageRepo, PackageRepo>();
+            builder.Services.AddScoped<IServiceProviderRepo, ServiceProviderRepo>();
+            builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+
 
 
             builder.Services.AddScoped<GenericRepository<Service>>();
             builder.Services.AddScoped<GenericRepository<Package>>();
             builder.Services.AddScoped<GenericRepository<ServiceProvider>>();
+            builder.Services.AddScoped<GenericRepository<LoveService>>();
+            builder.Services.AddScoped<GenericRepository<LovePackage>>();
+            builder.Services.AddScoped<GenericRepository<Category>>();
+
+
+
 
             //[Authorize] used JWT token in check authentication 
             // JWT Authentication configuration
@@ -89,6 +101,31 @@ namespace Travel_Website_System_API_
             });
 
 
+            builder.Services.AddAuthentication()
+            .AddGoogle(options =>
+            {
+                IConfigurationSection googleAuthNSection =
+                   builder.Configuration.GetSection("Authentication:Google");
+
+                options.ClientId = googleAuthNSection["ClientId"];
+                options.ClientSecret = googleAuthNSection["ClientSecret"];
+            })
+            .AddFacebook(options =>
+            {
+                IConfigurationSection fbAuthNSection =
+                    builder.Configuration.GetSection("Authentication:Facebook");
+
+                options.AppId = fbAuthNSection["AppId"];
+                options.AppSecret = fbAuthNSection["AppSecret"];
+            })
+            .AddTwitter(options =>
+            {
+                IConfigurationSection twitterAuthNSection =
+                    builder.Configuration.GetSection("Authentication:Twitter");
+
+                options.ConsumerKey = twitterAuthNSection["ConsumerKey"];
+                options.ConsumerSecret = twitterAuthNSection["ConsumerSecret"];
+            });
 
 
             var app = builder.Build();

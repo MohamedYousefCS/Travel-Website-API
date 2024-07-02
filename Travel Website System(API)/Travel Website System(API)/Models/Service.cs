@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Travel_Website_System_API_.Models;
 
 namespace Travel_Website_System_API.Models
 {
@@ -33,6 +34,9 @@ namespace Travel_Website_System_API.Models
         public int? serviceProviderId { get; set; }
         public virtual ServiceProvider serviceProvider { get; set; }
               
-        public virtual ICollection<Package> packages { get; set; } = new HashSet<Package>();
+       // public virtual ICollection<Package> Packages { get; set; } = new HashSet<Package>();
+
+        public virtual ICollection<PackageService> PackageServices { get; set; } = new HashSet<PackageService>();
+
     }
 }

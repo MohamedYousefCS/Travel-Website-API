@@ -12,10 +12,29 @@ namespace Travel_Website_System_API_.Repositories
         {
             this.db = db;
         }
+
         public List<TEntity> GetAll()
         {
-           return db.Set<TEntity>().ToList();
+            return db.Set<TEntity>()
+                     .ToList();
         }
+
+
+        public List<TEntity> GetAllWithPagination(int pageNumber, int pageSize)
+        {
+            return db.Set<TEntity>()
+                     .Where(e => EF.Property<bool>(e, "isDeleted") == false)
+                     .Skip((pageNumber - 1) * pageSize)
+                     .Take(pageSize)
+                     .ToList();
+        }
+
+
+        public int GetTotalCount()
+        {
+            return db.Set<TEntity>().Count();
+        }
+
 
         public TEntity GetById(int id) {
 
