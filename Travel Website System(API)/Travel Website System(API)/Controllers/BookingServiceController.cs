@@ -40,7 +40,7 @@ namespace Travel_Website_System_API_.Controllers
             // when adding bookingService object the quantity is increased by 1 and the available quantity for the service will be decreased by 1
             bookingServiceDTO.Quantity = unitOFWork.BookingServiceRepo.GetAll()
                 .Count(s=>s.serviceId ==bookingServiceDTO.ServiceId)+1;
-            bookingServiceDTO.allowingTime = DateTime.Now.AddDays(20);// will be added by admin 
+            bookingServiceDTO.allowingTime = DateTime.Now.AddDays(service.BookingTimeAllowed ?? 0 );// will be added by admin 
             bookingServiceDTO.Date = DateTime.Now;
             var bookingService = new BookingService(){ 
                 Id = bookingServiceDTO.BookingServiceId,
@@ -55,7 +55,7 @@ namespace Travel_Website_System_API_.Controllers
             // is decreased by 1, and the vise of deleting bookingservice
             service.QuantityAvailable--;
             unitOFWork.db.Services.Update(service);
-            unitOFWork.save();
+            unitOFWork.Save();
             // will return object in response where i can get it id in ui to pass it in payment
            return CreatedAtAction(nameof(GetByID), new { id = bookingServiceDTO.BookingServiceId }, bookingService);
         }
@@ -81,7 +81,7 @@ namespace Travel_Website_System_API_.Controllers
                 Quantity = bookingService.Quantity,
                 allowingTime = bookingService.allowingTime,
                 Date = bookingService.Data,
-                price = bookingService?.service?.price ?? 0
+               // price = bookingService?.service?.price ?? 0
                 //ClientName = bookingService.client?.user?.Fname ?? "unknown"
             };
             return Ok(bookingServiceDTO);
@@ -121,7 +121,7 @@ namespace Travel_Website_System_API_.Controllers
                 unitOFWork.db.Services.Update(service);// serviceRepo.update(service)
                 bookingService.Quantity--;
                 unitOFWork.BookingServiceRepo.Delete(bookingService.Id);
-                unitOFWork.save();
+                unitOFWork.Save();
                 return Ok("removed");// or bookingServiceDTO
             }
             else
