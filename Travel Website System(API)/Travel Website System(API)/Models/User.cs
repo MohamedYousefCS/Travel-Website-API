@@ -24,6 +24,9 @@ namespace Travel_Website_System_API.Models
         public CustomerService? customerService { get; set; }
 
 
+        public string Passport { get; set; }
+        public string Location { get; set; }
+
         public override string UserName
         {
             get => Email;
