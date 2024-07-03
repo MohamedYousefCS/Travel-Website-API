@@ -17,5 +17,7 @@ namespace Travel_Website_System_API_.DTO
         public string? customerServiceId { get; set; }
 
         public string? clientId { get; set; }
+
+        public List<string> Messages { get; set; }  // List of message contents
     }
 }

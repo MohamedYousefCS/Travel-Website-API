@@ -24,6 +24,8 @@ namespace Travel_Website_System_API_
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddSignalR();
+
             ConfigureServices(builder.Services, builder.Configuration);
 
             var app = builder.Build();
@@ -154,8 +156,7 @@ namespace Travel_Website_System_API_
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.MapControllers();
-            //app.MapHub<ChatHub>("/chathub");
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

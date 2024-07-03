@@ -16,7 +16,7 @@ namespace Travel_Website_System_API.Models
 
 
         public string status { get; set; }
-        public virtual ApplicationUser Sender { get; set; }
+        public ApplicationUser Sender { get; set; }
      
         public bool isDeleted { get; set; }
 
@@ -31,9 +31,6 @@ namespace Travel_Website_System_API.Models
         public bool IsRead { get;  set; }
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
-        public virtual ApplicationUser Receiver { get;  set; }
-        
-        
-
+        public ApplicationUser Receiver { get;  set; }
     }
 }
