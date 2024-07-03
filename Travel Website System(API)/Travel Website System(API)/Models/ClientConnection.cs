@@ -8,12 +8,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Travel_Website_System_API.Models
 {
 
-    public class ClientConnection
+    public class UserConnection
     {
         public int Id { get; set; }
-        public string ClientId { get; set; }
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
         public string ConnectionId { get; set; }
         public bool IsConnected { get; set; }
         public DateTime LastUpdated { get; set; }
     }
+  
 }

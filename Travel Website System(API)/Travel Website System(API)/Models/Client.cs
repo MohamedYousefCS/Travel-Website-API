@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-    public class Client
+    public class Client: ApplicationUser
     {
 
         public virtual Chat Chat { get; set; }

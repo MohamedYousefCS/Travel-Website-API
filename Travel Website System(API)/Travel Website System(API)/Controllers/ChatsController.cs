@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
+using Travel_Website_System_API_.Hubs;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -12,10 +15,12 @@ namespace Travel_Website_System_API_.Controllers
     {
 
         private readonly ApplicationDBContext _context;
+        private IHubContext<ChatHub> _hub;
 
-        public ChatsController(ApplicationDBContext context)
+        public ChatsController(ApplicationDBContext context, IHubContext<ChatHub> hub)
         {
             _context = context;
+            _hub = hub;
         }
 
         [HttpGet("GetChats")]
@@ -164,9 +169,116 @@ namespace Travel_Website_System_API_.Controllers
             return _context.Chats.Any(e => e.Id == id);
         }
 
+        [HttpPost("SendMessageToClient")]
+        public async Task<IActionResult> SendMessageToClient(string message, string ReceiverId, string SenderId)
+        {
+            // Store the message in the database
+            var newMessage = new Message
+            {
+                ReceiverId = ReceiverId,
+                SenderId = SenderId,
+                Content = message,
+                Timestamp = DateTime.UtcNow
+            };
+            await _context.Messages.AddAsync(newMessage);
+            await _context.SaveChangesAsync();
 
+            // Send the message to the specified client
+            // await Clients.Client(connectionId).SendAsync("ReceiveMessage", user, message);
+            var users = new List<string>() { ReceiverId };
+            var userConnections = _context.UserConnections.AsNoTracking().Where(x => users.Contains(x.ApplicationUserId)).Select(x => x.ConnectionId.ToString());
 
+            await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessage", JsonConvert.SerializeObject(newMessage));
+            return Ok(true);
+        }
+        [HttpPost("SendMessageToCustomerService")]
+        public async Task<IActionResult> SendMessageToCustomerService(string message, string ReceiverId, string SenderId)
+        {
+            var user = await _context.CustomerServices
+                .FirstOrDefaultAsync(c => c.Id == ReceiverId);
 
+            if (user != null)
+            {
+                // Store the message in the database
+                var newMessage = new Message
+                {
+                    ReceiverId = ReceiverId,
+                    SenderId = SenderId,
+                    Content = message,
+                    Timestamp = DateTime.UtcNow
+                };
+                await _context.Messages.AddAsync(newMessage);
+                await _context.SaveChangesAsync();
 
+                // Send the message to the customer service
+                // await Clients.User(user.Id).SendAsync("ReceiveMessageFromClient", message);
+                var users = new List<string>() { ReceiverId };
+                var userConnections = _context.UserConnections.AsNoTracking().Where(x => users.Contains(x.ApplicationUserId)).Select(x => x.ConnectionId.ToString());
+
+                await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessageFromClient", JsonConvert.SerializeObject(newMessage));
+
+            }
+            //else
+            //{
+            //    // Handle case where customer service is not connected
+            //    await _hub.Clients.Caller.SendAsync("NoCustomerServiceAvailable");
+            //}
+            return Ok(true);
+
+        }
+        [HttpDelete("DeleteMessage/{messageId}")]
+        public async Task<IActionResult> DeleteMessage(int messageId)
+        {
+            var message = await _context.Messages.FindAsync(messageId);
+            if (message != null)
+            {
+                _context.Messages.Remove(message);
+                await _context.SaveChangesAsync();
+                await _hub.Clients.All.SendAsync("MessageDeleted", messageId);
+            }
+            return Ok(true);
+        }
+        [HttpPut("MarkMessageAsRead/{messageId}")]
+        public async Task<IActionResult> MarkMessageAsRead(int messageId)
+        {
+            var message = await _context.Messages.FindAsync(messageId);
+            if (message != null)
+            {
+                message.IsRead = true;
+                _context.Messages.Update(message);
+                await _context.SaveChangesAsync();
+
+                await _hub.Clients.User(message.Sender.ToString()).SendAsync("MessageRead", messageId);
+            }
+            return Ok(true);
+
+        }
+        [HttpPut("UpdateUserStatus/{userId}/{status}")]
+
+        public async Task<IActionResult> UpdateUserStatus(int userId, string status)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.Status = status;
+                user.LastSeen = DateTime.UtcNow;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                await _hub.Clients.All.SendAsync("UserStatusUpdated", userId, status);
+            }
+            return Ok(true);
+        }
+
+        [HttpGet("NotifyTyping/{userId}")]
+        public async Task<IActionResult> NotifyTyping(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                await _hub. Clients.All.SendAsync("UserTyping", userId);
+            }
+            return Ok(true);
+        }
     }
 }

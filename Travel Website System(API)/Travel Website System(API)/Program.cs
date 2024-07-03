@@ -145,7 +145,7 @@ namespace Travel_Website_System_API_
                 seed.SeedRolesAsync().GetAwaiter().GetResult();
             }
 
-
+             
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
