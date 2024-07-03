@@ -19,12 +19,14 @@ namespace Travel_Website_System_API_.Controllers
     public class PackagesController : ControllerBase
     {
         GenericRepository<Package> packageRepo;
+        private readonly IPackageRepo _packageRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
 
-        public PackagesController(GenericRepository<Package> packageRepo, IWebHostEnvironment webHostEnvironment)
+        public PackagesController(GenericRepository<Package> packageRepo,IPackageRepo repo , IWebHostEnvironment webHostEnvironment)
         {
             this.packageRepo = packageRepo;
+            this._packageRepo = repo;
             _webHostEnvironment = webHostEnvironment;
         }
 
@@ -68,7 +70,43 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(response);
         }
 
+        [HttpGet("Search/{searchItem}")]
+        public ActionResult<List<string>> Search(string searchItem)
+        {
+            var serviceNames = _packageRepo.Search(searchItem);
+            return Ok(serviceNames);
+        }
 
+
+        [HttpGet("{name:alpha}")]
+        public ActionResult GetPackageByName(string name)
+        {
+            var package = _packageRepo.GetByName(name);
+
+            if (package == null) return NotFound();
+            else
+            {
+                // Ensure that related services are loaded
+                var serviceNames = package.PackageServices.Select(ps => ps.Service.Name).ToList();
+
+                PackageDTO packageDTO = new PackageDTO()
+                {
+                    Id = package.Id,
+                    Name = package.Name,
+                    Description = package.Description,
+                    ImageUrl = package.Image,
+                    QuantityAvailable = package.QuantityAvailable,
+                    Price = package.Price,
+                    isDeleted = package.isDeleted,
+                    startDate = package.startDate,
+                    Duration = package.Duration,
+                    adminId = package.adminId,
+                    ServiceNames = serviceNames // Include service names
+
+                };
+                return Ok(packageDTO);
+            }
+        }
 
         // GET: api/Packages/5
         [HttpGet("{id}")]

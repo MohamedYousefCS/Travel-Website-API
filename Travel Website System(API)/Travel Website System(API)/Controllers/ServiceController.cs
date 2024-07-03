@@ -17,11 +17,15 @@ namespace Travel_Website_System_API_.Controllers
 
 
         GenericRepository<Service> serviceRepo;
-        
+        private readonly IServiceRepo _serviceRepo;
 
-        public ServiceController(GenericRepository<Service> serviceRepo)
+
+        ApplicationDBContext db;
+        public ServiceController(GenericRepository<Service> serviceRepo, ApplicationDBContext db,IServiceRepo repo)
         {
             this.serviceRepo = serviceRepo;
+            this._serviceRepo = repo;
+            this.db = db;
         }
 
         [HttpGet]
@@ -70,6 +74,17 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
+
+
+
+
+        [HttpGet("Search/{searchItem}")]
+        public ActionResult<List<string>> Search(string searchItem)
+        {
+            var serviceNames = _serviceRepo.Search(searchItem);
+            return Ok(serviceNames);
+        }
+
         [HttpGet("{id}")]
         public ActionResult GetById(int id)
         {
@@ -77,41 +92,70 @@ namespace Travel_Website_System_API_.Controllers
             if (service == null) return NotFound();
             else
             {
-                ServiceDTO serviceDTO=new ServiceDTO() { 
-                
-                Id = service.Id,
-                Name = service.Name,
-                Description = service.Description,
-                Image= service.Image,
-                QuantityAvailable = service.QuantityAvailable,
-                StartDate = service.StartDate,
-                price=service.price,
-                isDeleted = service.isDeleted,
-                categoryId=service.categoryId,
-                serviceProviderId=service.serviceProviderId,
+                ServiceDTO serviceDTO = new ServiceDTO() {
+
+                    Id = service.Id,
+                    Name = service.Name,
+                    Description = service.Description,
+                    Image = service.Image,
+                    QuantityAvailable = service.QuantityAvailable,
+                    StartDate = service.StartDate,
+                    price = service.price,
+                    isDeleted = service.isDeleted,
+                    categoryId = service.categoryId,
+                    serviceProviderId = service.serviceProviderId,
                 };
                 return Ok(serviceDTO);
 
             }
-           
+
+        }
+
+
+
+        [HttpGet("{name:alpha}")]
+        public ActionResult GetByName(string name)
+        {
+            Service service = _serviceRepo.GetByName(name);
+            if (service == null) return NotFound();
+            else
+            {
+                ServiceDTO serviceDTO = new ServiceDTO()
+                {
+
+                    Id = service.Id,
+                    Name = service.Name,
+                    Description = service.Description,
+                    Image = service.Image,
+                    QuantityAvailable = service.QuantityAvailable,
+                    StartDate = service.StartDate,
+                    price = service.price,
+                    isDeleted = service.isDeleted,
+                    categoryId = service.categoryId,
+                    serviceProviderId = service.serviceProviderId,
+                };
+                return Ok(serviceDTO);
+
+            }
+
         }
 
         [HttpPost]
         public ActionResult AddService(ServiceDTO serviceDTO)
         {
             if (serviceDTO == null) return BadRequest();
-            if(!ModelState.IsValid) return BadRequest();
-            Service service=new Service() { 
-            //Id= serviceDTO.Id,
-            Name = serviceDTO.Name,
-            Description = serviceDTO.Description,
-            Image= serviceDTO.Image,
-            QuantityAvailable = serviceDTO.QuantityAvailable,
-            StartDate = serviceDTO.StartDate,
-            price=serviceDTO.price,
-            isDeleted = serviceDTO.isDeleted,
-            categoryId=serviceDTO.categoryId,
-            serviceProviderId= serviceDTO.serviceProviderId
+            if (!ModelState.IsValid) return BadRequest();
+            Service service = new Service() {
+                //Id= serviceDTO.Id,
+                Name = serviceDTO.Name,
+                Description = serviceDTO.Description,
+                Image = serviceDTO.Image,
+                QuantityAvailable = serviceDTO.QuantityAvailable,
+                StartDate = serviceDTO.StartDate,
+                price = serviceDTO.price,
+                isDeleted = serviceDTO.isDeleted,
+                categoryId = serviceDTO.categoryId,
+                serviceProviderId = serviceDTO.serviceProviderId
             };
             serviceRepo.Add(service);
             serviceRepo.Save();
@@ -121,10 +165,10 @@ namespace Travel_Website_System_API_.Controllers
 
         [HttpPut("{id}")]
 
-        public ActionResult EditService(ServiceDTO serviceDTO,int id)
+        public ActionResult EditService(ServiceDTO serviceDTO, int id)
         {
-            if(serviceDTO == null) return BadRequest();
-            if(serviceDTO.Id !=id) return BadRequest();
+            if (serviceDTO == null) return BadRequest();
+            if (serviceDTO.Id != id) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
             Service service = new Service()
             {
@@ -145,14 +189,14 @@ namespace Travel_Website_System_API_.Controllers
 
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public ActionResult DeleteService(int id) {
-        
-         Service service = serviceRepo.GetById(id);
+
+            Service service = serviceRepo.GetById(id);
             if (service == null) return NotFound();
-            if(service.QuantityAvailable==0)
+            if (service.QuantityAvailable == 0)
             {
-                service.isDeleted=true;
+                service.isDeleted = true;
                 serviceRepo.Edit(service);
             }
             else
@@ -162,8 +206,9 @@ namespace Travel_Website_System_API_.Controllers
             }
             serviceRepo.Save();
             return Ok(service);
-        
+
         }
+
 
 
     }

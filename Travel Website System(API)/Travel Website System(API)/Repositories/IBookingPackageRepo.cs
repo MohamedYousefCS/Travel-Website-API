@@ -6,5 +6,8 @@ namespace Travel_Website_System_API_.Repositories
     {
         public List<BookingPackage> selectAll();
         public BookingPackage GetById(int id);
+
+        public List<BookingPackage> SelectAllBookingforClient(string clientId);
+
     }
 }

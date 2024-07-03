@@ -18,7 +18,6 @@ namespace Travel_Website_System_API_.DTO
 
         [Column(TypeName = "date")]
         public DateTime? allowingTime { get; set; }
-        public decimal? price { get; set; }
 
     }
 }

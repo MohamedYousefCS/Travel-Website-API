@@ -6,23 +6,23 @@ namespace Travel_Website_System_API_.DTO
     // in Dto i can have only properties which i need from model and i can add another properties which i need in uI
     public class BookingPackageDTO
     {
-       /* [Key]
-        public int BookingPackageId { get; set; }*/
+        [Key]
+        public int? Id { get; set; }
 
         [Column(TypeName = "date")]
         public DateTime? Date { get; set; }
 
         public int? quantity { get; set; }
 
-        // i add it to  test relative data
-        // public string? clientName { get; set; }
         public string? clientId { get; set; }
      
         public int? packageId { get; set; }
 
         [Column(TypeName = "date")]
         public DateTime? allowingTime { get; set; }
-        public decimal ? price { get; set; }    
+        public Decimal ? price { get; set; }
+        public string ? PackageImage { get; set; }
+
 
     }
 }

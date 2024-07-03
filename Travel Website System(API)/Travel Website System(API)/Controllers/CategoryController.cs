@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.Repositories;
@@ -15,15 +16,15 @@ namespace Travel_Website_System_API_.Controllers
     public class CategoryController : ControllerBase
     {
 
-        ApplicationDBContext db;
 
         GenericRepository<Category> categortRepo;
+        ICategoryRepo repo;
 
 
-        public CategoryController(ApplicationDBContext db,GenericRepository<Category> CategoryRepo)
+        public CategoryController(GenericRepository<Category> CategoryRepo, ICategoryRepo repo)
         {
-            this.db = db;
             this.categortRepo = CategoryRepo;
+            this.repo = repo;
         }
 
         [HttpGet]
@@ -74,7 +75,7 @@ namespace Travel_Website_System_API_.Controllers
         [HttpGet("{name:alpha}")]
         public ActionResult GetCategoryByName(string name)
         {
-            Category category = db.Categories.FirstOrDefault(c => c.Name == name);
+            Category category =repo.GetByName(name);
             if(category == null) return NotFound();
             return Ok(category);
         }
@@ -116,16 +117,33 @@ namespace Travel_Website_System_API_.Controllers
             
         }
 
-        [HttpDelete]
-
+        [HttpDelete("{id}")]
         public ActionResult DeleteCategory(int id)
         {
-            Category category =categortRepo.GetById(id);
-            if(category == null) return NotFound();
-           categortRepo.Remove(category);
-            categortRepo.Save();
+            Category category = categortRepo.GetById(id);
+
+            if (category == null) return NotFound();
+
+            if (category.Services.Any())
+            {
+                
+                return BadRequest("Category cannot be deleted because it is referenced by existing Services.");
+            }
+
+            try
+            {
+                categortRepo.Remove(category);
+                categortRepo.Save();
+            }
+            catch (DbUpdateException ex)
+            {
+               
+                return BadRequest("Can't deleting the Category. Please ensure that it is not referenced by any existing records.");
+            }
+
             return Ok(category);
         }
+
 
 
     }

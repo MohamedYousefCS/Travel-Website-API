@@ -6,6 +6,7 @@ using Travel_Website_System_API_.DTO;
 using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -16,14 +17,14 @@ namespace Travel_Website_System_API_.Controllers
 
     public class ServiceProviderController : ControllerBase
     {
-        ApplicationDBContext db;
         GenericRepository<ServiceProvider> ServProviderRepo;
+        IServiceProviderRepo repo;
 
 
-        public ServiceProviderController(ApplicationDBContext db, GenericRepository<ServiceProvider> servProviderRepo)
+        public ServiceProviderController( GenericRepository<ServiceProvider> servProviderRepo,IServiceProviderRepo repo)
         {
-            this.db = db;
             this.ServProviderRepo = servProviderRepo;
+            this.repo = repo;
         }
 
 
@@ -79,16 +80,12 @@ namespace Travel_Website_System_API_.Controllers
             }
         }
 
-
-
-        [HttpGet("/api/SPS/{name}")]
-
         [HttpGet("{name:alpha}")]
 
         public ActionResult GetByName(string name)
         {
 
-            ServiceProvider SP = db.ServiceProviders.FirstOrDefault(x => x.Name == name);
+            ServiceProvider SP = repo.GetByName(name);
             if (SP == null) return NotFound();
             else return Ok(SP);
 
@@ -141,15 +138,30 @@ namespace Travel_Website_System_API_.Controllers
 
         //Remove ServiceProvider
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public ActionResult DeleteServiceProvider(int id)
         {
             ServiceProvider SP = ServProviderRepo.GetById(id);
-            if (SP == null) return NotFound();
-            ServProviderRepo.Remove(SP);
-            ServProviderRepo.Save();
-            return Ok(SP);
 
+            if (SP == null) return NotFound();
+
+            if (SP.Services.Any())
+            {
+                return BadRequest("ServiceProvider cannot be deleted because it is referenced by existing Services.");
+            }
+
+            try
+            {
+                ServProviderRepo.Remove(SP);
+                ServProviderRepo.Save();
+            }
+            catch (DbUpdateException ex)
+            {
+               
+                return BadRequest("Can't deleting the ServiceProvider. Please ensure that it is not referenced by any existing records.");
+            }
+
+            return Ok(SP);
         }
 
 

@@ -23,8 +23,7 @@ namespace Travel_Website_System_API_.Controllers
         // i will try by adding with DTO
         [HttpPost]
         [Consumes("application/json")]
-        // public ActionResult Add([FromBody]BookingPackage bookingPackage )
-        public ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
+        public  ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
             if(ModelState.IsValid)
             {
                 // to check the client has booked this package before or not
@@ -41,13 +40,14 @@ namespace Travel_Website_System_API_.Controllers
                     return BadRequest("this package is not availabe now ");
                 }
                 bookingPackageDTO.Date = DateTime.Now;
-                bookingPackageDTO.allowingTime = DateTime.Now.AddDays(20);
+                // bookingPackageDTO.allowingTime = DateTime.Now.AddDays(20);
+                bookingPackageDTO.allowingTime = DateTime.Now.AddDays(package.BookingTimeAllowed ??0);
                 //  count the number of bookings for the specified package
                 var bookingCountForPackage = unitOFWork.db.BookingPackages.Count(bp => bp.packageId == bookingPackageDTO.packageId);
                 bookingPackageDTO.quantity = bookingCountForPackage + 1;
                 var bookingPackage = new BookingPackage
                 {
-                    //Id = bookingPackageDTO.BookingPackageId,// is i dentity
+                    //Id = bookingPackageDTO.BookingPackageId,// is identity
                     clientId = bookingPackageDTO.clientId,
                     quantity = bookingPackageDTO.quantity,
                     Data = bookingPackageDTO.Date,
@@ -55,12 +55,16 @@ namespace Travel_Website_System_API_.Controllers
                     packageId = bookingPackageDTO.packageId,
                 };
                 unitOFWork.BookingPackageRepo.Add(bookingPackage);
+                unitOFWork.Save();
                 // after adding new booking for the specific package the availablequantity in package table will decreased by 1
                 package.QuantityAvailable--;
                 unitOFWork.db.Packages.Update(package);
-                unitOFWork.save();
+                unitOFWork.Save();
+                // Return the DTO with the new booking ID
+                bookingPackageDTO.Id = bookingPackage.Id;
+                Console.WriteLine(bookingPackageDTO.Id);
                 // will return object in response where i can get it id in ui to pass it in payment
-                return CreatedAtAction(nameof(GetBookingPackageById), new { id = bookingPackage.packageId }, bookingPackage);
+                return CreatedAtAction(nameof(GetBookingPackageById), new {id = bookingPackage.Id }, bookingPackageDTO);
                 // i returned bookingPackage not dto as when i returned dto the booking id was =0 and not changed 
             }
             else
@@ -77,21 +81,57 @@ namespace Travel_Website_System_API_.Controllers
             // here i get relative data with eager Loading
             var bookingPackage = unitOFWork.CustombookingPackageRepo.GetById(id);// to get relative data 
             if(bookingPackage == null) { return NotFound(); }
-           // var clientName = bookingPackage.client?.user?.Fname ?? "Unknown";
+            // var clientName = bookingPackage.client?.user?.Fname ?? "Unknown";
             var bookingPackageDTO = new BookingPackageDTO
             {
-               // BookingPackageId = bookingPackage.Id,
+                Id = bookingPackage.Id,
                 Date = bookingPackage.Data,
                 quantity = bookingPackage.quantity,
                 clientId = bookingPackage.clientId,
                 packageId = bookingPackage.packageId,
                 allowingTime = bookingPackage.allowingTime,
-               // clientName = clientName,// i get it for testing only i dont need it now
+                // clientName = clientName,// i get it for testing only i dont need it now
                 price = bookingPackage.package?.Price ?? 0,
+                PackageImage = bookingPackage.package?.Image ?? " "
             };
             return Ok(bookingPackageDTO);
         }
 
+        // Route for getting all bookings for a client that have no payment
+        [HttpGet("client/{clientId}")]
+        public IActionResult GetAllBookingForClient(string clientId)
+        {
+            if (string.IsNullOrEmpty(clientId))
+            {
+                return NotFound("Client ID cannot be null or empty.");
+            }
+
+            var allClientBookings = unitOFWork.CustombookingPackageRepo.SelectAllBookingforClient(clientId);
+
+            if (allClientBookings == null || !allClientBookings.Any())
+            {
+                return NotFound("There are no package bookings for this client.");
+            }
+            var allClientBookingsDTO = new List<BookingPackageDTO>();
+            foreach (var item in allClientBookings)
+            {
+                allClientBookingsDTO.Add(
+                new BookingPackageDTO
+                {
+                    Id = item.Id,
+                    clientId = item.clientId,
+                    packageId = item.packageId,
+                    allowingTime = item.allowingTime,
+                    Date = item.Data,
+                    quantity = item.quantity,
+                    price = item.package?.Price ?? 0,
+                });
+            }
+                
+            return Ok(allClientBookingsDTO);
+            // i can return list of dto
+        }
+        
         [HttpDelete("{id}")]
         public IActionResult DeleteBooking(int id)
         {
@@ -109,7 +149,7 @@ namespace Travel_Website_System_API_.Controllers
                 unitOFWork.db.Packages.Update(package);// PackageRepo.update(service)
                 bookingPackage.quantity--;
                 unitOFWork.BookingPackageRepo.Delete(bookingPackage.Id);
-                unitOFWork.save();
+                unitOFWork.Save();
                 return Ok("removed");
             }
             else

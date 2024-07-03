@@ -404,6 +404,31 @@ namespace Travel_Website_System_API_.Migrations
                     b.ToTable("Clients");
                 });
 
+            modelBuilder.Entity("Travel_Website_System_API.Models.ClientConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsConnected")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ClientConnections");
+                });
+
             modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
                 {
                     b.Property<string>("Id")
@@ -528,6 +553,9 @@ namespace Travel_Website_System_API_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("BookingTimeAllowed")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -615,6 +643,9 @@ namespace Travel_Website_System_API_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("BookingTimeAllowed")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -674,31 +705,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ServiceProviders");
-                });
-
-            modelBuilder.Entity("Travel_Website_System_API_.Models.ClientConnection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClientId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConnectionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsConnected")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ClientConnections");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API_.Models.PackageService", b =>

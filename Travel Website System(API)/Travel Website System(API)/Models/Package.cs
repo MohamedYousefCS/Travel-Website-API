@@ -20,6 +20,7 @@ namespace Travel_Website_System_API.Models
         public bool isDeleted { get; set; }
         public DateTime? startDate { get; set; }
         public int? Duration { get; set; }
+        public int ?BookingTimeAllowed { get; set; }
 
         public virtual ICollection<BookingPackage> BookingPackages { get; set; } = new HashSet<BookingPackage>();
         public virtual ICollection<LovePackage> LovePackages { get; set; } = new HashSet<LovePackage>();

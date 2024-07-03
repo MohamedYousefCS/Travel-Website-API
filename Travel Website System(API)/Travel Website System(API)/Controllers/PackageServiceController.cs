@@ -44,10 +44,8 @@ namespace Travel_Website_System_API_.Controllers
                     return BadRequest($"Service with ID {serviceId} not found.");
                 }
 
-                // Check if the service is already associated with the package
                 if (package.PackageServices.Any(ps => ps.ServiceId == serviceId))
                 {
-                    // Service already exists in the package
                     duplicateServices.Add(serviceId); // Track duplicate service IDs
                 }
                 else

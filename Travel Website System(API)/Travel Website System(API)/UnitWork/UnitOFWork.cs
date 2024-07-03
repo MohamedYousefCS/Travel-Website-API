@@ -1,4 +1,5 @@
-﻿using Travel_Website_System_API.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.Repositories;
 
 namespace Travel_Website_System_API_.UnitWork
@@ -64,9 +65,13 @@ namespace Travel_Website_System_API_.UnitWork
                 return custombookingPackageRepo;
             }
         }
-        public void save()
+        public void  Save()
         {
             db.SaveChanges();
+        }
+        public async void saveAsynch()
+        {
+            await db.SaveChangesAsync();
         }
     }
 }

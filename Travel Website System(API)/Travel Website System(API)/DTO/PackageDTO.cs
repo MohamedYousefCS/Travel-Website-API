@@ -16,6 +16,9 @@ namespace Travel_Website_System_API_.DTO
         public DateTime? startDate { get; set; }
         public int? Duration { get; set; }
         public string? adminId { get; set; }
+        public int? BookingTimeAllowed { get; set; }
+
+
 
         public List<string> ServiceNames { get; set; } = new List<string>(); // Initialize the list
 

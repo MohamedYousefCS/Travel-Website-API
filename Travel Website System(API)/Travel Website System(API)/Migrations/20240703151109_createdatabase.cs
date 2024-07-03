@@ -282,6 +282,7 @@ namespace Travel_Website_System_API_.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     isDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    BookingTimeAllowed = table.Column<int>(type: "int", nullable: true),
                     categoryId = table.Column<int>(type: "int", nullable: true),
                     serviceProviderId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -314,6 +315,7 @@ namespace Travel_Website_System_API_.Migrations
                     isDeleted = table.Column<bool>(type: "bit", nullable: false),
                     startDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
+                    BookingTimeAllowed = table.Column<int>(type: "int", nullable: true),
                     adminId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
