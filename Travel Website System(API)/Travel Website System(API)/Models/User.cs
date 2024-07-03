@@ -27,6 +27,9 @@ namespace Travel_Website_System_API.Models
         //for chat signalR
         public ICollection<Message> Messages { get; set; }
 
+        public string Passport { get; set; }
+        public string Location { get; set; }
+
         public override string UserName
         {
             get => Email;
