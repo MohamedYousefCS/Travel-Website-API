@@ -12,6 +12,7 @@ namespace Travel_Website_System_API.Models
    
     public class ApplicationUser : IdentityUser
     {
+
         public string Fname { get; set; }
         public string Lname { get; set; }
         public string Gender { get; set; }
@@ -23,6 +24,8 @@ namespace Travel_Website_System_API.Models
 
         public CustomerService? customerService { get; set; }
 
+        //for chat signalR
+        public ICollection<Message> Messages { get; set; }
 
         public override string UserName
         {
@@ -30,6 +33,15 @@ namespace Travel_Website_System_API.Models
             set => base.UserName = Email;
         }
 
+
+        //for chat signalR
+
+        public string ProfilePictureUrl { get;  set; }
+
+        public string Status { get;  set; }
+        public DateTime LastSeen { get;  set; }
+        public ApplicationUser User { get;  set; }
+        //////////////
     }
 }
 
