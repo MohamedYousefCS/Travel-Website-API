@@ -214,60 +214,140 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // PUT: api/Packages/5
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
         [HttpPut("{id}")]
-        public ActionResult EditPackage(int id, PackageDTO packageDTO)
+        public ActionResult EditPackage(int id, [FromBody] PackageDTO packageDTO)
         {
-           // var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //if (userId !=packageDTO.adminId) return BadRequest("this admin can not update this Package");
-            if (packageDTO == null) return BadRequest();
-            if (packageDTO.Id != id) return BadRequest();
-            if (!ModelState.IsValid) return BadRequest();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Get current user's ID
+            var package = packageRepo.GetById(id);
+
+            if (package == null)
+            {
+                return NotFound();
+            }
+
+            // Check if the logged-in user is authorized to edit this package
+            if (userId != package.adminId)
+            {
+                return BadRequest("You are not authorized to edit this package");
+            }
+
+            // Proceed with package edit logic
+            if (packageDTO == null || packageDTO.Id != id || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
             string uniqueFileName = UploadImage(packageDTO.Image);
-            Package package = new Package()
-            {
-                Id = packageDTO.Id,
-                Name = packageDTO.Name,
-                Description = packageDTO.Description,
-                Image = uniqueFileName,
-                QuantityAvailable = packageDTO.QuantityAvailable,
-                Price = packageDTO.Price,
-                isDeleted = packageDTO.isDeleted,
-                startDate = packageDTO.startDate,
-                Duration = packageDTO.Duration,
-                adminId = packageDTO.adminId,
-                BookingTimeAllowed = packageDTO.BookingTimeAllowed
-            };
+            package.Name = packageDTO.Name;
+            package.Description = packageDTO.Description;
+            package.Image = uniqueFileName;
+            package.QuantityAvailable = packageDTO.QuantityAvailable;
+            package.Price = packageDTO.Price;
+            package.isDeleted = packageDTO.isDeleted;
+            package.startDate = packageDTO.startDate;
+            package.Duration = packageDTO.Duration;
+            package.BookingTimeAllowed = packageDTO.BookingTimeAllowed;
+
             packageRepo.Edit(package);
             packageRepo.Save();
+
             return NoContent();
         }
-
 
         // DELETE: api/Packages/5
         //[Authorize(Roles = "superAdmin, admin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePackage(int id)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Get current user's ID
             var package = packageRepo.GetById(id);
-            if (package == null) return NotFound();
+
+            if (package == null)
+            {
+                return NotFound();
+            }
+
+            // Check if the logged-in user is authorized to delete this package
+            if (userId != package.adminId)
+            {
+               return BadRequest("You are not authorized to delete this package");
+            }
 
             // Check if there are any bookings associated with the package
             var hasBookings = bookingPackageRepo.GetAllBokking(id);
             if (hasBookings)
             {
-                // Return a message indicating the package cannot be deleted due to bookings
                 return BadRequest("The package cannot be deleted because it is reserved.");
             }
 
             // Perform a soft delete by marking the package as deleted
             package.isDeleted = true;
             packageRepo.Edit(package);
-
             packageRepo.Save();
+
             return Ok(package);
         }
+
+
+
+
+
+        //// PUT: api/Packages/5
+        //[Authorize(Roles = "superAdmin, admin")]
+        //[HttpPut("{id}")]
+        //public ActionResult EditPackage(int id, PackageDTO packageDTO)
+        //{
+        //   // var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //    //if (userId !=packageDTO.adminId) return BadRequest("this admin can not update this Package");
+        //    if (packageDTO == null) return BadRequest();
+        //    if (packageDTO.Id != id) return BadRequest();
+        //    if (!ModelState.IsValid) return BadRequest();
+
+        //    string uniqueFileName = UploadImage(packageDTO.Image);
+        //    Package package = new Package()
+        //    {
+        //        Id = packageDTO.Id,
+        //        Name = packageDTO.Name,
+        //        Description = packageDTO.Description,
+        //        Image = uniqueFileName,
+        //        QuantityAvailable = packageDTO.QuantityAvailable,
+        //        Price = packageDTO.Price,
+        //        isDeleted = packageDTO.isDeleted,
+        //        startDate = packageDTO.startDate,
+        //        Duration = packageDTO.Duration,
+        //        adminId = packageDTO.adminId,
+        //        BookingTimeAllowed = packageDTO.BookingTimeAllowed
+        //    };
+        //    packageRepo.Edit(package);
+        //    packageRepo.Save();
+        //    return NoContent();
+        //}
+
+
+        //// DELETE: api/Packages/5
+        ////[Authorize(Roles = "superAdmin, admin")]
+        //[HttpDelete("{id}")]
+        //public IActionResult DeletePackage(int id)
+        //{
+        //    var package = packageRepo.GetById(id);
+        //    if (package == null) return NotFound();
+
+        //    // Check if there are any bookings associated with the package
+        //    var hasBookings = bookingPackageRepo.GetAllBokking(id);
+        //    if (hasBookings)
+        //    {
+        //        // Return a message indicating the package cannot be deleted due to bookings
+        //        return BadRequest("The package cannot be deleted because it is reserved.");
+        //    }
+
+        //    // Perform a soft delete by marking the package as deleted
+        //    package.isDeleted = true;
+        //    packageRepo.Edit(package);
+
+        //    packageRepo.Save();
+        //    return Ok(package);
+        //}
 
 
 
