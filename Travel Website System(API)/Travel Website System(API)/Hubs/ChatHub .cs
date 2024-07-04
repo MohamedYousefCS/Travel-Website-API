@@ -43,11 +43,10 @@
 
         }
 
-        public async Task JoinGroup(string group, string userId)
+        public async Task JoinGroup(UserConnection conn)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, group);
-            var user = await _context.Users.FindAsync(userId);
-            await Clients.Group(group).SendAsync("UserJoined", user.UserName);
+            
+            await Clients.All.SendAsync("ReceiveMessage", "CustomerService", $"{conn.ApplicationUser}has joined the group");
         }
 
 
@@ -57,7 +56,7 @@
             var UserId = Context.UserIdentifier; // Assuming you use authentication and UserIdentifier is set
             var connectionId = Context.ConnectionId;
 
-            var clientConnection = new UserConnection
+            var UserConnection = new UserConnection
             {
                 ApplicationUserId = UserId,
                 ConnectionId = connectionId,
@@ -65,7 +64,7 @@
                 LastUpdated = DateTime.UtcNow
             };
 
-           await _context.UserConnections.AddAsync(clientConnection);
+           await _context.UserConnections.AddAsync(UserConnection);
             await _context.SaveChangesAsync();
 
             await base.OnConnectedAsync();
@@ -77,15 +76,15 @@
         {
             var connectionId = Context.ConnectionId;
 
-            var clientConnection = await _context.UserConnections
+            var UserConnection = await _context.UserConnections
                 .FirstOrDefaultAsync(cc => cc.ConnectionId == connectionId);
 
-            if (clientConnection != null)
+            if (UserConnection != null)
             {
-                clientConnection.IsConnected = false;
-                clientConnection.LastUpdated = DateTime.UtcNow;
+                UserConnection.IsConnected = false;
+                UserConnection.LastUpdated = DateTime.UtcNow;
 
-                 _context.UserConnections.Update(clientConnection);
+                 _context.UserConnections.Update(UserConnection);
                 await _context.SaveChangesAsync();
             }
 

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Travel_Website_System_API.Models
 {
-
+    // this is for getting users connection
     public class UserConnection
     {
         public int Id { get; set; }
