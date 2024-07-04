@@ -21,13 +21,16 @@ namespace Travel_Website_System_API_.Controllers
         GenericRepository<Package> packageRepo;
         private readonly IPackageRepo _packageRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        IBookingPackageRepo bookingPackageRepo;
 
 
-        public PackagesController(GenericRepository<Package> packageRepo,IPackageRepo repo , IWebHostEnvironment webHostEnvironment)
+        public PackagesController(GenericRepository<Package> packageRepo,IPackageRepo repo , IWebHostEnvironment webHostEnvironment,IBookingPackageRepo bookingPackageRepo)
         {
             this.packageRepo = packageRepo;
             this._packageRepo = repo;
             _webHostEnvironment = webHostEnvironment;
+            this.bookingPackageRepo = bookingPackageRepo;
+
         }
 
         // GET: api/Packages
@@ -55,6 +58,7 @@ namespace Travel_Website_System_API_.Controllers
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
+                    BookingTimeAllowed = package.BookingTimeAllowed,
                     ServiceNames = serviceNames // Include service names
                 });
             }
@@ -101,6 +105,7 @@ namespace Travel_Website_System_API_.Controllers
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
+                    BookingTimeAllowed = package.BookingTimeAllowed,
                     ServiceNames = serviceNames // Include service names
 
                 };
@@ -131,6 +136,7 @@ namespace Travel_Website_System_API_.Controllers
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
+                    BookingTimeAllowed= package.BookingTimeAllowed,
                     ServiceNames = serviceNames // Include service names
 
                 };
@@ -159,7 +165,8 @@ namespace Travel_Website_System_API_.Controllers
                 isDeleted = packageDTO.isDeleted,
                 startDate = packageDTO.startDate,
                 Duration = packageDTO.Duration,
-                adminId = packageDTO.adminId
+                adminId = packageDTO.adminId,
+                BookingTimeAllowed = packageDTO.BookingTimeAllowed
             };
             packageRepo.Add(package);
             packageRepo.Save();
@@ -229,7 +236,8 @@ namespace Travel_Website_System_API_.Controllers
                 isDeleted = packageDTO.isDeleted,
                 startDate = packageDTO.startDate,
                 Duration = packageDTO.Duration,
-                adminId = packageDTO.adminId
+                adminId = packageDTO.adminId,
+                BookingTimeAllowed = packageDTO.BookingTimeAllowed
             };
             packageRepo.Edit(package);
             packageRepo.Save();
@@ -242,22 +250,25 @@ namespace Travel_Website_System_API_.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeletePackage(int id)
         {
-            Package package = packageRepo.GetById(id);
+            var package = packageRepo.GetById(id);
             if (package == null) return NotFound();
 
-            if (package.QuantityAvailable == 0)
+            // Check if there are any bookings associated with the package
+            var hasBookings = bookingPackageRepo.GetAllBokking(id);
+            if (hasBookings)
             {
-                package.isDeleted = true;
-                packageRepo.Edit(package); 
+                // Return a message indicating the package cannot be deleted due to bookings
+                return BadRequest("The package cannot be deleted because it is reserved.");
             }
-            else
-            {
-                packageRepo.Remove(package);
-            }
+
+            // Perform a soft delete by marking the package as deleted
+            package.isDeleted = true;
+            packageRepo.Edit(package);
 
             packageRepo.Save();
             return Ok(package);
         }
+
 
 
     }

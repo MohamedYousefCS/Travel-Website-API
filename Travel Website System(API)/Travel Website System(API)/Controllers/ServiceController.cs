@@ -53,6 +53,7 @@ namespace Travel_Website_System_API_.Controllers
                     isDeleted = service.isDeleted,
                     categoryId = service.categoryId,
                     serviceProviderId = service.serviceProviderId,
+                    BookingTimeAllowed = service.BookingTimeAllowed
 
                 });
 
@@ -104,6 +105,7 @@ namespace Travel_Website_System_API_.Controllers
                     isDeleted = service.isDeleted,
                     categoryId = service.categoryId,
                     serviceProviderId = service.serviceProviderId,
+                    BookingTimeAllowed= service.BookingTimeAllowed
                 };
                 return Ok(serviceDTO);
 
@@ -133,6 +135,7 @@ namespace Travel_Website_System_API_.Controllers
                     isDeleted = service.isDeleted,
                     categoryId = service.categoryId,
                     serviceProviderId = service.serviceProviderId,
+                    BookingTimeAllowed = service.BookingTimeAllowed
                 };
                 return Ok(serviceDTO);
 
@@ -155,7 +158,8 @@ namespace Travel_Website_System_API_.Controllers
                 price = serviceDTO.price,
                 isDeleted = serviceDTO.isDeleted,
                 categoryId = serviceDTO.categoryId,
-                serviceProviderId = serviceDTO.serviceProviderId
+                serviceProviderId = serviceDTO.serviceProviderId,
+                BookingTimeAllowed= serviceDTO.BookingTimeAllowed
             };
             serviceRepo.Add(service);
             serviceRepo.Save();
@@ -181,7 +185,8 @@ namespace Travel_Website_System_API_.Controllers
                 price = serviceDTO.price,
                 isDeleted = serviceDTO.isDeleted,
                 categoryId = serviceDTO.categoryId,
-                serviceProviderId = serviceDTO.serviceProviderId
+                serviceProviderId = serviceDTO.serviceProviderId,
+                BookingTimeAllowed = serviceDTO.BookingTimeAllowed
             };
             serviceRepo.Edit(service);
             serviceRepo.Save();
@@ -190,23 +195,25 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteService(int id) {
-
-            Service service = serviceRepo.GetById(id);
+        public IActionResult DeleteService(int id)
+        {
+            var service = serviceRepo.GetById(id);
             if (service == null) return NotFound();
-            if (service.QuantityAvailable == 0)
-            {
-                service.isDeleted = true;
-                serviceRepo.Edit(service);
-            }
-            else
-            {
-                serviceRepo.Remove(service);
 
+            // Check if there are any bookings associated with the service
+            var hasBookings = _serviceRepo.GetAllBookings(id);
+            if (hasBookings)
+            {
+                // Return a message indicating the service cannot be deleted due to bookings
+                return BadRequest("The service cannot be deleted because it is reserved.");
             }
+
+            // Perform a soft delete by marking the service as deleted
+            service.isDeleted = true;
+            serviceRepo.Edit(service);
+
             serviceRepo.Save();
             return Ok(service);
-
         }
 
 
