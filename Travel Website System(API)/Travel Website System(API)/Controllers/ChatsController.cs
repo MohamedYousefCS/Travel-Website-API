@@ -169,6 +169,9 @@ namespace Travel_Website_System_API_.Controllers
             return _context.Chats.Any(e => e.Id == id);
         }
 
+
+        // send messaage from customer service to clients
+
         [HttpPost("SendMessageToClient")]
         public async Task<IActionResult> SendMessageToClient(string message, string ReceiverId, string SenderId)
         {
@@ -191,6 +194,10 @@ namespace Travel_Website_System_API_.Controllers
             await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessage", JsonConvert.SerializeObject(newMessage));
             return Ok(true);
         }
+
+
+        // send messaage from clients to customer service 
+
         [HttpPost("SendMessageToCustomerService")]
         public async Task<IActionResult> SendMessageToCustomerService(string message, string ReceiverId, string SenderId)
         {
@@ -226,6 +233,10 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(true);
 
         }
+
+
+        //deleting messages
+
         [HttpDelete("DeleteMessage/{messageId}")]
         public async Task<IActionResult> DeleteMessage(int messageId)
         {
@@ -238,6 +249,10 @@ namespace Travel_Website_System_API_.Controllers
             }
             return Ok(true);
         }
+
+
+        //mark for reading status
+
         [HttpPut("MarkMessageAsRead/{messageId}")]
         public async Task<IActionResult> MarkMessageAsRead(int messageId)
         {
@@ -253,6 +268,10 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(true);
 
         }
+
+
+        //mark for last seen 
+
         [HttpPut("UpdateUserStatus/{userId}/{status}")]
 
         public async Task<IActionResult> UpdateUserStatus(int userId, string status)
@@ -269,6 +288,9 @@ namespace Travel_Website_System_API_.Controllers
             }
             return Ok(true);
         }
+
+
+        // notify of typing messages
 
         [HttpGet("NotifyTyping/{userId}")]
         public async Task<IActionResult> NotifyTyping(int userId)
