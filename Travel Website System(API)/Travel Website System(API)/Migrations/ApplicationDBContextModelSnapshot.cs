@@ -162,7 +162,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.ApplicationUser", b =>
@@ -280,7 +280,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("packageId");
 
-                    b.ToTable("BookingPackages");
+                    b.ToTable("BookingPackages", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingService", b =>
@@ -315,7 +315,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("serviceId");
 
-                    b.ToTable("BookingServices");
+                    b.ToTable("BookingServices", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Category", b =>
@@ -337,7 +337,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Chat", b =>
@@ -377,7 +377,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("customerServiceId");
 
-                    b.ToTable("Chats");
+                    b.ToTable("Chats", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
@@ -387,7 +387,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clients");
+                    b.ToTable("Clients", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
@@ -397,7 +397,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerServices");
+                    b.ToTable("CustomerServices", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.LovePackage", b =>
@@ -426,7 +426,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("packageId");
 
-                    b.ToTable("LovePackages");
+                    b.ToTable("LovePackages", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.LoveService", b =>
@@ -455,7 +455,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("serviceId");
 
-                    b.ToTable("LoveServices");
+                    b.ToTable("LoveServices", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Message", b =>
@@ -482,7 +482,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("chatId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Package", b =>
@@ -527,7 +527,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("adminId");
 
-                    b.ToTable("Packages");
+                    b.ToTable("Packages", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Payment", b =>
@@ -572,7 +572,7 @@ namespace Travel_Website_System_API_.Migrations
                         .IsUnique()
                         .HasFilter("[BookingServiceId] IS NOT NULL");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Service", b =>
@@ -619,7 +619,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("serviceProviderId");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.ServiceProvider", b =>
@@ -644,7 +644,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServiceProviders");
+                    b.ToTable("ServiceProviders", (string)null);
                 });
 
             modelBuilder.Entity("Travel_Website_System_API_.Models.PackageService", b =>
@@ -664,7 +664,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("PackageService");
+                    b.ToTable("PackageService", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

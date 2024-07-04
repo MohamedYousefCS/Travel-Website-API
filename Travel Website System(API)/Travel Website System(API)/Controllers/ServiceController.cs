@@ -190,23 +190,30 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteService(int id) {
-
+        public ActionResult DeleteService(int id)
+        {
             Service service = serviceRepo.GetById(id);
             if (service == null) return NotFound();
+
+            // Check if there are any bookings associated with the service
+            if (service.BookingServices.Any())
+            {
+                // Return a message indicating the service cannot be deleted due to bookings
+                return BadRequest("The service cannot be deleted because it is reserved.");
+            }
+
             if (service.QuantityAvailable == 0)
             {
                 service.isDeleted = true;
-                serviceRepo.Edit(service);
             }
             else
             {
-                serviceRepo.Remove(service);
-
+                service.isDeleted = true; // Perform a soft delete by marking the service as deleted
             }
+
+            serviceRepo.Edit(service);
             serviceRepo.Save();
             return Ok(service);
-
         }
 
 
