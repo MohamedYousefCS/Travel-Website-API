@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +22,10 @@ namespace Travel_Website_System_API_.Controllers
             this.unitOFWork = unitOFWork;
         }
         // i will try by adding with DTO
+       
         [HttpPost]
         [Consumes("application/json")]
-        public  ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
+        public ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
             if(ModelState.IsValid)
             {
                 // to check the client has booked this package before or not
@@ -42,6 +44,8 @@ namespace Travel_Website_System_API_.Controllers
                 bookingPackageDTO.Date = DateTime.Now;
                 // bookingPackageDTO.allowingTime = DateTime.Now.AddDays(20);
                 bookingPackageDTO.allowingTime = DateTime.Now.AddDays(package.BookingTimeAllowed ??0);
+                bookingPackageDTO.price = package?.Price ?? 0;
+                bookingPackageDTO.PackageImage = package?.Image ?? " ";
                 //  count the number of bookings for the specified package
                 var bookingCountForPackage = unitOFWork.db.BookingPackages.Count(bp => bp.packageId == bookingPackageDTO.packageId);
                 bookingPackageDTO.quantity = bookingCountForPackage + 1;
@@ -62,7 +66,20 @@ namespace Travel_Website_System_API_.Controllers
                 unitOFWork.Save();
                 // Return the DTO with the new booking ID
                 bookingPackageDTO.Id = bookingPackage.Id;
-                Console.WriteLine(bookingPackageDTO.Id);
+
+                // Populate DTO from saved entity to ensure consistency
+                var savedBooking = unitOFWork.CustombookingPackageRepo.GetById(bookingPackage.Id);
+                bookingPackageDTO = new BookingPackageDTO
+                {
+                    Id = savedBooking.Id,
+                    Date = savedBooking.Data,
+                    quantity = savedBooking.quantity,
+                    clientId = savedBooking.clientId,
+                    packageId = savedBooking.packageId,
+                    allowingTime = savedBooking.allowingTime,
+                    price = package.Price ?? 0,
+                    PackageImage = package.Image ?? " "
+                };
                 // will return object in response where i can get it id in ui to pass it in payment
                 return CreatedAtAction(nameof(GetBookingPackageById), new {id = bookingPackage.Id }, bookingPackageDTO);
                 // i returned bookingPackage not dto as when i returned dto the booking id was =0 and not changed 

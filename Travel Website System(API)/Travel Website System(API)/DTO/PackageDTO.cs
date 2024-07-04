@@ -12,7 +12,7 @@ namespace Travel_Website_System_API_.DTO
         public string? ImageUrl { get; set; }  // For returning the image URL
         public int? QuantityAvailable { get; set; }
         public decimal? Price { get; set; }
-        public bool isDeleted { get; set; }
+        public bool isDeleted { get; set; }    
         public DateTime? startDate { get; set; }
         public int? Duration { get; set; }
         public string? adminId { get; set; }

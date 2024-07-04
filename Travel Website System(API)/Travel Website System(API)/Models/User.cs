@@ -12,6 +12,7 @@ namespace Travel_Website_System_API.Models
    
     public class ApplicationUser : IdentityUser
     {
+
         public string Fname { get; set; }
         public string Lname { get; set; }
         public string Gender { get; set; }
@@ -23,13 +24,15 @@ namespace Travel_Website_System_API.Models
 
         public CustomerService? customerService { get; set; }
 
+        public string Passport { get; set; }
+        public string ResidanceCountry { get; set; }
 
         public override string UserName
         {
             get => Email;
             set => base.UserName = Email;
         }
-
+        
     }
 }
 
