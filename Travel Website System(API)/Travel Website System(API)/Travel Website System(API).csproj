@@ -23,6 +23,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="8.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.5">
       <PrivateAssets>all</PrivateAssets>
@@ -33,7 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\packages\" />
+    <Folder Include="wwwroot\Images\Services\" />
+    <Folder Include="wwwroot\Images\Packages\" />
   </ItemGroup>
 
 </Project>

@@ -181,6 +181,39 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
+
+        [HttpPut("completeInfo")]
+        public async Task<IActionResult> CompleteInfo(UpdateUserDto updateUserDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(updateUserDto.Email);
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User not found" });
+                }
+
+                user.Passport = updateUserDto.Passport;
+                user.PhoneNumber = updateUserDto.PhoneNumber;
+                user.ResidanceCountry = updateUserDto.ResidanceCountry;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return Ok(new { Message = "User updated successfully" });
+                }
+
+                foreach (var err in result.Errors)
+                {
+                    ModelState.AddModelError("", err.Description);
+                }
+            }
+            return BadRequest(ModelState);
+        }
+
+
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> SoftDeleteUser(string id)
         {

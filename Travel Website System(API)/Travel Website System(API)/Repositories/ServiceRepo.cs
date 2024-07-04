@@ -42,6 +42,10 @@ namespace Travel_Website_System_API_.Repositories
         }
 
 
+        public bool GetAllBookings(int Id)
+        {
+            return db.BookingServices.Any(bs => bs.serviceId == Id);
+        }
 
     }
    

@@ -21,17 +21,24 @@ namespace Travel_Website_System_API.Models
         public Admin? Admin { get; set; }
         public Client? client { get; set; }
         public bool IsDeleted { get; set; }
-
         public CustomerService? customerService { get; set; }
-
         public string Passport { get; set; }
         public string ResidanceCountry { get; set; }
-
+        //for chat signalR
+        public ICollection<Message> Messages { get; set; }
         public override string UserName
         {
             get => Email;
             set => base.UserName = Email;
         }
+
+        //for chat signalR
+
+        public string ProfilePictureUrl { get;  set; }
+
+        public string Status { get;  set; }
+        public DateTime LastSeen { get;  set; }
+        public ApplicationUser User { get;  set; }
         
     }
 }
