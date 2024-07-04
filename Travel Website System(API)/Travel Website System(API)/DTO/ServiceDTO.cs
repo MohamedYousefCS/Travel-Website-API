@@ -18,9 +18,8 @@ namespace Travel_Website_System_API_.DTO
         public  int? categoryId { get; set; }
 
         public  int? serviceProviderId { get; set; }
-              
-    
 
+        public int? BookingTimeAllowed { get; set; }
 
     }
 }

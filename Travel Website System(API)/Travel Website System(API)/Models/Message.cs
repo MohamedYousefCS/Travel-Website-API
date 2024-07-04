@@ -10,13 +10,27 @@ namespace Travel_Website_System_API.Models
 {
     public class Message
     {
+        [Key]
+
         public int Id { get; set; }
+
+
         public string status { get; set; }
-        public string sender { get; set; }
+        public ApplicationUser Sender { get; set; }
+     
         public bool isDeleted { get; set; }
 
         [ForeignKey("Chat")]
         public int? chatId { get; set; }
         public virtual Chat Chat { get; set; }
+
+     
+
+        public DateTime Timestamp { get;  set; }
+        public string Content { get;  set; }
+        public bool IsRead { get;  set; }
+        public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
+        public ApplicationUser Receiver { get;  set; }
     }
 }

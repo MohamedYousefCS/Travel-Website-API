@@ -1,5 +1,5 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO.PaymentClasses;
+using Travel_Website_System_API_.Hubs;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.UnitWork;
 using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
@@ -23,6 +24,8 @@ namespace Travel_Website_System_API_
 
             // Add services to the container.
             builder.Services.AddControllers();
+
+            builder.Services.AddSignalR();
             // inject unit of work
             builder.Services.AddScoped<UnitOFWork>();
             builder.Services.AddControllers().AddJsonOptions(options =>
@@ -42,7 +45,7 @@ namespace Travel_Website_System_API_
             //})
             //);
 
-            builder.Services.AddDbContext<ApplicationDBContext>(op=>op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
+            builder.Services.AddDbContext<ApplicationDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
             builder.Services.Configure<PayPalSettings>(builder.Configuration.GetSection("PayPal"));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -62,6 +65,7 @@ namespace Travel_Website_System_API_
             builder.Services.AddScoped<IPackageRepo, PackageRepo>();
             builder.Services.AddScoped<IServiceProviderRepo, ServiceProviderRepo>();
             builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+            builder.Services.AddScoped<IBookingPackageRepo, BookingPackageRepo>();
 
 
 
@@ -162,8 +166,9 @@ namespace Travel_Website_System_API_
             app.UseRouting();
 
             app.UseAuthentication();//check JWT token
-           
+
             app.UseAuthorization();
+            app.MapHub<ChatHub>("/Chat");
             app.MapControllers();
 
             app.UseStaticFiles();//  for www
@@ -172,8 +177,17 @@ namespace Travel_Website_System_API_
             app.MapControllers();
 
             app.UseStaticFiles();
-           
-           
+
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapControllers();
+            //    endpoints.MapHub<ChatHub>("/ChatHub", options =>
+            //    {
+            //        options.Transports =
+            //            HttpTransportType.WebSockets |
+            //            HttpTransportType.LongPolling;
+            //    });
+            //});
 
 
 
@@ -181,6 +195,5 @@ namespace Travel_Website_System_API_
         }
 
     }
-            
-    }
 
+}
