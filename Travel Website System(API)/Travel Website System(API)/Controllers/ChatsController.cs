@@ -16,11 +16,14 @@ namespace Travel_Website_System_API_.Controllers
 
         private readonly ApplicationDBContext _context;
         private IHubContext<ChatHub> _hub;
+        private readonly ILogger<ChatsController> _logger;
 
-        public ChatsController(ApplicationDBContext context, IHubContext<ChatHub> hub)
+
+        public ChatsController(ApplicationDBContext context, IHubContext<ChatHub> hub , ILogger<ChatsController> logger)
         {
             _context = context;
             _hub = hub;
+            _logger = logger;
         }
 
         [HttpGet("GetChats")]
@@ -251,43 +254,96 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
+
+
         //mark for reading status
 
         [HttpPut("MarkMessageAsRead/{messageId}")]
         public async Task<IActionResult> MarkMessageAsRead(int messageId)
         {
-            var message = await _context.Messages.FindAsync(messageId);
-            if (message != null)
+            if (messageId <= 0)
             {
+                _logger.LogWarning("MarkMessageAsRead: Invalid messageId provided.");
+                return BadRequest("Invalid messageId.");
+            }
+
+            try
+            {
+                var message = await _context.Messages.FindAsync(messageId);
+                if (message == null)
+                {
+                    _logger.LogWarning($"MarkMessageAsRead: Message with messageId {messageId} not found.");
+                    return NotFound("Message not found.");
+                }
+
                 message.IsRead = true;
                 _context.Messages.Update(message);
                 await _context.SaveChangesAsync();
 
-                await _hub.Clients.User(message.Sender.ToString()).SendAsync("MessageRead", messageId);
-            }
-            return Ok(true);
+                _logger.LogInformation($"Message with messageId {messageId} marked as read.");
 
+                await _hub.Clients.User(message.Sender.ToString()).SendAsync("MessageRead", messageId);
+                _logger.LogInformation("Message read notification sent successfully.");
+
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while marking message as read.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+            }
         }
 
 
-        //mark for last seen 
 
-        [HttpPut("UpdateUserStatus/{userId}/{status}")]
 
+        //notify for last seen 
+
+        [HttpPost("UpdateUserStatus")]
         public async Task<IActionResult> UpdateUserStatus(int userId, string status)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null)
+            if (userId <= 0)
             {
+                _logger.LogWarning("UpdateUserStatus: Invalid userId provided.");
+                return BadRequest("Invalid userId.");
+            }
+
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                _logger.LogWarning("UpdateUserStatus: Status cannot be null or empty.");
+                return BadRequest("Status cannot be null or empty.");
+            }
+
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning($"UpdateUserStatus: User with userId {userId} not found.");
+                    return NotFound("User not found.");
+                }
+
                 user.Status = status;
                 user.LastSeen = DateTime.UtcNow;
+
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
 
-                await _hub.Clients.All.SendAsync("UserStatusUpdated", userId, status);
+                _logger.LogInformation($"User status updated for userId {userId}. New status: {status}");
+
+                await _hub.Clients.All.SendAsync("UserStatusUpdated", userId, status, user.LastSeen);
+                _logger.LogInformation("User status notification sent successfully.");
+
+                return Ok(true);
             }
-            return Ok(true);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating user status.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+            }
         }
+
+
 
 
         // notify of typing messages
@@ -295,12 +351,32 @@ namespace Travel_Website_System_API_.Controllers
         [HttpGet("NotifyTyping/{userId}")]
         public async Task<IActionResult> NotifyTyping(int userId)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null)
+            if (userId <= 0)
             {
-                await _hub. Clients.All.SendAsync("UserTyping", userId);
+                _logger.LogWarning("NotifyTyping: Invalid userId provided.");
+                return BadRequest("Invalid userId.");
             }
-            return Ok(true);
+
+            try
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning($"NotifyTyping: User with userId {userId} not found.");
+                    return NotFound("User not found.");
+                }
+
+                _logger.LogInformation($"Notifying typing status for userId {userId}.");
+                await _hub.Clients.All.SendAsync("UserTyping", userId);
+                _logger.LogInformation("Typing status notification sent successfully.");
+
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while notifying typing status.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+            }
         }
     }
 }
