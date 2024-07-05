@@ -1,4 +1,5 @@
-﻿using Travel_Website_System_API.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Travel_Website_System_API.Models;
 
 namespace Travel_Website_System_API_.Repositories
 {
@@ -29,9 +30,7 @@ namespace Travel_Website_System_API_.Repositories
             .Select(x => x.Name)
                 .ToList();
         }
-
-
-
+       
 
         public Package GetByName(string name)
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using PayPalCheckoutSdk.Orders;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.UnitWork;
@@ -55,7 +56,7 @@ namespace Travel_Website_System_API_.Controllers
                     //Id = bookingPackageDTO.BookingPackageId,// is identity
                     clientId = bookingPackageDTO.clientId,
                     quantity = bookingPackageDTO.quantity,
-                    Data = bookingPackageDTO.Date,
+                    Date = bookingPackageDTO.Date,
                     allowingTime = bookingPackageDTO.allowingTime,
                     packageId = bookingPackageDTO.packageId,
                 };
@@ -73,7 +74,7 @@ namespace Travel_Website_System_API_.Controllers
                 bookingPackageDTO = new BookingPackageDTO
                 {
                     Id = savedBooking.Id,
-                    Date = savedBooking.Data,
+                    Date = savedBooking.Date,
                     quantity = savedBooking.quantity,
                     clientId = savedBooking.clientId,
                     packageId = savedBooking.packageId,
@@ -103,7 +104,7 @@ namespace Travel_Website_System_API_.Controllers
             var bookingPackageDTO = new BookingPackageDTO
             {
                 Id = bookingPackage.Id,
-                Date = bookingPackage.Data,
+                Date = bookingPackage.Date,
                 quantity = bookingPackage.quantity,
                 clientId = bookingPackage.clientId,
                 packageId = bookingPackage.packageId,
@@ -140,13 +141,13 @@ namespace Travel_Website_System_API_.Controllers
                     clientId = item.clientId,
                     packageId = item.packageId,
                     allowingTime = item.allowingTime,
-                    Date = item.Data,
+                    Date = item.Date,
                     quantity = item.quantity,
                     price = item.package?.Price ?? 0,
                 });
             }
                 
-            return Ok(allClientBookingsDTO);
+            return Ok(allClientBookingsDTO);        
             // i can return list of dto
         }
 
@@ -180,9 +181,26 @@ namespace Travel_Website_System_API_.Controllers
         [HttpGet("AllBookings")]
         public IActionResult GetAllPackageBooking()
         {
-            var allPackageBooking = unitOFWork.BookingPackageRepo.GetAll();
-            if(allPackageBooking == null) { return NotFound(); }
-            return Ok(allPackageBooking);
+            var allPackageBooking = unitOFWork.CustombookingPackageRepo.selectAll();
+            if(allPackageBooking == null) { return NotFound("there are no Bookings"); }
+            var AllBookingsDTO = new List<BookingPackageDTO>();
+            foreach (var item in allPackageBooking)
+            {
+                AllBookingsDTO.Add(
+                    new BookingPackageDTO
+                    {
+                        Id = item.Id,
+                        clientId = item.clientId,
+                        packageId = item.packageId,
+                        allowingTime = item.allowingTime,
+                        Date = item.Date,
+                        quantity = item.quantity,
+                        price = item.package?.Price ?? 0,
+                        PackageImage = item.package.Image,
+                    });   
+            }
+
+            return Ok(AllBookingsDTO);
         }
         
     }

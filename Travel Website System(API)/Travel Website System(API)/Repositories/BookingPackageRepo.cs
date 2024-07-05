@@ -16,8 +16,6 @@ namespace Travel_Website_System_API_.Repositories
             return db.BookingPackages.Any(bp => bp.packageId == id);
         }
 
-
-
         public List<BookingPackage> selectAll()
         {
             return db.BookingPackages.Include(b=>b.Payment).Include(b=>b.client).Include(b=>b.package).ToList();
