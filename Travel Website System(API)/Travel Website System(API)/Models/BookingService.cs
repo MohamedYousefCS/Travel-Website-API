@@ -12,19 +12,15 @@ namespace Travel_Website_System_API.Models
     {
         public int Id { get; set; }
         public int? Quantity { get; set; }
-        public DateTime? Data { get; set; }
+        public DateTime? Date { get; set; }
 
         public DateTime? allowingTime { get; set; }
         public bool IsDeleted { get; set; }
-
-
         public virtual Payment Payment { get; set; }
-
 
         [ForeignKey("client")]
         public string? clientId { get; set; }
         public virtual Client client { get; set; }
-
 
         [ForeignKey("service")]
         public int? serviceId { get; set; }

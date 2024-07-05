@@ -17,9 +17,28 @@ namespace Travel_Website_System_API.Models
         public string? Image { get; set; }
         public int? QuantityAvailable { get; set; }
         public decimal? Price { get; set; }
-        public bool isDeleted { get; set; }
+        public bool isDeleted { get; set; } = false;
         public DateTime? startDate { get; set; }
         public int? Duration { get; set; }
+        public DateTime? EndDate { get; set; }
+        public PackageLocationEnum ?FirstLocation { get; set; }// dropdownlist
+        public PackageLocationEnum ?SecondLocation { get; set; }//dropdownlist
+
+        private int? firstLocationDuration;// fileld
+        public int? FirstLocationDuration// property
+        {
+            get => firstLocationDuration;
+            set
+            {
+                if (value > Duration)
+                {
+                    throw new ArgumentException("FirstLocationDuration must be less than or equal to Duration.");
+                }
+                firstLocationDuration = value;
+            }
+        }
+        public int? SecondLocationDuration { get; set; }// fixed : duration - FirstLocationDuration
+
         public int ?BookingTimeAllowed { get; set; }
 
         public virtual ICollection<BookingPackage> BookingPackages { get; set; } = new HashSet<BookingPackage>();

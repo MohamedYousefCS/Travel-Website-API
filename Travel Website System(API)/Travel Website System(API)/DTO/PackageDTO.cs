@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Travel_Website_System_API.Models;
 using System.ComponentModel.DataAnnotations;
+using Travel_Website_System_API_.Models;
 
 
 namespace Travel_Website_System_API_.DTO
@@ -29,10 +30,18 @@ namespace Travel_Website_System_API_.DTO
         [Range(0, double.MaxValue, ErrorMessage = "Price must be a non-negative number")]
         public decimal? Price { get; set; }
 
-        public bool isDeleted { get; set; }
+        public bool isDeleted { get; set; }    
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format")]
         public DateTime? startDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public PackageLocationEnum? FirstLocation { get; set; }// dropdownlist
+        public PackageLocationEnum ?SecondLocation { get; set; }//dropdownlist
+
+        public int? FirstLocationDuration { get; set; }// fixed
+        public int? SecondLocationDuration { get; set; }// fixed : duration - FirstLocationDuration
+
+        // accept updateing 
 
         [Range(1, int.MaxValue, ErrorMessage = "Duration must be a positive number")]
         public int? Duration { get; set; }

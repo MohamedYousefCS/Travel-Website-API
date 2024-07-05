@@ -57,9 +57,14 @@ namespace Travel_Website_System_API_.Controllers
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
+                    EndDate = package.EndDate,
                     adminId = package.adminId,
                     BookingTimeAllowed = package.BookingTimeAllowed,
-                    ServiceNames = serviceNames // Include service names
+                    ServiceNames = serviceNames ,// Include service names
+                    FirstLocation = package.FirstLocation,
+                    SecondLocation = package.SecondLocation,
+                    FirstLocationDuration = package.FirstLocationDuration,
+                    SecondLocationDuration = package.SecondLocationDuration,
                 });
             }
 
@@ -106,7 +111,11 @@ namespace Travel_Website_System_API_.Controllers
                     Duration = package.Duration,
                     adminId = package.adminId,
                     BookingTimeAllowed = package.BookingTimeAllowed,
-                    ServiceNames = serviceNames // Include service names
+                    ServiceNames = serviceNames ,// Include service names
+                    FirstLocation = package.FirstLocation,
+                    SecondLocation = package.SecondLocation,
+                    FirstLocationDuration = package.FirstLocationDuration,
+                    SecondLocationDuration = package.SecondLocationDuration,
 
                 };
                 return Ok(packageDTO);
@@ -135,10 +144,14 @@ namespace Travel_Website_System_API_.Controllers
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
+                    EndDate = package.EndDate,
                     adminId = package.adminId,
                     BookingTimeAllowed= package.BookingTimeAllowed,
-                    ServiceNames = serviceNames // Include service names
-
+                    ServiceNames = serviceNames, // Include service names
+                    FirstLocation = package.FirstLocation,
+                    SecondLocation = package.SecondLocation,
+                    FirstLocationDuration = package.FirstLocationDuration,
+                    SecondLocationDuration = package.SecondLocationDuration,
                 };
                 return Ok(packageDTO);
             }
@@ -154,6 +167,8 @@ namespace Travel_Website_System_API_.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             string uniqueFileName = UploadImage(packageDTO.Image);
+            packageDTO.EndDate = packageDTO.startDate?.AddDays(packageDTO.Duration ?? 0);
+            packageDTO.SecondLocationDuration = packageDTO.Duration - packageDTO.FirstLocationDuration;
 
             Package package = new Package() {
                 //Id = packageDTO.Id,
@@ -165,8 +180,13 @@ namespace Travel_Website_System_API_.Controllers
                 isDeleted = packageDTO.isDeleted,
                 startDate = packageDTO.startDate,
                 Duration = packageDTO.Duration,
+                EndDate = packageDTO.EndDate,
                 adminId = packageDTO.adminId,
-                BookingTimeAllowed = packageDTO.BookingTimeAllowed
+                BookingTimeAllowed = packageDTO.BookingTimeAllowed,
+                FirstLocation = packageDTO.FirstLocation,
+                SecondLocation = packageDTO.SecondLocation,
+                FirstLocationDuration = packageDTO.FirstLocationDuration,
+                SecondLocationDuration= packageDTO.SecondLocationDuration,
             };
             packageRepo.Add(package);
             packageRepo.Save();
@@ -247,7 +267,12 @@ namespace Travel_Website_System_API_.Controllers
             package.isDeleted = packageDTO.isDeleted;
             package.startDate = packageDTO.startDate;
             package.Duration = packageDTO.Duration;
+            package.EndDate = packageDTO.EndDate;
             package.BookingTimeAllowed = packageDTO.BookingTimeAllowed;
+            package.FirstLocation = package.FirstLocation;
+            package.SecondLocation = package.SecondLocation;
+            package.FirstLocationDuration = package.FirstLocationDuration;
+            package.SecondLocationDuration = package.SecondLocationDuration;
 
             packageRepo.Edit(package);
             packageRepo.Save();

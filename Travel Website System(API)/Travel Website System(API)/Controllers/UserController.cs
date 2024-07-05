@@ -148,6 +148,38 @@ namespace Travel_Website_System_API_.Controllers
 
             return NoContent();
         }
+        [HttpPut("completeInfo/{id}")]//update client data 
+        public async Task<IActionResult> CompleteInfo( [FromForm]UpdateUserDto updateUserDto,string id)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User not found" });
+                }
+
+                user.Passport = updateUserDto.Passport;
+                user.PhoneNumber = updateUserDto.PhoneNumber;
+                user.ResidanceCountry = updateUserDto.ResidanceCountry;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return Ok(new { Message = "User updated successfully" });
+                }
+
+                foreach (var err in result.Errors)
+                {
+                    ModelState.AddModelError("", err.Description);
+                }
+            }
+            return BadRequest(ModelState);
+        }
+
+
+
+
 
 
         [HttpPut("completeInfo")]
@@ -163,7 +195,7 @@ namespace Travel_Website_System_API_.Controllers
 
                 user.Passport = updateUserDto.Passport;
                 user.PhoneNumber = updateUserDto.PhoneNumber;
-                user.Location = updateUserDto.Location;
+                user.ResidanceCountry = updateUserDto.ResidanceCountry;
 
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)

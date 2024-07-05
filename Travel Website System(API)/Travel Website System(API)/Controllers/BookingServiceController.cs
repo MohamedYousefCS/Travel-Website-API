@@ -45,7 +45,7 @@ namespace Travel_Website_System_API_.Controllers
             var bookingService = new BookingService(){ 
                 Id = bookingServiceDTO.BookingServiceId,
                 allowingTime = bookingServiceDTO.allowingTime,
-                Data = DateTime.Now,
+                Date = DateTime.Now,
                 clientId = bookingServiceDTO.ClientId,
                 serviceId = bookingServiceDTO.ServiceId,
                 Quantity = bookingServiceDTO.Quantity,
@@ -80,7 +80,7 @@ namespace Travel_Website_System_API_.Controllers
                 ServiceId = bookingService.serviceId,
                 Quantity = bookingService.Quantity,
                 allowingTime = bookingService.allowingTime,
-                Date = bookingService.Data,
+                Date = bookingService.Date,
                // price = bookingService?.service?.price ?? 0
                 //ClientName = bookingService.client?.user?.Fname ?? "unknown"
             };

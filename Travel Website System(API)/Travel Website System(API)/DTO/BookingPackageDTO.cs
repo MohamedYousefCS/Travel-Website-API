@@ -20,7 +20,7 @@ namespace Travel_Website_System_API_.DTO
 
         [Column(TypeName = "date")]
         public DateTime? allowingTime { get; set; }
-        public Decimal ? price { get; set; }
+        public Decimal  ?price { get; set; }
         public string ? PackageImage { get; set; }
 
 

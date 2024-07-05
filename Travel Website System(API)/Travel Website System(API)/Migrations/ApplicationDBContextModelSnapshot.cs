@@ -199,9 +199,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("Lname")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Location")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -229,6 +226,9 @@ namespace Travel_Website_System_API_.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResidanceCountry")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
@@ -276,7 +276,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("Data")
+                    b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -311,7 +311,7 @@ namespace Travel_Website_System_API_.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("Data")
+                    b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -404,6 +404,9 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PassportNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -568,6 +571,15 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int?>("Duration")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FirstLocation")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FirstLocationDuration")
+                        .HasColumnType("int");
+
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
@@ -578,6 +590,12 @@ namespace Travel_Website_System_API_.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("QuantityAvailable")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SecondLocation")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SecondLocationDuration")
                         .HasColumnType("int");
 
                     b.Property<string>("adminId")
@@ -652,7 +670,34 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int?>("BookingTimeAllowed")
                         .HasColumnType("int");
 
+                    b.Property<string>("ComingBackFlightDesination")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ComingBackFlightSource")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ComingFlightTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GoingFlightDestination")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GoingFlightSource")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("GoingFlightTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HoltelLocation")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
@@ -666,6 +711,9 @@ namespace Travel_Website_System_API_.Migrations
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("categoryId")
                         .HasColumnType("int");
