@@ -15,7 +15,7 @@ namespace Travel_Website_System_API_.DTO
         [StringLength(20, ErrorMessage = "Description cannot exceed 20 characters")]
         public string Description { get; set; }
 
-        [Url(ErrorMessage = "Logo must be a valid URL")]
+       // [Url(ErrorMessage = "Logo must be a valid URL")]
         public string Logo { get; set; }
 
         public bool isDeleted { get; set; }
