@@ -28,14 +28,10 @@ namespace Travel_Website_System_API_.DTO
 
         [Range(0, double.MaxValue, ErrorMessage = "Price must be a non-negative number")]
         public decimal? Price { get; set; }
-<<<<<<< HEAD
-        public bool isDeleted { get; set; }    
-=======
 
-        public bool isDeleted { get; set; }
+        public bool isDeleted { get; set; }    
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format")]
->>>>>>> 4ac371bea6f60117308cc582fba0f211d50255b5
         public DateTime? startDate { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Duration must be a positive number")]

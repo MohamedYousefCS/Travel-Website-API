@@ -21,10 +21,11 @@ namespace Travel_Website_System_API_.Controllers
         {
             this.unitOFWork = unitOFWork;
         }
-        // i will try by adding with DTO
+      
        
         [HttpPost]
         [Consumes("application/json")]
+        // [Authorize(Roles = "client")]
         public ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
             if(ModelState.IsValid)
             {
@@ -91,7 +92,7 @@ namespace Travel_Website_System_API_.Controllers
             }
       
         }
-
+        
         [HttpGet("{id}")]
         public IActionResult GetBookingPackageById(int id)
         {
@@ -114,7 +115,7 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(bookingPackageDTO);
         }
 
-        // Route for getting all bookings for a client that have no payment
+        // Route for getting all bookings for a  logined client that have no payments
         [HttpGet("client/{clientId}")]
         public IActionResult GetAllBookingForClient(string clientId)
         {
@@ -148,7 +149,7 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(allClientBookingsDTO);
             // i can return list of dto
         }
-        
+
         [HttpDelete("{id}")]
         public IActionResult DeleteBooking(int id)
         {
@@ -176,6 +177,13 @@ namespace Travel_Website_System_API_.Controllers
             }
         }
 
-
+        [HttpGet("AllBookings")]
+        public IActionResult GetAllPackageBooking()
+        {
+            var allPackageBooking = unitOFWork.BookingPackageRepo.GetAll();
+            if(allPackageBooking == null) { return NotFound(); }
+            return Ok(allPackageBooking);
+        }
+        
     }
 }
