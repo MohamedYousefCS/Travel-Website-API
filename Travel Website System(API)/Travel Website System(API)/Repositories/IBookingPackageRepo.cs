@@ -11,6 +11,7 @@ namespace Travel_Website_System_API_.Repositories
         public BookingPackage GetById(int id);
 
         public List<BookingPackage> SelectAllBookingforClient(string clientId);
+        public List<BookingPackage> GetAllPaidBookingsForClient(string clientId);
 
     }
 }

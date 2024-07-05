@@ -4,6 +4,7 @@ using Travel_Website_System_API.Models;
 
 namespace Travel_Website_System_API_.Repositories
 {
+    // to get all booking relative data
     public class BookingPackageRepo:IBookingPackageRepo
     {
         ApplicationDBContext db;
@@ -25,7 +26,7 @@ namespace Travel_Website_System_API_.Repositories
         {
           return  db.BookingPackages.Include(b => b.Payment).Include(b => b.client).ThenInclude(c=>c.ApplicationUser).Include(b => b.package).SingleOrDefault(b =>b.Id == id);
         }
-        // this to get relative data and booking with no payment 
+        // this to get relative data and allbooking for a client with  no payment 
         public List<BookingPackage> SelectAllBookingforClient(string clientId)
         {
             return db.BookingPackages.Include(b => b.client).ThenInclude(c => c.ApplicationUser).Include(b => b.package).
@@ -33,6 +34,15 @@ namespace Travel_Website_System_API_.Repositories
                 .ToList();
         }
 
+        // this to get relative data and allbooking for a client with  those has paid 
+        public List<BookingPackage> GetAllPaidBookingsForClient(string clientId)
+        {
+            return db.BookingPackages.Include(b => b.client).ThenInclude(c => c.ApplicationUser).Include(b => b.package).
+                Include(b=>b.Payment)
+                            .Where(b => b.clientId.Equals(clientId))
+                            .ToList();
+        }
+   
 
     }
 }
