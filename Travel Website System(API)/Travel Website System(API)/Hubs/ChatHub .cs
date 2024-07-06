@@ -22,14 +22,7 @@
         }
 
 
-     
-
-
-        public async Task JoinGroup(UserConnection conn)
-        {
-            
-            await Clients.All.SendAsync("ReceiveMessage", "CustomerService", $"{conn.ApplicationUser}has joined the group");
-        }
+   
 
 
 
