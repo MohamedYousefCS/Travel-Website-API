@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Travel_Website_System_API_.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDatabase : Migration
+    public partial class mmmmmmmm : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +36,7 @@ namespace Travel_Website_System_API_.Migrations
                     SSN = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    Passport = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PassportNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResidanceCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -44,7 +44,6 @@ namespace Travel_Website_System_API_.Migrations
                     LastSeen = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
-                    PassportNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -293,10 +292,9 @@ namespace Travel_Website_System_API_.Migrations
                     GoingFlightDestination = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ComingBackFlightSource = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ComingBackFlightDesination = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GoingFlightTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ComingFlightTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    HoltelLocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    HoltelLocation = table.Column<int>(type: "int", nullable: true),
+                    NumberOFAvailableRooms = table.Column<int>(type: "int", nullable: true),
+                    NumberOFPersons = table.Column<int>(type: "int", nullable: true),
                     categoryId = table.Column<int>(type: "int", nullable: true),
                     serviceProviderId = table.Column<int>(type: "int", nullable: true)
                 },

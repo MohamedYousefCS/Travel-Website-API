@@ -22,7 +22,7 @@ namespace Travel_Website_System_API.Models
         public Client? client { get; set; }
         public bool IsDeleted { get; set; }
         public CustomerService? customerService { get; set; }
-        public string Passport { get; set; }
+        public string PassportNumber { get; set; }
         public string ResidanceCountry { get; set; }
         //for chat signalR
         public ICollection<Message> Messages { get; set; }

@@ -69,7 +69,7 @@ namespace Travel_Website_System_API_.Controllers
                 // Return the DTO with the new booking ID
                 bookingPackageDTO.Id = bookingPackage.Id;
 
-                // Populate DTO from saved entity to ensure consistency
+                // Populate DTO from saved entity to ensure passing all values to Dto attributes
                 var savedBooking = unitOFWork.CustombookingPackageRepo.GetById(bookingPackage.Id);
                 bookingPackageDTO = new BookingPackageDTO
                 {
@@ -150,7 +150,7 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(allClientBookingsDTO);        
             // i can return list of dto
         }
-
+        // [Authorize(Roles ="admin,superAdmin")]
         [HttpDelete("{id}")]
         public IActionResult DeleteBooking(int id)
         {
@@ -160,11 +160,11 @@ namespace Travel_Website_System_API_.Controllers
                 return NotFound();
             }
             //bookingPackage.allowingTime < DateTime.Now: if the date of today is > date of allowingtime
-            if (bookingPackage.allowingTime != null && bookingPackage.allowingTime < DateTime.Now)
+            if (bookingPackage.allowingTime != null && bookingPackage.allowingTime < DateTime.Now)//package start date
             {
                 // get the current package in booking row
                 var package = unitOFWork.db.Packages.SingleOrDefault(s => s.Id == bookingPackage.packageId);
-                //package.QuantityAvailable++;
+                package.QuantityAvailable++;
                 unitOFWork.db.Packages.Update(package);// PackageRepo.update(service)
                 bookingPackage.quantity--;
                 unitOFWork.BookingPackageRepo.Delete(bookingPackage.Id);
@@ -178,8 +178,9 @@ namespace Travel_Website_System_API_.Controllers
             }
         }
 
+        //[Authorize(Roles ="admin,superAdmin")]
         [HttpGet("AllBookings")]
-        public IActionResult GetAllPackageBooking()
+        public IActionResult GetAllPackageBooking() // Get all booking for all clients
         {
             var allPackageBooking = unitOFWork.CustombookingPackageRepo.selectAll();
             if(allPackageBooking == null) { return NotFound("there are no Bookings"); }
@@ -201,6 +202,35 @@ namespace Travel_Website_System_API_.Controllers
             }
 
             return Ok(AllBookingsDTO);
+        }
+        // allBookings for a sepecific client
+       // [Authorize(Roles ="client,admin,superAdmin")]
+        [HttpGet("AllBookings/{clientId}")]
+        public IActionResult GetAllPaidBookingsForClient(string clientId) {
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                return NotFound("Client ID cannot be null or empty.");
+            }
+            var AllPaidBookings = unitOFWork.CustombookingPackageRepo.GetAllPaidBookingsForClient(clientId);
+            var AllPaidBookingsDTO = new List<BookingPackageDTO>();
+
+            foreach (var item in AllPaidBookings)
+            {
+                AllPaidBookingsDTO.Add(
+                    new BookingPackageDTO
+                    {
+                        Id = item.Id,
+                        clientId = item.clientId,
+                        packageId = item.packageId,
+                        allowingTime = item.allowingTime,
+                        Date = item.Date,
+                        quantity = item.quantity,
+                        price = item.package?.Price ?? 0,
+                        PackageImage = item.package.Image,
+                    });
+            }
+            return Ok(AllPaidBookingsDTO);
         }
         
     }

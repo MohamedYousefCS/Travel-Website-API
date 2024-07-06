@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
@@ -15,8 +16,8 @@ namespace Travel_Website_System_API_.Controllers
         {
             this.unitOFWork = unitOFWork;
         }
-        // in add and get by id i will add and get Dto 
-        // i used Lazyloading here
+        
+        //[Authorize(Roles ="client")]
         [HttpPost]
         public IActionResult Add(BookingServiceDTO bookingServiceDTO)//client id , service id 
         {
@@ -43,21 +44,33 @@ namespace Travel_Website_System_API_.Controllers
             bookingServiceDTO.allowingTime = DateTime.Now.AddDays(service.BookingTimeAllowed ?? 0 );// will be added by admin 
             bookingServiceDTO.Date = DateTime.Now;
             var bookingService = new BookingService(){ 
-                Id = bookingServiceDTO.BookingServiceId,
                 allowingTime = bookingServiceDTO.allowingTime,
-                Date = DateTime.Now,
+                Date =bookingServiceDTO.Date,
                 clientId = bookingServiceDTO.ClientId,
                 serviceId = bookingServiceDTO.ServiceId,
                 Quantity = bookingServiceDTO.Quantity,
             };
             unitOFWork.BookingServiceRepo.Add(bookingService);
+            unitOFWork.Save();
             // when adding bookingService object the quantity is increased by 1 and the available quantity for the service 
             // is decreased by 1, and the vise of deleting bookingservice
             service.QuantityAvailable--;
             unitOFWork.db.Services.Update(service);
             unitOFWork.Save();
+            bookingServiceDTO.Id = bookingService.Id;
+            var savedBooking = unitOFWork.CustombookingServiceRepo.GetById(bookingService.Id);
+            bookingServiceDTO = new BookingServiceDTO
+            {
+                Id = savedBooking.Id,
+                Date = savedBooking.Date,
+                Quantity = savedBooking.Quantity,
+                ClientId = savedBooking.clientId,
+                ServiceId = savedBooking.serviceId,
+                allowingTime = savedBooking.allowingTime,
+                price = service.price??0,
+            };
             // will return object in response where i can get it id in ui to pass it in payment
-           return CreatedAtAction(nameof(GetByID), new { id = bookingServiceDTO.BookingServiceId }, bookingService);
+            return CreatedAtAction(nameof(GetByID), new { id = bookingService.Id }, bookingServiceDTO);
         }
 
         [HttpGet("{id}")] 
@@ -68,20 +81,20 @@ namespace Travel_Website_System_API_.Controllers
                 return BadRequest("please enter valid id");
             }
             // here i will get relative data by lazy loading
-            var bookingService = unitOFWork.BookingServiceRepo.GetById(id);
+            var bookingService = unitOFWork.CustombookingServiceRepo.GetById(id);
             if(bookingService == null)
             {
                 return NotFound();
             }
             BookingServiceDTO bookingServiceDTO = new BookingServiceDTO()
             {
-                BookingServiceId = bookingService.Id,
+                Id = bookingService.Id,
                 ClientId = bookingService.clientId,
                 ServiceId = bookingService.serviceId,
                 Quantity = bookingService.Quantity,
                 allowingTime = bookingService.allowingTime,
                 Date = bookingService.Date,
-               // price = bookingService?.service?.price ?? 0
+                price = bookingService?.service?.price ?? 0
                 //ClientName = bookingService.client?.user?.Fname ?? "unknown"
             };
             return Ok(bookingServiceDTO);
@@ -103,6 +116,7 @@ namespace Travel_Website_System_API_.Controllers
           //and compared with the quantity in package/service table if are euals make this package/service is deleted = true;
          */
 
+       // [Authorize(Roles = "admin,superAdmin")]
         [HttpDelete ("{id}")]// delete and get dont have body in request
         public IActionResult DeleteBooking(int id)
         {
@@ -129,6 +143,36 @@ namespace Travel_Website_System_API_.Controllers
                 // Allow booking removal only if allowing time has expired
                 return BadRequest("Booking service cannot be removed as allowing time has not expired yet.");
             }    
+        }
+
+        // [Authorize(Roles ="client,admin,superAdmin")]
+        [HttpGet("AllPaidBookings/{clientId}")]
+        public IActionResult GetAllPaidBookingsForClient(string clientId)
+        {
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                return NotFound("Client ID cannot be null or empty.");
+            }
+            var AllPaidBookings = unitOFWork.CustombookingServiceRepo.GetAllPaidBookingsForClient(clientId);
+            if (AllPaidBookings == null) { return Ok("there is no paid bookings"); }
+            var AllPaidBookingsDTO = new List<BookingServiceDTO>();
+
+            foreach (var item in AllPaidBookings)
+            {
+                AllPaidBookingsDTO.Add(
+                    new BookingServiceDTO
+                    {
+                        Id = item.Id,
+                        ClientId = item.clientId,
+                        ServiceId = item.serviceId,
+                        Quantity = item.Quantity,
+                        allowingTime = item.allowingTime,
+                        Date = item.Date,
+                        price = item?.service?.price ?? 0
+                    });
+            }
+            return Ok(AllPaidBookingsDTO);
         }
     }
 }
