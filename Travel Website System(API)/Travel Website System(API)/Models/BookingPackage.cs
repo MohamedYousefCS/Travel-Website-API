@@ -11,7 +11,7 @@ namespace Travel_Website_System_API.Models
     public class BookingPackage
     {
         public int Id { get; set; }
-        public DateTime? Data { get; set; }
+        public DateTime? Date { get; set; }
         public int? quantity { get; set; }
         public DateTime? allowingTime { get; set; }
 

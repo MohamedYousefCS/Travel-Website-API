@@ -21,13 +21,16 @@ namespace Travel_Website_System_API_.Controllers
         GenericRepository<Package> packageRepo;
         private readonly IPackageRepo _packageRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        IBookingPackageRepo bookingPackageRepo;
 
 
-        public PackagesController(GenericRepository<Package> packageRepo,IPackageRepo repo , IWebHostEnvironment webHostEnvironment)
+        public PackagesController(GenericRepository<Package> packageRepo,IPackageRepo repo , IWebHostEnvironment webHostEnvironment,IBookingPackageRepo bookingPackageRepo)
         {
             this.packageRepo = packageRepo;
             this._packageRepo = repo;
             _webHostEnvironment = webHostEnvironment;
+            this.bookingPackageRepo = bookingPackageRepo;
+
         }
 
         // GET: api/Packages
@@ -48,14 +51,20 @@ namespace Travel_Website_System_API_.Controllers
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    ImageUrl = package.Image,
+                    Image = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
+                    EndDate = package.EndDate,
                     adminId = package.adminId,
-                    ServiceNames = serviceNames // Include service names
+                    BookingTimeAllowed = package.BookingTimeAllowed,
+                    ServiceNames = serviceNames ,// Include service names
+                    FirstLocation = package.FirstLocation,
+                    SecondLocation = package.SecondLocation,
+                    FirstLocationDuration = package.FirstLocationDuration,
+                    SecondLocationDuration = package.SecondLocationDuration,
                 });
             }
 
@@ -94,14 +103,19 @@ namespace Travel_Website_System_API_.Controllers
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    ImageUrl = package.Image,
+                    Image = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
                     adminId = package.adminId,
-                    ServiceNames = serviceNames // Include service names
+                    BookingTimeAllowed = package.BookingTimeAllowed,
+                    ServiceNames = serviceNames ,// Include service names
+                    FirstLocation = package.FirstLocation,
+                    SecondLocation = package.SecondLocation,
+                    FirstLocationDuration = package.FirstLocationDuration,
+                    SecondLocationDuration = package.SecondLocationDuration,
 
                 };
                 return Ok(packageDTO);
@@ -124,15 +138,20 @@ namespace Travel_Website_System_API_.Controllers
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    ImageUrl = package.Image,
+                    Image = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
                     startDate = package.startDate,
                     Duration = package.Duration,
+                    EndDate = package.EndDate,
                     adminId = package.adminId,
-                    ServiceNames = serviceNames // Include service names
-
+                    BookingTimeAllowed= package.BookingTimeAllowed,
+                    ServiceNames = serviceNames, // Include service names
+                    FirstLocation = package.FirstLocation,
+                    SecondLocation = package.SecondLocation,
+                    FirstLocationDuration = package.FirstLocationDuration,
+                    SecondLocationDuration = package.SecondLocationDuration,
                 };
                 return Ok(packageDTO);
             }
@@ -147,19 +166,35 @@ namespace Travel_Website_System_API_.Controllers
             if (packageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
 
-            string uniqueFileName = UploadImage(packageDTO.Image);
+            // Get the current logged-in user's ID
+            var adminId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (adminId == null)
+            {
+                return Unauthorized();
+            }
+
+            //string uniqueFileName = UploadImage(packageDTO.Image);
+            packageDTO.EndDate = packageDTO.startDate?.AddDays(packageDTO.Duration ?? 0);
+            packageDTO.SecondLocationDuration = packageDTO.Duration - packageDTO.FirstLocationDuration;
 
             Package package = new Package() {
                 //Id = packageDTO.Id,
                 Name = packageDTO.Name,
                 Description = packageDTO.Description,
-                Image = uniqueFileName,
+                //Image = uniqueFileName,
+                Image= packageDTO.Image,
                 QuantityAvailable = packageDTO.QuantityAvailable,
                 Price = packageDTO.Price,
                 isDeleted = packageDTO.isDeleted,
                 startDate = packageDTO.startDate,
                 Duration = packageDTO.Duration,
-                adminId = packageDTO.adminId
+                EndDate = packageDTO.EndDate,
+                adminId = adminId,
+                BookingTimeAllowed = packageDTO.BookingTimeAllowed,
+                FirstLocation = packageDTO.FirstLocation,
+                SecondLocation = packageDTO.SecondLocation,
+                FirstLocationDuration = packageDTO.FirstLocationDuration,
+                SecondLocationDuration= packageDTO.SecondLocationDuration,
             };
             packageRepo.Add(package);
             packageRepo.Save();
@@ -207,57 +242,147 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // PUT: api/Packages/5
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
         [HttpPut("{id}")]
-        public ActionResult EditPackage(int id, PackageDTO packageDTO)
+        public ActionResult EditPackage(int id, [FromBody] PackageDTO packageDTO)
         {
-           // var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //if (userId !=packageDTO.adminId) return BadRequest("this admin can not update this Package");
-            if (packageDTO == null) return BadRequest();
-            if (packageDTO.Id != id) return BadRequest();
-            if (!ModelState.IsValid) return BadRequest();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Get current user's ID
+            var package = packageRepo.GetById(id);
 
-            string uniqueFileName = UploadImage(packageDTO.Image);
-            Package package = new Package()
+            if (package == null)
             {
-                Id = packageDTO.Id,
-                Name = packageDTO.Name,
-                Description = packageDTO.Description,
-                Image = uniqueFileName,
-                QuantityAvailable = packageDTO.QuantityAvailable,
-                Price = packageDTO.Price,
-                isDeleted = packageDTO.isDeleted,
-                startDate = packageDTO.startDate,
-                Duration = packageDTO.Duration,
-                adminId = packageDTO.adminId
-            };
+                return NotFound();
+            }
+
+            // Check if the logged-in user is authorized to edit this package
+            if (userId != package.adminId)
+            {
+                return BadRequest("You are not authorized to edit this package");
+            }
+
+            // Proceed with package edit logic
+            if (packageDTO == null || packageDTO.Id != id || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+           // string uniqueFileName = UploadImage(packageDTO.Image);
+            package.Name = packageDTO.Name;
+            package.Description = packageDTO.Description;
+            //package.Image = uniqueFileName;
+            package.Image=packageDTO.Image;
+            package.QuantityAvailable = packageDTO.QuantityAvailable;
+            package.Price = packageDTO.Price;
+            package.isDeleted = packageDTO.isDeleted;
+            package.startDate = packageDTO.startDate;
+            package.Duration = packageDTO.Duration;
+            package.EndDate = packageDTO.EndDate;
+            package.BookingTimeAllowed = packageDTO.BookingTimeAllowed;
+            package.FirstLocation = package.FirstLocation;
+            package.SecondLocation = package.SecondLocation;
+            package.FirstLocationDuration = package.FirstLocationDuration;
+            package.SecondLocationDuration = package.SecondLocationDuration;
+
             packageRepo.Edit(package);
             packageRepo.Save();
+
             return NoContent();
         }
-
 
         // DELETE: api/Packages/5
         //[Authorize(Roles = "superAdmin, admin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePackage(int id)
         {
-            Package package = packageRepo.GetById(id);
-            if (package == null) return NotFound();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Get current user's ID
+            var package = packageRepo.GetById(id);
 
-            if (package.QuantityAvailable == 0)
+            if (package == null)
             {
-                package.isDeleted = true;
-                packageRepo.Edit(package); 
-            }
-            else
-            {
-                packageRepo.Remove(package);
+                return NotFound();
             }
 
+            // Check if the logged-in user is authorized to delete this package
+            if (userId != package.adminId)
+            {
+               return BadRequest("You are not authorized to delete this package");
+            }
+
+            // Check if there are any bookings associated with the package
+            var hasBookings = bookingPackageRepo.GetAllBokking(id);
+            if (hasBookings)
+            {
+                return BadRequest("The package cannot be deleted because it is reserved.");
+            }
+
+            // Perform a soft delete by marking the package as deleted
+            package.isDeleted = true;
+            packageRepo.Edit(package);
             packageRepo.Save();
+
             return Ok(package);
         }
+
+
+
+
+
+        //// PUT: api/Packages/5
+        //[Authorize(Roles = "superAdmin, admin")]
+        //[HttpPut("{id}")]
+        //public ActionResult EditPackage(int id, PackageDTO packageDTO)
+        //{
+        //   // var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //    //if (userId !=packageDTO.adminId) return BadRequest("this admin can not update this Package");
+        //    if (packageDTO == null) return BadRequest();
+        //    if (packageDTO.Id != id) return BadRequest();
+        //    if (!ModelState.IsValid) return BadRequest();
+
+        //    string uniqueFileName = UploadImage(packageDTO.Image);
+        //    Package package = new Package()
+        //    {
+        //        Id = packageDTO.Id,
+        //        Name = packageDTO.Name,
+        //        Description = packageDTO.Description,
+        //        Image = uniqueFileName,
+        //        QuantityAvailable = packageDTO.QuantityAvailable,
+        //        Price = packageDTO.Price,
+        //        isDeleted = packageDTO.isDeleted,
+        //        startDate = packageDTO.startDate,
+        //        Duration = packageDTO.Duration,
+        //        adminId = packageDTO.adminId,
+        //        BookingTimeAllowed = packageDTO.BookingTimeAllowed
+        //    };
+        //    packageRepo.Edit(package);
+        //    packageRepo.Save();
+        //    return NoContent();
+        //}
+
+
+        //// DELETE: api/Packages/5
+        ////[Authorize(Roles = "superAdmin, admin")]
+        //[HttpDelete("{id}")]
+        //public IActionResult DeletePackage(int id)
+        //{
+        //    var package = packageRepo.GetById(id);
+        //    if (package == null) return NotFound();
+
+        //    // Check if there are any bookings associated with the package
+        //    var hasBookings = bookingPackageRepo.GetAllBokking(id);
+        //    if (hasBookings)
+        //    {
+        //        // Return a message indicating the package cannot be deleted due to bookings
+        //        return BadRequest("The package cannot be deleted because it is reserved.");
+        //    }
+
+        //    // Perform a soft delete by marking the package as deleted
+        //    package.isDeleted = true;
+        //    packageRepo.Edit(package);
+
+        //    packageRepo.Save();
+        //    return Ok(package);
+        //}
+
 
 
     }

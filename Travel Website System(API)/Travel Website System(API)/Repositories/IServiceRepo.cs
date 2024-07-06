@@ -9,5 +9,8 @@ namespace Travel_Website_System_API_.Repositories
 
         Service GetByName(string name);
 
+        public bool GetAllBookings(int Id);
+
+
     }
 }

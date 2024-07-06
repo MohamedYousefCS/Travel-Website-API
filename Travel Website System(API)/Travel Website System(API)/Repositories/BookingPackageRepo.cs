@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API.Models;
 
 namespace Travel_Website_System_API_.Repositories
@@ -10,6 +11,11 @@ namespace Travel_Website_System_API_.Repositories
         {
             this.db = db;
         }
+        public bool GetAllBokking(int id)
+        {
+            return db.BookingPackages.Any(bp => bp.packageId == id);
+        }
+
         public List<BookingPackage> selectAll()
         {
             return db.BookingPackages.Include(b=>b.Payment).Include(b=>b.client).Include(b=>b.package).ToList();

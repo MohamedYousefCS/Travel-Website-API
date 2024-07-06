@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Numerics;
 using Microsoft.EntityFrameworkCore;
 using Travel_Website_System_API_.Models;
 
@@ -19,8 +20,22 @@ namespace Travel_Website_System_API.Models
         public int? QuantityAvailable { get; set; } = 4;
         public DateTime? StartDate { get; set; }
         public decimal? price { get; set; }
-        public bool? isDeleted { get; set; }
-        public int ? BookingTimeAllowed { get; set; }
+        public bool? isDeleted { get; set; } = false;
+        public int ? BookingTimeAllowed { get; set;}
+        public int ? Duration { get; set; }
+        public DateTime? EndDate { get; set; }
+     
+        //// for flight
+        public string ?GoingFlightSource { get; set; }
+        public string ?GoingFlightDestination { get; set; }
+        public string ?ComingBackFlightSource { get; set; }
+        public string ?ComingBackFlightDesination { get; set; }
+        public DateTime ?GoingFlightTime { get; set; }// = start date of package 
+        public DateTime ?ComingFlightTime { get; set; }//= end date of pakcage
+
+        // hotels: choose start date , duration
+        public string ?HoltelLocation { get; set;}
+        public decimal? TotalPrice { get; set; }
 
         public virtual ICollection<BookingService> BookingServices { get; set; } = new HashSet<BookingService>();
 
