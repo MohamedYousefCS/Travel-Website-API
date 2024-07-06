@@ -12,5 +12,9 @@ namespace Travel_Website_System_API_.DTO
         public string clientId { get; set; }
 
         public int packageId { get; set; }
+
+        public string PackageName { get; set; } 
+        public string PackageDescription { get; set; } 
+        public decimal? PackagePrice { get; set; }
     }
 }
