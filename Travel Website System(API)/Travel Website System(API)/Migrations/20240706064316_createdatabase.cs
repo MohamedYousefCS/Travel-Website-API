@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Travel_Website_System_API_.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDatabase : Migration
+    public partial class createdatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,6 +43,8 @@ namespace Travel_Website_System_API_.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastSeen = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
+                    PassportNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -80,22 +82,6 @@ namespace Travel_Website_System_API_.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClientConnections",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConnectionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsConnected = table.Column<bool>(type: "bit", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientConnections", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -238,38 +224,53 @@ namespace Travel_Website_System_API_.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Clients",
+                name: "Chats",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PassportNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    customerServiceId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Clients", x => x.Id);
+                    table.PrimaryKey("PK_Chats", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Clients_AspNetUsers_Id",
-                        column: x => x.Id,
+                        name: "FK_Chats_AspNetUsers_clientId",
+                        column: x => x.clientId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Chats_AspNetUsers_customerServiceId",
+                        column: x => x.customerServiceId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerServices",
+                name: "UserConnections",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ConnectionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsConnected = table.Column<bool>(type: "bit", nullable: false),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CustomerServices", x => x.Id);
+                    table.PrimaryKey("PK_UserConnections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CustomerServices_AspNetUsers_Id",
-                        column: x => x.Id,
+                        name: "FK_UserConnections_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -347,31 +348,37 @@ namespace Travel_Website_System_API_.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Chats",
+                name: "Messages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    customerServiceId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    isDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    chatId = table.Column<int>(type: "int", nullable: true),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Chats", x => x.Id);
+                    table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Chats_Clients_clientId",
-                        column: x => x.clientId,
-                        principalTable: "Clients",
+                        name: "FK_Messages_AspNetUsers_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Chats_CustomerServices_customerServiceId",
-                        column: x => x.customerServiceId,
-                        principalTable: "CustomerServices",
+                        name: "FK_Messages_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Messages_Chats_chatId",
+                        column: x => x.chatId,
+                        principalTable: "Chats",
                         principalColumn: "Id");
                 });
 
@@ -392,9 +399,9 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     table.PrimaryKey("PK_BookingServices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BookingServices_Clients_clientId",
+                        name: "FK_BookingServices_AspNetUsers_clientId",
                         column: x => x.clientId,
-                        principalTable: "Clients",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_BookingServices_Services_serviceId",
@@ -418,9 +425,9 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     table.PrimaryKey("PK_LoveServices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LoveServices_Clients_clientId",
+                        name: "FK_LoveServices_AspNetUsers_clientId",
                         column: x => x.clientId,
-                        principalTable: "Clients",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_LoveServices_Services_serviceId",
@@ -447,9 +454,9 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     table.PrimaryKey("PK_BookingPackages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BookingPackages_Clients_clientId",
+                        name: "FK_BookingPackages_AspNetUsers_clientId",
                         column: x => x.clientId,
-                        principalTable: "Clients",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_BookingPackages_Packages_packageId",
@@ -473,9 +480,9 @@ namespace Travel_Website_System_API_.Migrations
                 {
                     table.PrimaryKey("PK_LovePackages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LovePackages_Clients_clientId",
+                        name: "FK_LovePackages_AspNetUsers_clientId",
                         column: x => x.clientId,
-                        principalTable: "Clients",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_LovePackages_Packages_packageId",
@@ -508,47 +515,6 @@ namespace Travel_Website_System_API_.Migrations
                         principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Messages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    isDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    chatId = table.Column<int>(type: "int", nullable: true),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_ReceiverId",
-                        column: x => x.ReceiverId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Messages_Chats_chatId",
-                        column: x => x.chatId,
-                        principalTable: "Chats",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -693,11 +659,6 @@ namespace Travel_Website_System_API_.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_UserId",
-                table: "Messages",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Packages_adminId",
                 table: "Packages",
                 column: "adminId");
@@ -730,6 +691,11 @@ namespace Travel_Website_System_API_.Migrations
                 name: "IX_Services_serviceProviderId",
                 table: "Services",
                 column: "serviceProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserConnections_ApplicationUserId",
+                table: "UserConnections",
+                column: "ApplicationUserId");
         }
 
         /// <inheritdoc />
@@ -751,9 +717,6 @@ namespace Travel_Website_System_API_.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ClientConnections");
-
-            migrationBuilder.DropTable(
                 name: "LovePackages");
 
             migrationBuilder.DropTable(
@@ -769,6 +732,9 @@ namespace Travel_Website_System_API_.Migrations
                 name: "Payments");
 
             migrationBuilder.DropTable(
+                name: "UserConnections");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -781,13 +747,7 @@ namespace Travel_Website_System_API_.Migrations
                 name: "BookingServices");
 
             migrationBuilder.DropTable(
-                name: "CustomerServices");
-
-            migrationBuilder.DropTable(
                 name: "Packages");
-
-            migrationBuilder.DropTable(
-                name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "Services");

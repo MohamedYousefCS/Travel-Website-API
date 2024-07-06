@@ -177,6 +177,11 @@ namespace Travel_Website_System_API_.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -266,6 +271,10 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.BookingPackage", b =>
@@ -400,54 +409,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.ToTable("Chats");
                 });
 
-            modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PassportNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("Travel_Website_System_API.Models.ClientConnection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClientId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConnectionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsConnected")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ClientConnections");
-                });
-
-            modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CustomerServices");
-                });
-
             modelBuilder.Entity("Travel_Website_System_API.Models.LovePackage", b =>
                 {
                     b.Property<int>("Id")
@@ -529,9 +490,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int?>("chatId")
                         .HasColumnType("int");
 
@@ -546,8 +504,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("chatId");
 
@@ -761,6 +717,33 @@ namespace Travel_Website_System_API_.Migrations
                     b.ToTable("ServiceProviders");
                 });
 
+            modelBuilder.Entity("Travel_Website_System_API.Models.UserConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsConnected")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("UserConnections");
+                });
+
             modelBuilder.Entity("Travel_Website_System_API_.Models.PackageService", b =>
                 {
                     b.Property<int>("PackageId")
@@ -779,6 +762,23 @@ namespace Travel_Website_System_API_.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("PackageService");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
+                {
+                    b.HasBaseType("Travel_Website_System_API.Models.ApplicationUser");
+
+                    b.Property<string>("PassportNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Client");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
+                {
+                    b.HasBaseType("Travel_Website_System_API.Models.ApplicationUser");
+
+                    b.HasDiscriminator().HasValue("CustomerService");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -897,28 +897,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Navigation("customerService");
                 });
 
-            modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
-                {
-                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("client")
-                        .HasForeignKey("Travel_Website_System_API.Models.Client", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
-                {
-                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("customerService")
-                        .HasForeignKey("Travel_Website_System_API.Models.CustomerService", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
             modelBuilder.Entity("Travel_Website_System_API.Models.LovePackage", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Client", "client")
@@ -956,16 +934,12 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.Message", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "Receiver")
-                        .WithMany()
+                        .WithMany("Messages")
                         .HasForeignKey("ReceiverId");
 
                     b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId");
-
-                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "User")
-                        .WithMany("Messages")
-                        .HasForeignKey("UserId");
 
                     b.HasOne("Travel_Website_System_API.Models.Chat", "Chat")
                         .WithMany("Messages")
@@ -976,8 +950,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Package", b =>
@@ -1019,6 +991,15 @@ namespace Travel_Website_System_API_.Migrations
                     b.Navigation("serviceProvider");
                 });
 
+            modelBuilder.Entity("Travel_Website_System_API.Models.UserConnection", b =>
+                {
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("Travel_Website_System_API_.Models.PackageService", b =>
                 {
                     b.HasOne("Travel_Website_System_API.Models.Package", "Package")
@@ -1036,6 +1017,28 @@ namespace Travel_Website_System_API_.Migrations
                     b.Navigation("Package");
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
+                {
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("client")
+                        .HasForeignKey("Travel_Website_System_API.Models.Client", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
+                {
+                    b.HasOne("Travel_Website_System_API.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("customerService")
+                        .HasForeignKey("Travel_Website_System_API.Models.CustomerService", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Travel_Website_System_API.Models.Admin", b =>
@@ -1074,16 +1077,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
-                {
-                    b.Navigation("Chat");
-                });
-
-            modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
-                {
-                    b.Navigation("Chats");
-                });
-
             modelBuilder.Entity("Travel_Website_System_API.Models.Package", b =>
                 {
                     b.Navigation("BookingPackages");
@@ -1105,6 +1098,16 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.ServiceProvider", b =>
                 {
                     b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
+                {
+                    b.Navigation("Chat");
+                });
+
+            modelBuilder.Entity("Travel_Website_System_API.Models.CustomerService", b =>
+                {
+                    b.Navigation("Chats");
                 });
 #pragma warning restore 612, 618
         }
