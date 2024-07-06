@@ -238,6 +238,40 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
+
+        // GET: api/Chats/GetAllMessages
+        [HttpGet("GetAllMessages")]
+        public async Task<ActionResult<IEnumerable<ChatMessagesDTO>>> GetAllMessages()
+        {
+            var chats = await _context.Chats
+                .Include(c => c.Messages)
+                .ToListAsync();
+
+            if (!chats.Any())
+            {
+                return NotFound();
+            }
+
+            var chatMessagesDTOs = chats.Select(chat => new ChatMessagesDTO
+            {
+                ChatId = chat.Id,
+                ChatName = chat.Name,
+                Messages = chat.Messages.Select(m => new MessageDto
+                {
+                    Id = m.Id,
+                    Sender = m.SenderId,
+                    Receiver = m.ReceiverId,
+                    Content = m.Content,
+                    Timestamp = m.Timestamp
+                }).ToList()
+            }).ToList();
+
+            return Ok(chatMessagesDTOs);
+        }
+
+
+
+
         //deleting messages
 
         [HttpDelete("DeleteMessage/{messageId}")]
