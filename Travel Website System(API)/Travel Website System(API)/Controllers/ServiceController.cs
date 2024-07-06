@@ -51,13 +51,15 @@ namespace Travel_Website_System_API_.Controllers
                     Image = service.Image,
                     QuantityAvailable = service.QuantityAvailable,
                     StartDate = service.StartDate,
+                    EndDate = service.EndDate,
+                    Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                     price = service.price,
                     isDeleted = service.isDeleted,
                     categoryId = service.categoryId,
                     serviceProviderId = service.serviceProviderId,
                     BookingTimeAllowed = service.BookingTimeAllowed
 
-                });
+                }); ;
             }
 
             var response = new PaginatedResponse<ServiceDTO>
@@ -92,11 +94,16 @@ namespace Travel_Website_System_API_.Controllers
                     Image = service.Image,
                     QuantityAvailable = service.QuantityAvailable,
                     StartDate = service.StartDate,
+                    EndDate = service.EndDate,
                     price = service.price,
                     isDeleted = service.isDeleted,
                     categoryId = service.categoryId,
+                    Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                     serviceProviderId = service.serviceProviderId,
-                    BookingTimeAllowed = service.BookingTimeAllowed
+                    BookingTimeAllowed = service.BookingTimeAllowed,
+                    HoltelLocation = service.HoltelLocation, // Hotels Services
+                    NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                    NumberOFPersons = service.NumberOFPersons // Hotels Services
 
                 });
             }
@@ -137,31 +144,33 @@ namespace Travel_Website_System_API_.Controllers
                 packageStartDate = packageServices.Min(ps => ps.Package.startDate);
                 packageEndDate = packageServices.Max(ps => ps.Package.EndDate);
             }
-                ServiceDTO serviceDTO = new ServiceDTO()
-                {
+            ServiceDTO serviceDTO = new ServiceDTO()
+            {
 
-                    Id = service.Id,
-                    Name = service.Name,
-                    Description = service.Description,
-                    Image = service.Image,
-                    QuantityAvailable = service.QuantityAvailable,
-                    StartDate = service.StartDate,
-                    price = service.price,
-                    isDeleted = service.isDeleted,
-                    categoryId = service.categoryId,
-                    serviceProviderId = service.serviceProviderId,
-                    BookingTimeAllowed = service.BookingTimeAllowed,
-                    GoingFlightDestination = service.GoingFlightDestination, // Flight Services
-                    GoingFlightSource = service.GoingFlightSource, // Flight Services
-                    ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
-                    ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
-                    GoingFlightTime = packageStartDate ?? default, // Use default if null
-                    ComingFlightTime = packageEndDate ?? default, // Use default if null
-                    HoltelLocation = service.HoltelLocation, // Hotels Services
-                    NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                    NumberOFPersons = service.NumberOFPersons // Hotels Services
-                };
-                return Ok(serviceDTO);
+                Id = service.Id,
+                Name = service.Name,
+                Description = service.Description,
+                Image = service.Image,
+                QuantityAvailable = service.QuantityAvailable,
+                StartDate = service.StartDate,
+                EndDate = service.EndDate,
+                price = service.price,
+                isDeleted = service.isDeleted,
+                categoryId = service.categoryId,
+                Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
+                serviceProviderId = service.serviceProviderId,
+                BookingTimeAllowed = service.BookingTimeAllowed,
+                GoingFlightDestination = service.GoingFlightDestination, // Flight Services
+                GoingFlightSource = service.GoingFlightSource, // Flight Services
+                ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
+                ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
+                GoingFlightTime = packageStartDate ?? default, // Use default if null
+                ComingFlightTime = packageEndDate ?? default, // Use default if null
+                HoltelLocation = service.HoltelLocation, // Hotels Services
+                NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                NumberOFPersons = service.NumberOFPersons // Hotels Services
+            };
+            return Ok(serviceDTO);
         }
 
 
@@ -199,6 +208,8 @@ namespace Travel_Website_System_API_.Controllers
                 price = service.price,
                 isDeleted = service.isDeleted,
                 categoryId = service.categoryId,
+                EndDate = service.EndDate,
+                Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                 serviceProviderId = service.serviceProviderId,
                 BookingTimeAllowed = service.BookingTimeAllowed,
                 GoingFlightDestination = service.GoingFlightDestination, // Flight Services
@@ -214,12 +225,13 @@ namespace Travel_Website_System_API_.Controllers
 
             return Ok(serviceDTO);
         }
-    [HttpPost]
+        [HttpPost]
         public ActionResult AddService(ServiceDTO serviceDTO)
         {
             if (serviceDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
-            Service service = new Service() {
+            Service service = new Service()
+            {
                 //Id= serviceDTO.Id,
                 Name = serviceDTO.Name,
                 Description = serviceDTO.Description,
@@ -228,9 +240,11 @@ namespace Travel_Website_System_API_.Controllers
                 StartDate = serviceDTO.StartDate,
                 price = serviceDTO.price,
                 isDeleted = serviceDTO.isDeleted,
+                EndDate = serviceDTO.EndDate,
+                Duration = (serviceDTO.EndDate.Value - serviceDTO.StartDate.Value).Days + 1, // +1 to include both start and end date
                 categoryId = serviceDTO.categoryId,
                 serviceProviderId = serviceDTO.serviceProviderId,
-                BookingTimeAllowed= serviceDTO.BookingTimeAllowed,
+                BookingTimeAllowed = serviceDTO.BookingTimeAllowed,
                 GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
                 GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
                 ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
@@ -261,6 +275,8 @@ namespace Travel_Website_System_API_.Controllers
                 QuantityAvailable = serviceDTO.QuantityAvailable,
                 StartDate = serviceDTO.StartDate,
                 price = serviceDTO.price,
+                EndDate = serviceDTO.EndDate,
+                Duration = serviceDTO.Duration,
                 isDeleted = serviceDTO.isDeleted,
                 categoryId = serviceDTO.categoryId,
                 serviceProviderId = serviceDTO.serviceProviderId,
