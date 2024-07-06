@@ -39,7 +39,7 @@ namespace Travel_Website_System_API_.Repositories
         {
             return db.BookingPackages.Include(b => b.client).ThenInclude(c => c.ApplicationUser).Include(b => b.package).
                 Include(b=>b.Payment)
-                            .Where(b => b.clientId.Equals(clientId))
+                            .Where(b => b.clientId.Equals(clientId) && b.Payment!=null)
                             .ToList();
         }
    

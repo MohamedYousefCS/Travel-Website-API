@@ -18,26 +18,27 @@ namespace Travel_Website_System_API.Models
         public string ?Description { get; set; }
         public string ?Image { get; set; }
         public int? QuantityAvailable { get; set; } = 4;
-        public DateTime? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }// choose statrt in service 
         public decimal? price { get; set; }
         public bool? isDeleted { get; set; } = false;
         public int ? BookingTimeAllowed { get; set;}
-        public int ? Duration { get; set; }
-        public DateTime? EndDate { get; set; }
+        public int ? Duration { get; set; }// choose duration(number of days or nights = duration-1)
+        public DateTime? EndDate { get; set; }// calculated
      
         //// for flight
         public string ?GoingFlightSource { get; set; }
         public string ?GoingFlightDestination { get; set; }
         public string ?ComingBackFlightSource { get; set; }
         public string ?ComingBackFlightDesination { get; set; }
-        public DateTime ?GoingFlightTime { get; set; }// = start date of package 
-        public DateTime ?ComingFlightTime { get; set; }//= end date of pakcage
+       
 
         // hotels: choose start date , duration
-        public string ?HoltelLocation { get; set;}
-        public decimal? TotalPrice { get; set; }
+        public PackageLocationEnum? HoltelLocation { get; set;} // makkah , madinah
+        public int ?NumberOFAvailableRooms { get; set;}
+        public int? NumberOFPersons { get; set; } = 2;// in each room 2 by default if increased add 1 room
 
-        public virtual ICollection<BookingService> BookingServices { get; set; } = new HashSet<BookingService>();
+
+    public virtual ICollection<BookingService> BookingServices { get; set; } = new HashSet<BookingService>();
 
         public virtual ICollection<LoveService> LoveServices { get; set; } = new HashSet<LoveService>();
 

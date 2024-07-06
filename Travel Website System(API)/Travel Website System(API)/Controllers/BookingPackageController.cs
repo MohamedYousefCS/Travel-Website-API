@@ -69,7 +69,7 @@ namespace Travel_Website_System_API_.Controllers
                 // Return the DTO with the new booking ID
                 bookingPackageDTO.Id = bookingPackage.Id;
 
-                // Populate DTO from saved entity to ensure consistency
+                // Populate DTO from saved entity to ensure passing all values to Dto attributes
                 var savedBooking = unitOFWork.CustombookingPackageRepo.GetById(bookingPackage.Id);
                 bookingPackageDTO = new BookingPackageDTO
                 {
@@ -203,9 +203,9 @@ namespace Travel_Website_System_API_.Controllers
 
             return Ok(AllBookingsDTO);
         }
-
+        // allBookings for a sepecific client
        // [Authorize(Roles ="client,admin,superAdmin")]
-        [HttpGet("AllPaidBookings/{clientId}")]
+        [HttpGet("AllBookings/{clientId}")]
         public IActionResult GetAllPaidBookingsForClient(string clientId) {
 
             if (string.IsNullOrEmpty(clientId))

@@ -1,6 +1,7 @@
 ﻿using Travel_Website_System_API.Models;
 using ServiceProvider = Travel_Website_System_API.Models.ServiceProvider;
 using System.ComponentModel.DataAnnotations;
+using Travel_Website_System_API_.Models;
 
 
 namespace Travel_Website_System_API_.DTO
@@ -38,6 +39,24 @@ namespace Travel_Website_System_API_.DTO
         public int? serviceProviderId { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Booking time allowed must be a non-negative number")]
-        public int? BookingTimeAllowed { get; set; }
+        public int? BookingTimeAllowed { get; set; }//must <= start date
+        public int? NumberOFNights { get; set; } // duration-1 
+
+        // for flights 
+        public DateTime? GoingFlightTime { get; set; }// = start date of package (calculated) for view in front
+        public DateTime? ComingFlightTime { get; set; }//= end date of pakcage (calculated)
+        public string? GoingFlightSource { get; set; }
+        public string? GoingFlightDestination { get; set; }
+        public string? ComingBackFlightSource { get; set; }
+        public string? ComingBackFlightDesination { get; set; }
+
+        // Hotels
+
+        public PackageLocationEnum? HoltelLocation { get; set; } // makkah , madinah
+                                                       
+        public int? NumberOFAvailableRooms { get; set; }
+        public int? NumberOFPersons { get; set; } = 2;// in each room 2 by default if increased add 1 room
+       // public decimal? TotalPrice { get; set; }
+
     }
 }

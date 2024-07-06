@@ -19,11 +19,20 @@ namespace Travel_Website_System_API_.Repositories
                      .ToList();
         }
 
-
+        // This For Hotels Services Only , will be used in service Component in angular
         public List<TEntity> GetAllWithPagination(int pageNumber, int pageSize)
         {
             return db.Set<TEntity>()
                      .Where(e => EF.Property<bool>(e, "isDeleted") == false)
+                     .Skip((pageNumber - 1) * pageSize)
+                     .Take(pageSize)
+                     .ToList();
+        }
+     
+        public List<Service> GetAllHotelsWithPagination(int pageNumber, int pageSize)
+{
+            return db.Set<Service>()
+                     .Where(s => s.isDeleted == false && s.category.Name == "Hotels")
                      .Skip((pageNumber - 1) * pageSize)
                      .Take(pageSize)
                      .ToList();
