@@ -17,6 +17,7 @@
         public ChatHub(ApplicationDBContext context , ILogger<ChatHub> logger)
         {
             _context = context;
+            _logger = logger;
 ;
         }
 

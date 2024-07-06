@@ -194,7 +194,7 @@ namespace Travel_Website_System_API_.Controllers
             var users = new List<string>() { ReceiverId };
             var userConnections = _context.UserConnections.AsNoTracking().Where(x => users.Contains(x.ApplicationUserId)).Select(x => x.ConnectionId.ToString());
 
-            await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessage", JsonConvert.SerializeObject(newMessage));
+            await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessageFromCustomer", JsonConvert.SerializeObject(newMessage));
             return Ok(true);
         }
 
