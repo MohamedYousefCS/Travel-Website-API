@@ -19,7 +19,7 @@ namespace Travel_Website_System_API_.DTO
         public string Description { get; set; }
 
         [Url(ErrorMessage = "Image must be a valid URL")]
-        public string Image { get; set; }
+        public string ?Image { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Quantity available must be a non-negative number")]
         public int? QuantityAvailable { get; set; }

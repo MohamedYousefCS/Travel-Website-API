@@ -60,7 +60,7 @@ namespace Travel_Website_System_API_.Controllers
                     EndDate = package.EndDate,
                     adminId = package.adminId,
                     BookingTimeAllowed = package.BookingTimeAllowed,
-                    ServiceNames = serviceNames ,// Include service names
+                  ServiceNames = serviceNames ,// Include service names
                     FirstLocation = package.FirstLocation,
                     SecondLocation = package.SecondLocation,
                     FirstLocationDuration = package.FirstLocationDuration,
@@ -132,7 +132,7 @@ namespace Travel_Website_System_API_.Controllers
             else
             {
                 // Ensure that related services are loaded
-                var serviceNames = package.PackageServices.Select(ps => ps.Service.Name).ToList();
+               var serviceNames = package.PackageServices.Select(ps => ps.Service.Name).ToList();
 
                 PackageDTO packageDTO = new PackageDTO() {
                     Id = package.Id,
@@ -147,7 +147,7 @@ namespace Travel_Website_System_API_.Controllers
                     EndDate = package.EndDate,
                     adminId = package.adminId,
                     BookingTimeAllowed= package.BookingTimeAllowed,
-                    ServiceNames = serviceNames, // Include service names
+                   ServiceNames = serviceNames, // Include service names
                     FirstLocation = package.FirstLocation,
                     SecondLocation = package.SecondLocation,
                     FirstLocationDuration = package.FirstLocationDuration,
@@ -165,7 +165,6 @@ namespace Travel_Website_System_API_.Controllers
         {
             if (packageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
-
             string uniqueFileName = UploadImage(packageDTO.Image);
             packageDTO.EndDate = packageDTO.startDate?.AddDays(packageDTO.Duration ?? 0);
             packageDTO.SecondLocationDuration = packageDTO.Duration - packageDTO.FirstLocationDuration;
@@ -189,6 +188,7 @@ namespace Travel_Website_System_API_.Controllers
                 SecondLocationDuration= packageDTO.SecondLocationDuration,
             };
             packageRepo.Add(package);
+            packageDTO.Id = package.Id;
             packageRepo.Save();
             // return Ok(packageDTO);
             return CreatedAtAction("GetPackageById", new { id = package.Id }, packageDTO);

@@ -20,9 +20,9 @@ namespace Travel_Website_System_API_.DTO
         public string Description { get; set; }
 
         [DataType(DataType.Upload)]
-        public IFormFile Image { get; set; } // For image upload
+        public IFormFile ?Image { get; set; } // For image upload
 
-        public string ImageUrl { get; set; } // For returning the image URL
+        public string ?ImageUrl { get; set; } // For returning the image URL
 
         [Range(0, int.MaxValue, ErrorMessage = "Quantity available must be a non-negative number")]
         public int? QuantityAvailable { get; set; }
@@ -52,6 +52,6 @@ namespace Travel_Website_System_API_.DTO
         [Range(0, int.MaxValue, ErrorMessage = "Booking time allowed must be a non-negative number")]
         public int? BookingTimeAllowed { get; set; }
 
-        public List<string> ServiceNames { get; set; } = new List<string>(); 
+        public List<string> ?ServiceNames { get; set; } = new List<string>(); 
     }
 }
