@@ -16,11 +16,13 @@ namespace Travel_Website_System_API.Models
 
 
         public string status { get; set; }
+
+        public string SenderId { get; set; }
         public ApplicationUser Sender { get; set; }
      
         public bool isDeleted { get; set; }
 
-        [ForeignKey("Chat")]
+        //[ForeignKey("Chat")]
         public int? chatId { get; set; }
         public virtual Chat Chat { get; set; }
 
@@ -29,8 +31,8 @@ namespace Travel_Website_System_API.Models
         public DateTime Timestamp { get;  set; }
         public string Content { get;  set; }
         public bool IsRead { get;  set; }
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public string ReceiverId { get; set; }
+        //public ApplicationUser User { get; set; }
         public ApplicationUser Receiver { get;  set; }
     }
 }

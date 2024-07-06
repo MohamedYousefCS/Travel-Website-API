@@ -29,7 +29,8 @@ namespace Travel_Website_System_API.Models
         public virtual DbSet<Package> Packages { get; set; }
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Service> Services { get; set; }
-        public DbSet<ClientConnection> ClientConnections { get; set; }
+        public DbSet<UserConnection> UserConnections { get; set; }
+
 
         public virtual DbSet<ServiceProvider> ServiceProviders { get; set; }
 
@@ -60,8 +61,8 @@ namespace Travel_Website_System_API.Models
             // Define the relationship between ApplicationUser and Message
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.Messages)
-                .WithOne(m => m.User)
-                .HasForeignKey(m => m.UserId); // Assuming you have a UserId property in the Message class
+                .WithOne(m => m.Receiver)
+                .HasForeignKey(m => m.ReceiverId); // Assuming you have a UserId property in the Message class
         }
     }
     }
