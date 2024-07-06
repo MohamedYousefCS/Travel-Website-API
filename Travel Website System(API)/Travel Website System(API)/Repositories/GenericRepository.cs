@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Travel_Website_System_API.Models;
 
 namespace Travel_Website_System_API_.Repositories
@@ -8,9 +9,12 @@ namespace Travel_Website_System_API_.Repositories
 
 
         ApplicationDBContext db;
+        private readonly DbSet<TEntity> _dbSet;
+
         public GenericRepository(ApplicationDBContext db)
         {
             this.db = db;
+            _dbSet = db.Set<TEntity>();
         }
 
         public List<TEntity> GetAll()
@@ -68,5 +72,37 @@ namespace Travel_Website_System_API_.Repositories
             db.SaveChanges();
         }
 
-}
+
+
+        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        {
+            return db.Set<TEntity>().Where(predicate);
+        }
+
+
+
+
+
+
+
+        //
+       
+
+            public IQueryable<TEntity> FindWithInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+            {
+                IQueryable<TEntity> query = _dbSet;
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+                return query.Where(predicate);
+            }
+
+            // دوال أخرى مثل Add، Remove، Save، الخ
+        
+
+
+        //
+
+    }
 }

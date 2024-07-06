@@ -51,7 +51,7 @@ namespace Travel_Website_System_API_.Controllers
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    ImageUrl = package.Image,
+                    Image = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
@@ -103,7 +103,7 @@ namespace Travel_Website_System_API_.Controllers
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    ImageUrl = package.Image,
+                    Image = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
@@ -138,7 +138,7 @@ namespace Travel_Website_System_API_.Controllers
                     Id = package.Id,
                     Name = package.Name,
                     Description = package.Description,
-                    ImageUrl = package.Image,
+                    Image = package.Image,
                     QuantityAvailable = package.QuantityAvailable,
                     Price = package.Price,
                     isDeleted = package.isDeleted,
@@ -165,7 +165,15 @@ namespace Travel_Website_System_API_.Controllers
         {
             if (packageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
-            string uniqueFileName = UploadImage(packageDTO.Image);
+
+            // Get the current logged-in user's ID
+            var adminId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (adminId == null)
+            {
+                return Unauthorized();
+            }
+
+            //string uniqueFileName = UploadImage(packageDTO.Image);
             packageDTO.EndDate = packageDTO.startDate?.AddDays(packageDTO.Duration ?? 0);
             packageDTO.SecondLocationDuration = packageDTO.Duration - packageDTO.FirstLocationDuration;
 
@@ -173,14 +181,15 @@ namespace Travel_Website_System_API_.Controllers
                 //Id = packageDTO.Id,
                 Name = packageDTO.Name,
                 Description = packageDTO.Description,
-                Image = uniqueFileName,
+                //Image = uniqueFileName,
+                Image= packageDTO.Image,
                 QuantityAvailable = packageDTO.QuantityAvailable,
                 Price = packageDTO.Price,
                 isDeleted = packageDTO.isDeleted,
                 startDate = packageDTO.startDate,
                 Duration = packageDTO.Duration,
                 EndDate = packageDTO.EndDate,
-                adminId = packageDTO.adminId,
+                adminId = adminId,
                 BookingTimeAllowed = packageDTO.BookingTimeAllowed,
                 FirstLocation = packageDTO.FirstLocation,
                 SecondLocation = packageDTO.SecondLocation,
@@ -258,10 +267,11 @@ namespace Travel_Website_System_API_.Controllers
                 return BadRequest();
             }
 
-            string uniqueFileName = UploadImage(packageDTO.Image);
+           // string uniqueFileName = UploadImage(packageDTO.Image);
             package.Name = packageDTO.Name;
             package.Description = packageDTO.Description;
-            package.Image = uniqueFileName;
+            //package.Image = uniqueFileName;
+            package.Image=packageDTO.Image;
             package.QuantityAvailable = packageDTO.QuantityAvailable;
             package.Price = packageDTO.Price;
             package.isDeleted = packageDTO.isDeleted;

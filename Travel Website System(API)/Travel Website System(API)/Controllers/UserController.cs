@@ -159,7 +159,7 @@ namespace Travel_Website_System_API_.Controllers
                     return NotFound(new { Message = "User not found" });
                 }
 
-                user.Passport = updateUserDto.Passport;
+                user.PassportNumber = updateUserDto.PassportNumber;
                 user.PhoneNumber = updateUserDto.PhoneNumber;
                 user.ResidanceCountry = updateUserDto.ResidanceCountry;
 
@@ -193,7 +193,7 @@ namespace Travel_Website_System_API_.Controllers
                     return NotFound(new { Message = "User not found" });
                 }
 
-                user.Passport = updateUserDto.Passport;
+                user.PassportNumber = updateUserDto.PassportNumber;
                 user.PhoneNumber = updateUserDto.PhoneNumber;
                 user.ResidanceCountry = updateUserDto.ResidanceCountry;
 
