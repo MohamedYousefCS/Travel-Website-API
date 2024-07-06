@@ -239,6 +239,91 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
+        [HttpPost("SendMessageToAll")]
+        public async Task<IActionResult> SendMessageToAll(string userId, string message)
+        {
+            // Find the user in the database
+            var user = await _context.ApplicationUsers.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Store the message in the database
+            var newMessage = new Message
+            {
+                ReceiverId = user.Id,
+                Content = message,
+                Timestamp = DateTime.UtcNow
+            };
+            await _context.Messages.AddAsync(newMessage);
+            await _context.SaveChangesAsync();
+
+            // Broadcast the message to all connected clients
+            var userConnections = _context.UserConnections.AsNoTracking().Where(x => x.ApplicationUserId == user.Id).Select(x => x.ConnectionId.ToString()).ToList();
+
+            await _hub.Clients.Clients(userConnections).SendAsync("ReceiveMessage", JsonConvert.SerializeObject(newMessage));
+
+            return Ok(true);
+        }
+
+
+
+        [HttpPost("NotifyUser")]
+        public async Task<IActionResult> NotifyUserAsync(string userId, string message)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                _logger.LogWarning("NotifyUserAsync: User ID is null or empty.");
+                return BadRequest("User ID cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                _logger.LogWarning("NotifyUserAsync: Message is null or empty.");
+                return BadRequest("Message cannot be null or empty.");
+            }
+
+            try
+            {
+                _logger.LogInformation($"Notifying user '{userId}' with message: {message}");
+                await _hub.Clients.User(userId).SendAsync("ReceiveNotification", message);
+                _logger.LogInformation("Notification sent successfully.");
+                return Ok("Notification sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while notifying the user.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while notifying the user.");
+            }
+        }
+
+
+
+        [HttpPost("JoinGroup")]
+        public async Task<IActionResult> JoinGroup(UserConnection conn)
+        {
+            if (conn == null || string.IsNullOrWhiteSpace(conn.ApplicationUser.ToString()))
+            {
+                _logger.LogWarning("JoinGroup: Connection or ApplicationUser is null or empty.");
+                return BadRequest("Invalid connection data.");
+            }
+
+            try
+            {
+                _logger.LogInformation($"User '{conn.ApplicationUser}' is joining the group.");
+                await _hub.Clients.All.SendAsync("ReceiveMessage", "CustomerService", $"{conn.ApplicationUser} has joined the group");
+                _logger.LogInformation("User joined the group successfully.");
+                return Ok("User joined the group successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while joining the group.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while joining the group.");
+            }
+        }
+
         // GET: api/Chats/GetAllMessages
         [HttpGet("GetAllMessages")]
         public async Task<ActionResult<IEnumerable<ChatMessagesDTO>>> GetAllMessages()
