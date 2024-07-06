@@ -218,7 +218,7 @@ namespace Travel_Website_System_API_.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("Passport")
+                    b.Property<string>("PassportNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
@@ -632,9 +632,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("ComingBackFlightSource")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ComingFlightTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -650,11 +647,8 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("GoingFlightSource")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("GoingFlightTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("HoltelLocation")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("HoltelLocation")
+                        .HasColumnType("int");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
@@ -662,14 +656,17 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("NumberOFAvailableRooms")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NumberOFPersons")
+                        .HasColumnType("int");
+
                     b.Property<int?>("QuantityAvailable")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("categoryId")
                         .HasColumnType("int");
@@ -767,9 +764,6 @@ namespace Travel_Website_System_API_.Migrations
             modelBuilder.Entity("Travel_Website_System_API.Models.Client", b =>
                 {
                     b.HasBaseType("Travel_Website_System_API.Models.ApplicationUser");
-
-                    b.Property<string>("PassportNumber")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("Client");
                 });

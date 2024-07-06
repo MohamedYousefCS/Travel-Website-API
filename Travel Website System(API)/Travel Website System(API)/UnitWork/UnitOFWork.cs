@@ -13,6 +13,7 @@ namespace Travel_Website_System_API_.UnitWork
         IGenericRepo<BookingPackage> bookingPackageRepo;
         IGenericRepo<BookingService> bookingServiceRepo;
         IBookingPackageRepo custombookingPackageRepo;
+        IBookingServiceRepo custombookingServiceRepo;
         public UnitOFWork(ApplicationDBContext db)
         {
             this.db = db;
@@ -54,6 +55,7 @@ namespace Travel_Website_System_API_.UnitWork
                 return bookingServiceRepo;
             }
         }
+        // Custom Repos to include relative Data
         public IBookingPackageRepo CustombookingPackageRepo
         {
             get
@@ -65,6 +67,18 @@ namespace Travel_Website_System_API_.UnitWork
                 return custombookingPackageRepo;
             }
         }
+        public IBookingServiceRepo CustombookingServiceRepo
+        {
+            get
+            {
+                if (custombookingServiceRepo == null)// to check there is only one object of the repo
+                {
+                    custombookingServiceRepo = new BookingServiceRepo(db);
+                }
+                return custombookingServiceRepo;
+            }
+        }
+        
         public void  Save()
         {
             db.SaveChanges();

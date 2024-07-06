@@ -6,7 +6,7 @@ namespace Travel_Website_System_API_.DTO
     public class BookingServiceDTO
     {
         [Key]
-        public int BookingServiceId { get; set; }
+        public int? Id { get; set; }
         public int? Quantity { get; set; }
 
         [Column(TypeName = "date")]
@@ -18,6 +18,7 @@ namespace Travel_Website_System_API_.DTO
 
         [Column(TypeName = "date")]
         public DateTime? allowingTime { get; set; }
+        public decimal? price { get; set; }
 
     }
 }

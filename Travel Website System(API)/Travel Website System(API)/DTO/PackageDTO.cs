@@ -55,6 +55,6 @@ namespace Travel_Website_System_API_.DTO
         [Range(0, int.MaxValue, ErrorMessage = "Booking time allowed must be a non-negative number")]
         public int? BookingTimeAllowed { get; set; }
 
-        public List<string> ServiceNames { get; set; } = new List<string>(); 
+        public List<string> ?ServiceNames { get; set; } = new List<string>(); 
     }
 }
