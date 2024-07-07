@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
@@ -16,11 +17,15 @@ namespace Travel_Website_System_API_.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly UserRepo _userRepo;
+        private readonly ApplicationDBContext _context;
 
-        public UserController(UserManager<ApplicationUser> userManager, UserRepo userRepo)
+
+
+        public UserController(UserManager<ApplicationUser> userManager, UserRepo userRepo, ApplicationDBContext context)
         {
             _userManager = userManager;
             _userRepo = userRepo;
+            _context = context;
         }
 
         [HttpGet("All")]

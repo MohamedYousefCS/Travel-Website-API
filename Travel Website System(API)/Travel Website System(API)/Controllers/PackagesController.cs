@@ -34,6 +34,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         // GET: api/Packages
+        [Authorize(Roles = "superAdmin, admin")]
+
         [HttpGet]
         public ActionResult GetPackages(int pageNumber = 1, int pageSize = 10)
         {
@@ -86,6 +88,7 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(serviceNames);
         }
 
+        [Authorize(Roles = "superAdmin, admin")]
 
         [HttpGet("{name:alpha}")]
         public ActionResult GetPackageByName(string name)
@@ -123,6 +126,7 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         // GET: api/Packages/5
+        [Authorize(Roles = "superAdmin, admin")]
         [HttpGet("{id}")]
         public ActionResult GetPackageById(int id)
         {
@@ -159,7 +163,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // POST: api/Packages
-       // [Authorize(Roles = "superAdmin, admin")]
+        [Authorize(Roles = "superAdmin, admin")]
         [HttpPost]
         public ActionResult AddPackage(PackageDTO packageDTO)
         {
@@ -243,7 +247,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // PUT: api/Packages/5
-       // [Authorize(Roles = "superAdmin, admin")]
+        [Authorize(Roles = "superAdmin, admin")]
         [HttpPut("{id}")]
         public ActionResult EditPackage(int id, [FromBody] PackageDTO packageDTO)
         {
@@ -291,7 +295,7 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         // DELETE: api/Packages/5
-        //[Authorize(Roles = "superAdmin, admin")]
+        [Authorize(Roles = "superAdmin, admin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePackage(int id)
         {
@@ -328,61 +332,6 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
-        //// PUT: api/Packages/5
-        //[Authorize(Roles = "superAdmin, admin")]
-        //[HttpPut("{id}")]
-        //public ActionResult EditPackage(int id, PackageDTO packageDTO)
-        //{
-        //   // var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //    //if (userId !=packageDTO.adminId) return BadRequest("this admin can not update this Package");
-        //    if (packageDTO == null) return BadRequest();
-        //    if (packageDTO.Id != id) return BadRequest();
-        //    if (!ModelState.IsValid) return BadRequest();
-
-        //    string uniqueFileName = UploadImage(packageDTO.Image);
-        //    Package package = new Package()
-        //    {
-        //        Id = packageDTO.Id,
-        //        Name = packageDTO.Name,
-        //        Description = packageDTO.Description,
-        //        Image = uniqueFileName,
-        //        QuantityAvailable = packageDTO.QuantityAvailable,
-        //        Price = packageDTO.Price,
-        //        isDeleted = packageDTO.isDeleted,
-        //        startDate = packageDTO.startDate,
-        //        Duration = packageDTO.Duration,
-        //        adminId = packageDTO.adminId,
-        //        BookingTimeAllowed = packageDTO.BookingTimeAllowed
-        //    };
-        //    packageRepo.Edit(package);
-        //    packageRepo.Save();
-        //    return NoContent();
-        //}
-
-
-        //// DELETE: api/Packages/5
-        ////[Authorize(Roles = "superAdmin, admin")]
-        //[HttpDelete("{id}")]
-        //public IActionResult DeletePackage(int id)
-        //{
-        //    var package = packageRepo.GetById(id);
-        //    if (package == null) return NotFound();
-
-        //    // Check if there are any bookings associated with the package
-        //    var hasBookings = bookingPackageRepo.GetAllBokking(id);
-        //    if (hasBookings)
-        //    {
-        //        // Return a message indicating the package cannot be deleted due to bookings
-        //        return BadRequest("The package cannot be deleted because it is reserved.");
-        //    }
-
-        //    // Perform a soft delete by marking the package as deleted
-        //    package.isDeleted = true;
-        //    packageRepo.Edit(package);
-
-        //    packageRepo.Save();
-        //    return Ok(package);
-        //}
 
 
 
