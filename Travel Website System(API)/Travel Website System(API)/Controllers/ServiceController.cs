@@ -32,6 +32,8 @@ namespace Travel_Website_System_API_.Controllers
 
         [HttpGet]
         //[Produces("application/json")]
+        [Authorize(Roles = "superAdmin, admin")]
+
         public ActionResult GetAllServices(int pageNumber = 1, int pageSize = 10)
         {
             List<Service> services = serviceRepo.GetAllWithPagination(pageNumber, pageSize);
@@ -74,6 +76,8 @@ namespace Travel_Website_System_API_.Controllers
         }
         // amira
         [HttpGet("HotelServices")]
+        [Authorize(Roles = "superAdmin, admin")]
+
         //[Produces("application/json")]
         public ActionResult GetAllHotelServices(int pageNumber = 1, int pageSize = 10)
         {
@@ -120,6 +124,8 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpGet("Search/{searchItem}")]
+        [Authorize(Roles = "superAdmin, admin")]
+
         public ActionResult<List<string>> Search(string searchItem)
         {
             var serviceNames = _serviceRepo.Search(searchItem);
@@ -175,6 +181,8 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpGet("{name:alpha}")]
+        [Authorize(Roles = "superAdmin, admin")]
+
         public IActionResult GetByName(string name)
         {
             Service service = _serviceRepo.GetByName(name);
@@ -225,7 +233,11 @@ namespace Travel_Website_System_API_.Controllers
 
             return Ok(serviceDTO);
         }
+
+
         [HttpPost]
+        [Authorize(Roles = "superAdmin, admin")]
+
         public ActionResult AddService(ServiceDTO serviceDTO)
         {
             if (serviceDTO == null) return BadRequest();
@@ -260,6 +272,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "superAdmin, admin")]
+
 
         public ActionResult EditService(ServiceDTO serviceDTO, int id)
         {
@@ -296,6 +310,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "superAdmin, admin")]
+
         public IActionResult DeleteService(int id)
         {
             var service = serviceRepo.GetById(id);
