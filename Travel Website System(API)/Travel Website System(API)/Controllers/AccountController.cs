@@ -2,14 +2,18 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.viewModels;
+
+
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -25,6 +29,7 @@ namespace Travel_Website_System_API_.Controllers
         private readonly IGenericRepo<CustomerService> _cusSerGenericRepo;
         private readonly IConfiguration _configuration;
         private readonly IEmailSender _emailSender;
+        private readonly UserRepo _userRepo;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -34,7 +39,8 @@ namespace Travel_Website_System_API_.Controllers
             IGenericRepo<Admin> adminGenericRepo,
             IGenericRepo<CustomerService> cusSerGenericRepo,
             IConfiguration configuration,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            UserRepo userRepo)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -44,6 +50,7 @@ namespace Travel_Website_System_API_.Controllers
             _cusSerGenericRepo = cusSerGenericRepo;
             _configuration = configuration;
             _emailSender = emailSender;
+            _userRepo = userRepo;
         }
 
         // Register endpoint
@@ -60,6 +67,11 @@ namespace Travel_Website_System_API_.Controllers
                     Role = registerDto.Role
                 };
 
+                var verificationCode = Guid.NewGuid().ToString().Substring(0, 6);
+                user.VerificationCode = verificationCode;
+
+                await _emailSender.SendEmailAsync(user.Email, "Verification Code", $"Your verification code is: {verificationCode}");
+
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
 
                 if (result.Succeeded)
@@ -70,7 +82,7 @@ namespace Travel_Website_System_API_.Controllers
                     {
                         CreateUserAccordingToHisType(user, registerDto.Role);
                     }
-                    return Ok(new { Message = "User registered successfully" });
+                    return Ok(new { Message = "User registered step1 successfully" });
                 }
 
                 foreach (var err in result.Errors)
@@ -80,6 +92,38 @@ namespace Travel_Website_System_API_.Controllers
             }
             return BadRequest(ModelState);
         }
+
+        
+       
+
+
+
+        [HttpPost("email confirmation")]
+        public async Task<IActionResult> Verify([FromBody] VerifyVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var dbUser = await _userRepo.FindByVerificationCodeAsync(model.VerificationCode);
+
+                if (dbUser != null && dbUser.VerificationCode == model.VerificationCode)
+                {
+                    dbUser.IsVerified = true;
+                    await _context.SaveChangesAsync();
+
+
+                    return Ok(new { Message = "User verified successfully" });
+                }
+
+                return BadRequest(new { Message = "Invalid verification code." });
+            }
+
+            return BadRequest(ModelState);
+        }
+
+
+
+
+
 
         private void CreateUserAccordingToHisType(ApplicationUser user, string role)
         {
@@ -150,7 +194,7 @@ namespace Travel_Website_System_API_.Controllers
             return BadRequest(ModelState);
         }
 
-        // External login endpoints
+       /* // External login endpoints
         [HttpGet("external-login")]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
@@ -222,7 +266,7 @@ namespace Travel_Website_System_API_.Controllers
             }
             return BadRequest(ModelState);
         }
-
+*/
         private string GenerateJwtToken(ApplicationUser user)
         {
             var claims = new List<Claim>
@@ -255,29 +299,38 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         // Forget Password endpoint
-        [HttpPost("forget-password")]
-        public async Task<IActionResult> ForgotPassword(ForgetPasswordModel model)
+
+   [HttpPost("forget-password")]
+    public async Task<IActionResult> ForgotPassword(ForgetPasswordModel model)
+    {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null)
-                {
-                    return Ok(new { message = "Email not found" });
-                }
-
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var resetLink = $"{model.url}?email={model.Email}&token={token}";
-
-                await _emailSender.SendEmailAsync(model.Email, "Password Reset", $"Please reset your password by clicking <a href='{resetLink}'>here</a>.");
-
-                return Ok(new { message = "You received a password reset link on your email." });
+                return Ok(new { message = "Email not found" });
             }
-            return BadRequest("Cannot send email");
-        }
 
-        // Reset Password endpoint
-        [HttpPost("reset-password")]
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = WebUtility.UrlEncode(token); // URL-encode the token
+            var resetLink = $"{model.url}?email={model.Email}&token={encodedToken}";
+
+            var emailContent = $" <p>Please reset your password by clicking <a href='{resetLink}'>here</a>.</p>";
+
+                await _emailSender.SendEmailAsync(user.Email, "Verification Code", $"Your verification code is: {token}");
+
+
+                //await _emailSender.SendEmailAsync(user.Email, "Password Reset", emailContent);
+
+            return Ok(new { message = "You received a password reset link on your email." });
+        }
+        return BadRequest("Cannot send email");
+    }
+
+
+
+    // Reset Password endpoint
+    [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
         {
             if (ModelState.IsValid)

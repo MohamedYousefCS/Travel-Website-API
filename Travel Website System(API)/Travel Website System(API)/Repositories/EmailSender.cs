@@ -22,27 +22,27 @@ namespace Travel_Website_System_API_.Repositories
         }
         public async Task SendEmailAsync(string email, string subject, string message)
         {
-           
-                var client = new SmtpClient(smtpServer)
-                {
-                    UseDefaultCredentials = false,
-                    Port = smtpPort,
-                    Credentials = new NetworkCredential(smtpUser, smtpPass),
-                    EnableSsl = enableSsl,
-                   
-                };
 
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(smtpUser),
-                    Subject = subject,
-                    Body = message,
-                    IsBodyHtml = true
-                };
-                mailMessage.To.Add(email);
+            var client = new SmtpClient(smtpServer)
+            {
+                UseDefaultCredentials = false,
+                Port = smtpPort,
+                Credentials = new NetworkCredential(smtpUser, smtpPass),
+                EnableSsl = enableSsl,
 
-                await client.SendMailAsync(mailMessage);
-            
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(smtpUser),
+                Subject = subject,
+                Body = message,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(email);
+
+            await client.SendMailAsync(mailMessage);
+
             /*catch (SmtpException ex)
             {
                 Console.WriteLine($"SMTP Exception: {ex.Message}");

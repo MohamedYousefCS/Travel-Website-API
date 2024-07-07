@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Travel_Website_System_API_.Migrations
 {
     /// <inheritdoc />
-    public partial class mmmmmmmm : Migration
+    public partial class m : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,6 +36,8 @@ namespace Travel_Website_System_API_.Migrations
                     SSN = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    VerificationCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
                     PassportNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResidanceCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -285,8 +287,8 @@ namespace Travel_Website_System_API_.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     isDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    BookingTimeAllowed = table.Column<int>(type: "int", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true),
+                    BookingTimeAllowed = table.Column<int>(type: "int", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     GoingFlightSource = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     GoingFlightDestination = table.Column<string>(type: "nvarchar(max)", nullable: true),
