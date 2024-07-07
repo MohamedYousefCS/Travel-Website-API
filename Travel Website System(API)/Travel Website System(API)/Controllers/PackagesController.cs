@@ -62,7 +62,7 @@ namespace Travel_Website_System_API_.Controllers
                     EndDate = package.EndDate,
                     adminId = package.adminId,
                     BookingTimeAllowed = package.BookingTimeAllowed,
-                  ServiceNames = serviceNames ,// Include service names
+                   ServiceNames = serviceNames ,// Include service names
                     FirstLocation = package.FirstLocation,
                     SecondLocation = package.SecondLocation,
                     FirstLocationDuration = package.FirstLocationDuration,
