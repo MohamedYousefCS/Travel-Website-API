@@ -34,7 +34,7 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         // GET: api/Packages
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
 
         [HttpGet]
         public ActionResult GetPackages(int pageNumber = 1, int pageSize = 10)
@@ -88,7 +88,7 @@ namespace Travel_Website_System_API_.Controllers
             return Ok(serviceNames);
         }
 
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
 
         [HttpGet("{name:alpha}")]
         public ActionResult GetPackageByName(string name)
@@ -126,7 +126,7 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         // GET: api/Packages/5
-        [Authorize(Roles = "superAdmin, admin")]
+        //[Authorize(Roles = "superAdmin, admin")]
         [HttpGet("{id}")]
         public ActionResult GetPackageById(int id)
         {
