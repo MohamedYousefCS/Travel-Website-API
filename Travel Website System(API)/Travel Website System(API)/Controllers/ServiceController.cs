@@ -102,7 +102,7 @@ namespace Travel_Website_System_API_.Controllers
                     serviceProviderId = service.serviceProviderId,
                     BookingTimeAllowed = service.BookingTimeAllowed,
                     HoltelLocation = service.HoltelLocation, // Hotels Services
-                    NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                    //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
                     NumberOFPersons = service.NumberOFPersons // Hotels Services
 
                 });

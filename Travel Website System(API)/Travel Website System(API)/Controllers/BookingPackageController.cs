@@ -35,13 +35,13 @@ namespace Travel_Website_System_API_.Controllers
                     .FirstOrDefault(p=>p.clientId==bookingPackageDTO.clientId&& p.packageId==bookingPackageDTO.packageId);
                 if(model!=null)//if exists
                 {
-                    return BadRequest("this booking for the same client and this package is found before");
+                  return BadRequest(new { message = "This client has already booked this package." });
                 }
                 var package = unitOFWork.db.Packages.SingleOrDefault(p => p.Id == bookingPackageDTO.packageId);
                 if(package.QuantityAvailable == 0)
                 {
                     package.isDeleted = true;// package will be not in website and you cant booking it
-                    return BadRequest("this package is not availabe now ");
+                    return BadRequest(new { message = "Package not available now." });
                 }
                 bookingPackageDTO.Date = DateTime.Now;
                 // bookingPackageDTO.allowingTime = DateTime.Now.AddDays(20);
@@ -88,10 +88,10 @@ namespace Travel_Website_System_API_.Controllers
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "invalid data provided");
-                return BadRequest(ModelState);
+                return BadRequest(new { message = "Invalid data provided.", errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)) });
+
             }
-      
+
         }
         
         [HttpGet("{id}")]
