@@ -25,12 +25,16 @@ namespace Travel_Website_System_API_.Controllers
         {
             if (lovePackageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+
             LovePackage lovePackage = new LovePackage()
             {
                 //Id = lovePackageDTO.Id,
                 date = DateTime.Now,
                 IsDeleted = lovePackageDTO.IsDeleted,
-                clientId = lovePackageDTO.clientId,
+                clientId = userId,
                 packageId = lovePackageDTO.packageId
             };
             lovePackageRepo.Add(lovePackage);
@@ -47,7 +51,8 @@ namespace Travel_Website_System_API_.Controllers
 
             LovePackage lovePackage = lovePackageRepo.GetById(id);
             if (lovePackage == null) return NotFound();
-            lovePackageRepo.Remove(lovePackage);
+            lovePackage.IsDeleted=true;
+            lovePackageRepo.Edit(lovePackage);
             lovePackageRepo.Save();
             return Ok(lovePackage);
 
