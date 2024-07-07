@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -25,6 +26,7 @@ namespace Travel_Website_System_API_.Controllers
         private readonly IGenericRepo<CustomerService> _cusSerGenericRepo;
         private readonly IConfiguration _configuration;
         private readonly IEmailSender _emailSender;
+        private readonly UserRepo _userRepo;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -34,7 +36,8 @@ namespace Travel_Website_System_API_.Controllers
             IGenericRepo<Admin> adminGenericRepo,
             IGenericRepo<CustomerService> cusSerGenericRepo,
             IConfiguration configuration,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            UserRepo userRepo)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -44,6 +47,7 @@ namespace Travel_Website_System_API_.Controllers
             _cusSerGenericRepo = cusSerGenericRepo;
             _configuration = configuration;
             _emailSender = emailSender;
+            _userRepo = userRepo;
         }
 
         // Register endpoint
@@ -60,6 +64,11 @@ namespace Travel_Website_System_API_.Controllers
                     Role = registerDto.Role
                 };
 
+                var verificationCode = Guid.NewGuid().ToString().Substring(0, 6);
+                user.VerificationCode = verificationCode;
+
+                await _emailSender.SendEmailAsync(user.Email, "Verification Code", $"Your verification code is: {verificationCode}");
+
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
 
                 if (result.Succeeded)
@@ -70,7 +79,7 @@ namespace Travel_Website_System_API_.Controllers
                     {
                         CreateUserAccordingToHisType(user, registerDto.Role);
                     }
-                    return Ok(new { Message = "User registered successfully" });
+                    return Ok(new { Message = "User registered step1 successfully" });
                 }
 
                 foreach (var err in result.Errors)
@@ -80,6 +89,37 @@ namespace Travel_Website_System_API_.Controllers
             }
             return BadRequest(ModelState);
         }
+
+        
+       
+
+
+
+        [HttpPost("email confirmation")]
+        public async Task<IActionResult> Verify([FromBody] VerifyVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var dbUser = await _userRepo.FindByVerificationCodeAsync(model.VerificationCode);
+
+                if (dbUser != null && dbUser.VerificationCode == model.VerificationCode)
+                {
+                    dbUser.IsVerified = true;
+                    await _context.SaveChangesAsync();
+
+                    return Ok(new { Message = "User verified successfully" });
+                }
+
+                return BadRequest(new { Message = "Invalid verification code." });
+            }
+
+            return BadRequest(ModelState);
+        }
+
+
+
+
+
 
         private void CreateUserAccordingToHisType(ApplicationUser user, string role)
         {
@@ -150,7 +190,7 @@ namespace Travel_Website_System_API_.Controllers
             return BadRequest(ModelState);
         }
 
-        // External login endpoints
+       /* // External login endpoints
         [HttpGet("external-login")]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
@@ -222,7 +262,7 @@ namespace Travel_Website_System_API_.Controllers
             }
             return BadRequest(ModelState);
         }
-
+*/
         private string GenerateJwtToken(ApplicationUser user)
         {
             var claims = new List<Claim>

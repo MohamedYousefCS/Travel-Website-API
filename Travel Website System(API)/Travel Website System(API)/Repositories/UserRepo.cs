@@ -88,5 +88,10 @@ namespace Travel_Website_System_API_.Repositories
             _db.SaveChanges();
         }
 
+        public async Task<ApplicationUser> FindByVerificationCodeAsync(string verificationCode)
+        {
+            return await _db.Users.SingleOrDefaultAsync(u => u.VerificationCode == verificationCode);
+        }
+
     }
 }
