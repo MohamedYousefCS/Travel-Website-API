@@ -26,7 +26,7 @@ namespace Travel_Website_System_API_.Controllers
        
         [HttpPost]
         [Consumes("application/json")]
-        // [Authorize(Roles = "client")]
+        //[Authorize(Roles = "client")]
         public ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
             if(ModelState.IsValid)
             {
