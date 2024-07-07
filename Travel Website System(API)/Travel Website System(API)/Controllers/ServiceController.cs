@@ -32,7 +32,7 @@ namespace Travel_Website_System_API_.Controllers
 
         [HttpGet]
         //[Produces("application/json")]
-        [Authorize(Roles = "superAdmin, admin")]
+        //[Authorize(Roles = "superAdmin, admin")]
 
         public ActionResult GetAllServices(int pageNumber = 1, int pageSize = 10)
         {
@@ -76,7 +76,7 @@ namespace Travel_Website_System_API_.Controllers
         }
         // amira
         [HttpGet("HotelServices")]
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
 
         //[Produces("application/json")]
         public ActionResult GetAllHotelServices(int pageNumber = 1, int pageSize = 10)
@@ -124,7 +124,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpGet("Search/{searchItem}")]
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
 
         public ActionResult<List<string>> Search(string searchItem)
         {
@@ -181,7 +181,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpGet("{name:alpha}")]
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
 
         public IActionResult GetByName(string name)
         {
