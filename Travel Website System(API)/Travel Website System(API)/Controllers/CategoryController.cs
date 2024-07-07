@@ -82,6 +82,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "superAdmin")]
 
         public ActionResult AddCategory(CategoryDTO categoryDTO) {
             if(categoryDTO == null) return BadRequest();
@@ -99,6 +100,7 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "superAdmin")]
 
         public ActionResult EditCategory(CategoryDTO categoryDTO,int id) { 
             if (categoryDTO == null) return BadRequest();
@@ -118,6 +120,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "superAdmin")]
+
         public ActionResult DeleteCategory(int id)
         {
             Category category = categortRepo.GetById(id);

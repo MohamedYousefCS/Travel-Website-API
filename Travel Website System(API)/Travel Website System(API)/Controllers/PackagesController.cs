@@ -172,7 +172,14 @@ namespace Travel_Website_System_API_.Controllers
 
             // Get the current logged-in user's ID
             var adminId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (adminId == null)
+
+            // Check if the user is a superAdmin
+            var isSuperAdmin = User.IsInRole("superAdmin");
+            if (isSuperAdmin)
+            {
+                adminId = null;
+            }
+            else if (adminId == null)
             {
                 return Unauthorized();
             }
@@ -181,12 +188,13 @@ namespace Travel_Website_System_API_.Controllers
             packageDTO.EndDate = packageDTO.startDate?.AddDays(packageDTO.Duration ?? 0);
             packageDTO.SecondLocationDuration = packageDTO.Duration - packageDTO.FirstLocationDuration;
 
-            Package package = new Package() {
+            Package package = new Package()
+            {
                 //Id = packageDTO.Id,
                 Name = packageDTO.Name,
                 Description = packageDTO.Description,
                 //Image = uniqueFileName,
-                Image= packageDTO.Image,
+                Image = packageDTO.Image,
                 QuantityAvailable = packageDTO.QuantityAvailable,
                 Price = packageDTO.Price,
                 isDeleted = packageDTO.isDeleted,
@@ -198,15 +206,14 @@ namespace Travel_Website_System_API_.Controllers
                 FirstLocation = packageDTO.FirstLocation,
                 SecondLocation = packageDTO.SecondLocation,
                 FirstLocationDuration = packageDTO.FirstLocationDuration,
-                SecondLocationDuration= packageDTO.SecondLocationDuration,
+                SecondLocationDuration = packageDTO.SecondLocationDuration,
             };
             packageRepo.Add(package);
             packageDTO.Id = package.Id;
             packageRepo.Save();
-            // return Ok(packageDTO);
             return CreatedAtAction("GetPackageById", new { id = package.Id }, packageDTO);
-
         }
+
 
 
         //implement image any problem call helmy 
@@ -259,8 +266,8 @@ namespace Travel_Website_System_API_.Controllers
                 return NotFound();
             }
 
-            // Check if the logged-in user is authorized to edit this package
-            if (userId != package.adminId)
+            // Check if the logged-in user is a superAdmin or the owner of the package
+            if (!User.IsInRole("superAdmin") && userId != package.adminId)
             {
                 return BadRequest("You are not authorized to edit this package");
             }
@@ -271,11 +278,11 @@ namespace Travel_Website_System_API_.Controllers
                 return BadRequest();
             }
 
-           // string uniqueFileName = UploadImage(packageDTO.Image);
+            // string uniqueFileName = UploadImage(packageDTO.Image);
             package.Name = packageDTO.Name;
             package.Description = packageDTO.Description;
             //package.Image = uniqueFileName;
-            package.Image=packageDTO.Image;
+            package.Image = packageDTO.Image;
             package.QuantityAvailable = packageDTO.QuantityAvailable;
             package.Price = packageDTO.Price;
             package.isDeleted = packageDTO.isDeleted;
@@ -294,12 +301,13 @@ namespace Travel_Website_System_API_.Controllers
             return NoContent();
         }
 
+
         // DELETE: api/Packages/5
         [Authorize(Roles = "superAdmin, admin")]
         [HttpDelete("{id}")]
         public IActionResult DeletePackage(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Get current user's ID
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
             var package = packageRepo.GetById(id);
 
             if (package == null)
@@ -307,10 +315,10 @@ namespace Travel_Website_System_API_.Controllers
                 return NotFound();
             }
 
-            // Check if the logged-in user is authorized to delete this package
-            if (userId != package.adminId)
+            // Check if the logged-in user is a superAdmin or the owner of the package
+            if (!User.IsInRole("superAdmin") && userId != package.adminId)
             {
-               return BadRequest("You are not authorized to delete this package");
+                return BadRequest("You are not authorized to delete this package");
             }
 
             // Check if there are any bookings associated with the package
@@ -327,7 +335,6 @@ namespace Travel_Website_System_API_.Controllers
 
             return Ok(package);
         }
-
 
 
 
