@@ -108,6 +108,9 @@ namespace Travel_Website_System_API_.Controllers
                     //HoltelLocation = service.HoltelLocation, // Hotels Services
                     //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
                     //NumberOFPersons = service.NumberOFPersons // Hotels Services
+                    //HoltelLocation = service.HoltelLocation, // Hotels Services
+                    //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                    //NumberOFPersons = service.NumberOFPersons // Hotels Services
 
                 });
             }
@@ -236,7 +239,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
 
         public ActionResult AddService(ServiceDTO serviceDTO)
         {

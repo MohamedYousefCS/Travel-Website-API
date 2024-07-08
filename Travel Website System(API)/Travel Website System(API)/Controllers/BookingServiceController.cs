@@ -23,20 +23,20 @@ namespace Travel_Website_System_API_.Controllers
         {
             if(bookingServiceDTO == null)
             {
-                return BadRequest("the bookingService order cant be null ");
+                return BadRequest( new { Message= "the bookingService order cant be null " });
             }
             var existBookService = unitOFWork.BookingServiceRepo.GetAll()
                 .FirstOrDefault(b => b.clientId == bookingServiceDTO.ClientId && b.serviceId == bookingServiceDTO.ServiceId);
             // to check uniqeness of clientId and serviceId
             if (existBookService != null) { 
-                return BadRequest("A booking service with the same ClientId and ServiceId already exists.");
+                return BadRequest( new { Message = "A booking service with the same ClientId and ServiceId already exists" });
             }
             var service = unitOFWork.db.Services.SingleOrDefault(s => s.Id == bookingServiceDTO.ServiceId);
             // in this the package is removed if its quantity is =0
             if (service.QuantityAvailable ==0)
             {
                 service.isDeleted = true;
-                return BadRequest("sorry this service is not valid for booking now");
+                return BadRequest( new { Message = "sorry this service is not valid for booking now" });
             }
             // when adding bookingService object the quantity is increased by 1 and the available quantity for the service will be decreased by 1
             bookingServiceDTO.Quantity = unitOFWork.BookingServiceRepo.GetAll()
@@ -72,7 +72,7 @@ namespace Travel_Website_System_API_.Controllers
             // will return object in response where i can get it id in ui to pass it in payment
             return CreatedAtAction(nameof(GetByID), new { id = bookingService.Id }, bookingServiceDTO);
         }
-
+       
         [HttpGet("{id}")] 
         public IActionResult GetByID(int id)// return Dto
         {
