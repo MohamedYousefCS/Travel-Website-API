@@ -21,7 +21,7 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddLoveService(LovePackageDTO lovePackageDTO)
+        public ActionResult AddLovePackage(LovePackageDTO lovePackageDTO)
         {
             if (lovePackageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
@@ -46,7 +46,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteLoveService(int id)
+        public ActionResult DeleteLovePackage(int id)
         {
 
             LovePackage lovePackage = lovePackageRepo.GetById(id);
