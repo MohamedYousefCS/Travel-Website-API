@@ -105,9 +105,12 @@ namespace Travel_Website_System_API_.Controllers
                     Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                     serviceProviderId = service.serviceProviderId,
                     BookingTimeAllowed = service.BookingTimeAllowed,
-                    HoltelLocation = service.HoltelLocation, // Hotels Services
+                    //HoltelLocation = service.HoltelLocation, // Hotels Services
                     //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                    NumberOFPersons = service.NumberOFPersons // Hotels Services
+                    //NumberOFPersons = service.NumberOFPersons // Hotels Services
+                    //HoltelLocation = service.HoltelLocation, // Hotels Services
+                    //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                    //NumberOFPersons = service.NumberOFPersons // Hotels Services
 
                 });
             }
@@ -166,15 +169,15 @@ namespace Travel_Website_System_API_.Controllers
                 Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                 serviceProviderId = service.serviceProviderId,
                 BookingTimeAllowed = service.BookingTimeAllowed,
-                GoingFlightDestination = service.GoingFlightDestination, // Flight Services
-                GoingFlightSource = service.GoingFlightSource, // Flight Services
-                ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
-                ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
-                GoingFlightTime = packageStartDate ?? default, // Use default if null
-                ComingFlightTime = packageEndDate ?? default, // Use default if null
-                HoltelLocation = service.HoltelLocation, // Hotels Services
-                NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = service.NumberOFPersons // Hotels Services
+                //GoingFlightDestination = service.GoingFlightDestination, // Flight Services
+                //GoingFlightSource = service.GoingFlightSource, // Flight Services
+                //ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
+                //ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
+                //GoingFlightTime = packageStartDate ?? default, // Use default if null
+                //ComingFlightTime = packageEndDate ?? default, // Use default if null
+                //HoltelLocation = service.HoltelLocation, // Hotels Services
+                //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                //NumberOFPersons = service.NumberOFPersons // Hotels Services
             };
             return Ok(serviceDTO);
         }
@@ -220,15 +223,15 @@ namespace Travel_Website_System_API_.Controllers
                 Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                 serviceProviderId = service.serviceProviderId,
                 BookingTimeAllowed = service.BookingTimeAllowed,
-                GoingFlightDestination = service.GoingFlightDestination, // Flight Services
-                GoingFlightSource = service.GoingFlightSource, // Flight Services
-                ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
-                ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
-                GoingFlightTime = packageStartDate ?? default, // Use default if null
-                ComingFlightTime = packageEndDate ?? default, // Use default if null
-                HoltelLocation = service.HoltelLocation, // Hotels Services
-                NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = service.NumberOFPersons // Hotels Services
+                //GoingFlightDestination = service.GoingFlightDestination, // Flight Services
+                //GoingFlightSource = service.GoingFlightSource, // Flight Services
+                //ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
+                //ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
+                //GoingFlightTime = packageStartDate ?? default, // Use default if null
+                //ComingFlightTime = packageEndDate ?? default, // Use default if null
+                //HoltelLocation = service.HoltelLocation, // Hotels Services
+                //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                //NumberOFPersons = service.NumberOFPersons // Hotels Services
             };
 
             return Ok(serviceDTO);
@@ -236,7 +239,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
 
         public ActionResult AddService(ServiceDTO serviceDTO)
         {
@@ -257,13 +260,13 @@ namespace Travel_Website_System_API_.Controllers
                 categoryId = serviceDTO.categoryId,
                 serviceProviderId = serviceDTO.serviceProviderId,
                 BookingTimeAllowed = serviceDTO.BookingTimeAllowed,
-                GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
-                GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
-                ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
-                ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
-                HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
-                NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
+                //GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
+                //GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
+                //ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
+                //ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
+                //HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
+                //NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
+                //NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
             };
             serviceRepo.Add(service);
             serviceRepo.Save();
@@ -295,13 +298,13 @@ namespace Travel_Website_System_API_.Controllers
                 categoryId = serviceDTO.categoryId,
                 serviceProviderId = serviceDTO.serviceProviderId,
                 BookingTimeAllowed = serviceDTO.BookingTimeAllowed,
-                GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
-                GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
-                ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
-                ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
-                HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
-                NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
+            //    GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
+            //    GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
+            //    ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
+            //    ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
+            //    HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
+            //    NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
+            //    NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
             };
             serviceRepo.Edit(service);
             serviceRepo.Save();
