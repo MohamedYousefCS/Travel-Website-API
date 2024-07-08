@@ -67,11 +67,11 @@ namespace Travel_Website_System_API_.Controllers
                     Role = registerDto.Role
                 };
 
-                /*var verificationCode = Guid.NewGuid().ToString().Substring(0, 6);
+                var verificationCode = Guid.NewGuid().ToString().Substring(0, 6);
                 user.VerificationCode = verificationCode;
 
                 await _emailSender.SendEmailAsync(user.Email, "Verification Code", $"Your verification code is: {verificationCode}");
-*/
+
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
 
                 if (result.Succeeded)
@@ -93,12 +93,12 @@ namespace Travel_Website_System_API_.Controllers
             return BadRequest(ModelState);
         }
 
-        
-       
 
 
 
-       /* [HttpPost("email confirmation")]
+
+
+        [HttpPost("email confirmation")]
         public async Task<IActionResult> Verify([FromBody] VerifyVM model)
         {
             if (ModelState.IsValid)
@@ -119,7 +119,7 @@ namespace Travel_Website_System_API_.Controllers
 
             return BadRequest(ModelState);
         }
-*/
+
 
 
 
