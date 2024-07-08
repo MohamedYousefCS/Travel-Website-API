@@ -5,6 +5,7 @@ using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Travel_Website_System_API_.Controllers
@@ -21,6 +22,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "client")]
+
         public ActionResult AddLovePackage(LovePackageDTO lovePackageDTO)
         {
             if (lovePackageDTO == null) return BadRequest();
@@ -33,7 +36,7 @@ namespace Travel_Website_System_API_.Controllers
             {
                 //Id = lovePackageDTO.Id,
                 date = DateTime.Now,
-                IsDeleted = lovePackageDTO.IsDeleted,
+                IsDeleted = false,
                 clientId = userId,
                 packageId = lovePackageDTO.packageId
             };
