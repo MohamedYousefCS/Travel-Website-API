@@ -12,12 +12,10 @@
     public class ChatHub : Hub
     {
         private readonly ApplicationDBContext _context;
-        private readonly ILogger<ChatHub> _logger;
 
-        public ChatHub(ApplicationDBContext context , ILogger<ChatHub> logger)
+        public ChatHub(ApplicationDBContext context )
         {
             _context = context;
-            _logger = logger;
 ;
         }
 

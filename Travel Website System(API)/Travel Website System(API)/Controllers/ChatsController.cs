@@ -178,24 +178,32 @@ namespace Travel_Website_System_API_.Controllers
         [HttpPost("SendMessageToClient")]
         public async Task<IActionResult> SendMessageToClient(string message, string ReceiverId, string SenderId)
         {
-            // Store the message in the database
-            var newMessage = new Message
+            try
             {
-                ReceiverId = ReceiverId,
-                SenderId = SenderId,
-                Content = message,
-                Timestamp = DateTime.UtcNow
-            };
-            await _context.Messages.AddAsync(newMessage);
-            await _context.SaveChangesAsync();
+                // Store the message in the database
+                var newMessage = new Message
+                {
+                    ReceiverId = ReceiverId,
+                    SenderId = SenderId,
+                    Content = message,
+                    Timestamp = DateTime.UtcNow
+                };
+                await _context.Messages.AddAsync(newMessage);
+                await _context.SaveChangesAsync();
 
-            // Send the message to the specified client
-            // await Clients.Client(connectionId).SendAsync("ReceiveMessage", user, message);
-            var users = new List<string>() { ReceiverId };
-            var userConnections = _context.UserConnections.AsNoTracking().Where(x => users.Contains(x.ApplicationUserId)).Select(x => x.ConnectionId.ToString());
+                // Send the message to the specified client
+                // await Clients.Client(connectionId).SendAsync("ReceiveMessage", user, message);
+                var users = new List<string>() { ReceiverId };
+                var userConnections = _context.UserConnections.AsNoTracking().Where(x => users.Contains(x.ApplicationUserId)).Select(x => x.ConnectionId.ToString());
 
-            await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessageFromCustomer", JsonConvert.SerializeObject(newMessage));
-            return Ok(true);
+                await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessageFromCustomer", JsonConvert.SerializeObject(newMessage));
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
          
 
@@ -247,7 +255,9 @@ namespace Travel_Website_System_API_.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                throw new ArgumentException("user not found.");
+
+                //return NotFound();
             }
 
             // Store the message in the database
