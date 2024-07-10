@@ -34,5 +34,6 @@ namespace Travel_Website_System_API.Models
         public string ReceiverId { get; set; }
         //public ApplicationUser User { get; set; }
         public ApplicationUser Receiver { get;  set; }
+        public string GroupName { get; internal set; }
     }
 }
