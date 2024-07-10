@@ -198,6 +198,9 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastSeen")
                         .HasColumnType("datetime2");
 
@@ -257,6 +260,9 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("VerificationCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -629,12 +635,6 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<int?>("BookingTimeAllowed")
                         .HasColumnType("int");
 
-                    b.Property<string>("ComingBackFlightDesination")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ComingBackFlightSource")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -644,26 +644,11 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("GoingFlightDestination")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GoingFlightSource")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("HoltelLocation")
-                        .HasColumnType("int");
-
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("NumberOFAvailableRooms")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("NumberOFPersons")
-                        .HasColumnType("int");
 
                     b.Property<int?>("QuantityAvailable")
                         .HasColumnType("int");

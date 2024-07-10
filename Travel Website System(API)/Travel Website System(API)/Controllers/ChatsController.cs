@@ -8,6 +8,7 @@ using System;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.Hubs;
+using System.Security.Claims;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -125,6 +126,12 @@ namespace Travel_Website_System_API_.Controllers
         [HttpPost("AddChat")]
         public async Task<ActionResult<ChatDTO>> AddChat(ChatDTO chatDTO)
         {
+            var CustomerServiceId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (CustomerServiceId == null)
+            {
+                return Unauthorized();                 //mohamed
+            }
+
             var chat = new Chat
             {
                 Name = chatDTO.Name,
@@ -132,7 +139,8 @@ namespace Travel_Website_System_API_.Controllers
                 Description = chatDTO.Description,
                 Logo = chatDTO.Logo,
                 IsDeleted = chatDTO.IsDeleted,
-                customerServiceId = chatDTO.customerServiceId,
+                //customerServiceId = chatDTO.customerServiceId,
+                customerServiceId=CustomerServiceId,    //mohamed
                 clientId = chatDTO.clientId,
                 Messages = chatDTO.Messages.Select(m => new Message { Content = m }).ToList()
             };

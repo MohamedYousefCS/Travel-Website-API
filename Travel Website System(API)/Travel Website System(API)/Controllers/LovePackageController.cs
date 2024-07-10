@@ -5,6 +5,7 @@ using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Travel_Website_System_API_.Controllers
@@ -21,16 +22,22 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddLoveService(LovePackageDTO lovePackageDTO)
+        [Authorize(Roles = "client")]
+
+        public ActionResult AddLovePackage(LovePackageDTO lovePackageDTO)
         {
             if (lovePackageDTO == null) return BadRequest();
             if (!ModelState.IsValid) return BadRequest();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+
             LovePackage lovePackage = new LovePackage()
             {
                 //Id = lovePackageDTO.Id,
                 date = DateTime.Now,
-                IsDeleted = lovePackageDTO.IsDeleted,
-                clientId = lovePackageDTO.clientId,
+                IsDeleted = false,
+                clientId = userId,
                 packageId = lovePackageDTO.packageId
             };
             lovePackageRepo.Add(lovePackage);
@@ -42,12 +49,13 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteLoveService(int id)
+        public ActionResult DeleteLovePackage(int id)
         {
 
             LovePackage lovePackage = lovePackageRepo.GetById(id);
             if (lovePackage == null) return NotFound();
-            lovePackageRepo.Remove(lovePackage);
+            lovePackage.IsDeleted=true;
+            lovePackageRepo.Edit(lovePackage);
             lovePackageRepo.Save();
             return Ok(lovePackage);
 

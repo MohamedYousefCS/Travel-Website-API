@@ -96,6 +96,8 @@ namespace Travel_Website_System_API_.Controllers
         //Add ServiceProvider
 
         [HttpPost]
+        [Authorize(Roles = "superAdmin")]
+
 
         public ActionResult AddServiceProvider(ServiceProviderDTO serviceProviderDTO)
         {
@@ -119,6 +121,8 @@ namespace Travel_Website_System_API_.Controllers
         //Update ServiceProvider
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "superAdmin")]
+
         public ActionResult EditServiceProvider(ServiceProviderDTO serviceProviderDTO, int id) {
             if (serviceProviderDTO == null) return BadRequest();
             if (serviceProviderDTO.Id != id) return BadRequest();
@@ -139,6 +143,8 @@ namespace Travel_Website_System_API_.Controllers
         //Remove ServiceProvider
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "superAdmin")]
+
         public ActionResult DeleteServiceProvider(int id)
         {
             ServiceProvider SP = ServProviderRepo.GetById(id);

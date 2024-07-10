@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
@@ -16,11 +17,15 @@ namespace Travel_Website_System_API_.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly UserRepo _userRepo;
+        private readonly ApplicationDBContext _context;
 
-        public UserController(UserManager<ApplicationUser> userManager, UserRepo userRepo)
+
+
+        public UserController(UserManager<ApplicationUser> userManager, UserRepo userRepo, ApplicationDBContext context)
         {
             _userManager = userManager;
             _userRepo = userRepo;
+            _context = context;
         }
 
         [HttpGet("All")]
@@ -215,24 +220,34 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> SoftDeleteUser(string id)
+public async Task<IActionResult> SoftDeleteUser(string id)
+{
+    var user = await _userManager.FindByIdAsync(id);
+    if (user == null || user.IsDeleted)
+    {
+        return NotFound();
+    }
+
+    // Check if the user is a client and has active booking packages
+    
+        var hasActiveBookings = await _context.BookingPackages
+            .AnyAsync(bp => bp.clientId == user.Id);
+
+        if (hasActiveBookings)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null || user.IsDeleted)
-            {
-                return NotFound();
-            }
-
-            user.IsDeleted = true;
-            var result = await _userManager.UpdateAsync(user);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-            return Ok(new { message = "user deleted successfully" });
-          
+            return BadRequest(new { message = "User cannot be deleted because they have active booking packages." });
         }
+    
+
+    user.IsDeleted = true;
+    var result = await _userManager.UpdateAsync(user);
+
+    if (!result.Succeeded)
+    {
+        return BadRequest(result.Errors);
+    }
+    return Ok(new { message = "User deleted successfully" });
+}
 
 
     }

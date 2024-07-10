@@ -21,6 +21,12 @@ namespace Travel_Website_System_API.Models
         public Admin? Admin { get; set; }
         public Client? client { get; set; }
         public bool IsDeleted { get; set; }
+
+
+        public string? VerificationCode { get; set; }
+        public bool IsVerified { get; set; }
+
+
         public CustomerService? customerService { get; set; }
         public string PassportNumber { get; set; }
         public string ResidanceCountry { get; set; }

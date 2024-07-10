@@ -32,6 +32,8 @@ namespace Travel_Website_System_API_.Controllers
 
         [HttpGet]
         //[Produces("application/json")]
+        //[Authorize(Roles = "superAdmin, admin")]
+
         public ActionResult GetAllServices(int pageNumber = 1, int pageSize = 10)
         {
             List<Service> services = serviceRepo.GetAllWithPagination(pageNumber, pageSize);
@@ -74,6 +76,8 @@ namespace Travel_Website_System_API_.Controllers
         }
         // amira
         [HttpGet("HotelServices")]
+       // [Authorize(Roles = "superAdmin, admin")]
+
         //[Produces("application/json")]
         public ActionResult GetAllHotelServices(int pageNumber = 1, int pageSize = 10)
         {
@@ -101,9 +105,12 @@ namespace Travel_Website_System_API_.Controllers
                     Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                     serviceProviderId = service.serviceProviderId,
                     BookingTimeAllowed = service.BookingTimeAllowed,
-                    HoltelLocation = service.HoltelLocation, // Hotels Services
-                    NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                    NumberOFPersons = service.NumberOFPersons // Hotels Services
+                    //HoltelLocation = service.HoltelLocation, // Hotels Services
+                    //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                    //NumberOFPersons = service.NumberOFPersons // Hotels Services
+                    //HoltelLocation = service.HoltelLocation, // Hotels Services
+                    //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                    //NumberOFPersons = service.NumberOFPersons // Hotels Services
 
                 });
             }
@@ -120,6 +127,8 @@ namespace Travel_Website_System_API_.Controllers
 
 
         [HttpGet("Search/{searchItem}")]
+       // [Authorize(Roles = "superAdmin, admin")]
+
         public ActionResult<List<string>> Search(string searchItem)
         {
             var serviceNames = _serviceRepo.Search(searchItem);
@@ -160,21 +169,23 @@ namespace Travel_Website_System_API_.Controllers
                 Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                 serviceProviderId = service.serviceProviderId,
                 BookingTimeAllowed = service.BookingTimeAllowed,
-                GoingFlightDestination = service.GoingFlightDestination, // Flight Services
-                GoingFlightSource = service.GoingFlightSource, // Flight Services
-                ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
-                ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
-                GoingFlightTime = packageStartDate ?? default, // Use default if null
-                ComingFlightTime = packageEndDate ?? default, // Use default if null
-                HoltelLocation = service.HoltelLocation, // Hotels Services
-                NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = service.NumberOFPersons // Hotels Services
+                //GoingFlightDestination = service.GoingFlightDestination, // Flight Services
+                //GoingFlightSource = service.GoingFlightSource, // Flight Services
+                //ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
+                //ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
+                //GoingFlightTime = packageStartDate ?? default, // Use default if null
+                //ComingFlightTime = packageEndDate ?? default, // Use default if null
+                //HoltelLocation = service.HoltelLocation, // Hotels Services
+                //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                //NumberOFPersons = service.NumberOFPersons // Hotels Services
             };
             return Ok(serviceDTO);
         }
 
 
         [HttpGet("{name:alpha}")]
+       // [Authorize(Roles = "superAdmin, admin")]
+
         public IActionResult GetByName(string name)
         {
             Service service = _serviceRepo.GetByName(name);
@@ -212,20 +223,24 @@ namespace Travel_Website_System_API_.Controllers
                 Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                 serviceProviderId = service.serviceProviderId,
                 BookingTimeAllowed = service.BookingTimeAllowed,
-                GoingFlightDestination = service.GoingFlightDestination, // Flight Services
-                GoingFlightSource = service.GoingFlightSource, // Flight Services
-                ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
-                ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
-                GoingFlightTime = packageStartDate ?? default, // Use default if null
-                ComingFlightTime = packageEndDate ?? default, // Use default if null
-                HoltelLocation = service.HoltelLocation, // Hotels Services
-                NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = service.NumberOFPersons // Hotels Services
+                //GoingFlightDestination = service.GoingFlightDestination, // Flight Services
+                //GoingFlightSource = service.GoingFlightSource, // Flight Services
+                //ComingBackFlightSource = service.ComingBackFlightSource, // Flight Services
+                //ComingBackFlightDesination = service.ComingBackFlightDesination, // Flight Services
+                //GoingFlightTime = packageStartDate ?? default, // Use default if null
+                //ComingFlightTime = packageEndDate ?? default, // Use default if null
+                //HoltelLocation = service.HoltelLocation, // Hotels Services
+                //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
+                //NumberOFPersons = service.NumberOFPersons // Hotels Services
             };
 
             return Ok(serviceDTO);
         }
+
+
         [HttpPost]
+       // [Authorize(Roles = "superAdmin, admin")]
+
         public ActionResult AddService(ServiceDTO serviceDTO)
         {
             if (serviceDTO == null) return BadRequest();
@@ -245,13 +260,13 @@ namespace Travel_Website_System_API_.Controllers
                 categoryId = serviceDTO.categoryId,
                 serviceProviderId = serviceDTO.serviceProviderId,
                 BookingTimeAllowed = serviceDTO.BookingTimeAllowed,
-                GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
-                GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
-                ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
-                ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
-                HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
-                NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
+                //GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
+                //GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
+                //ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
+                //ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
+                //HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
+                //NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
+                //NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
             };
             serviceRepo.Add(service);
             serviceRepo.Save();
@@ -260,6 +275,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "superAdmin, admin")]
+
 
         public ActionResult EditService(ServiceDTO serviceDTO, int id)
         {
@@ -281,13 +298,13 @@ namespace Travel_Website_System_API_.Controllers
                 categoryId = serviceDTO.categoryId,
                 serviceProviderId = serviceDTO.serviceProviderId,
                 BookingTimeAllowed = serviceDTO.BookingTimeAllowed,
-                GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
-                GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
-                ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
-                ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
-                HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
-                NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
-                NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
+            //    GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
+            //    GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
+            //    ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
+            //    ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
+            //    HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
+            //    NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
+            //    NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
             };
             serviceRepo.Edit(service);
             serviceRepo.Save();
@@ -296,6 +313,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "superAdmin, admin")]
+
         public IActionResult DeleteService(int id)
         {
             var service = serviceRepo.GetById(id);
