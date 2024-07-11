@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
+using System;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.Hubs;
+using System.Security.Claims;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -16,14 +19,12 @@ namespace Travel_Website_System_API_.Controllers
 
         private readonly ApplicationDBContext _context;
         private IHubContext<ChatHub> _hub;
-        private readonly ILogger<ChatsController> _logger;
 
 
-        public ChatsController(ApplicationDBContext context, IHubContext<ChatHub> hub , ILogger<ChatsController> logger)
+        public ChatsController(ApplicationDBContext context, IHubContext<ChatHub> hub )
         {
             _context = context;
             _hub = hub;
-            _logger = logger;
         }
 
         [HttpGet("GetChats")]
@@ -125,6 +126,12 @@ namespace Travel_Website_System_API_.Controllers
         [HttpPost("AddChat")]
         public async Task<ActionResult<ChatDTO>> AddChat(ChatDTO chatDTO)
         {
+            var CustomerServiceId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (CustomerServiceId == null)
+            {
+                return Unauthorized();                 //mohamed
+            }
+
             var chat = new Chat
             {
                 Name = chatDTO.Name,
@@ -132,7 +139,8 @@ namespace Travel_Website_System_API_.Controllers
                 Description = chatDTO.Description,
                 Logo = chatDTO.Logo,
                 IsDeleted = chatDTO.IsDeleted,
-                customerServiceId = chatDTO.customerServiceId,
+                //customerServiceId = chatDTO.customerServiceId,
+                customerServiceId=CustomerServiceId,    //mohamed
                 clientId = chatDTO.clientId,
                 Messages = chatDTO.Messages.Select(m => new Message { Content = m }).ToList()
             };
@@ -178,26 +186,34 @@ namespace Travel_Website_System_API_.Controllers
         [HttpPost("SendMessageToClient")]
         public async Task<IActionResult> SendMessageToClient(string message, string ReceiverId, string SenderId)
         {
-            // Store the message in the database
-            var newMessage = new Message
+            try
             {
-                ReceiverId = ReceiverId,
-                SenderId = SenderId,
-                Content = message,
-                Timestamp = DateTime.UtcNow
-            };
-            await _context.Messages.AddAsync(newMessage);
-            await _context.SaveChangesAsync();
+                // Store the message in the database
+                var newMessage = new Message
+                {
+                    ReceiverId = ReceiverId,
+                    SenderId = SenderId,
+                    Content = message,
+                    Timestamp = DateTime.UtcNow
+                };
+                await _context.Messages.AddAsync(newMessage);
+                await _context.SaveChangesAsync();
 
-            // Send the message to the specified client
-            // await Clients.Client(connectionId).SendAsync("ReceiveMessage", user, message);
-            var users = new List<string>() { ReceiverId };
-            var userConnections = _context.UserConnections.AsNoTracking().Where(x => users.Contains(x.ApplicationUserId)).Select(x => x.ConnectionId.ToString());
+                // Send the message to the specified client
+                // await Clients.Client(connectionId).SendAsync("ReceiveMessage", user, message);
+                var users = new List<string>() { ReceiverId };
+                var userConnections = _context.UserConnections.AsNoTracking().Where(x => users.Contains(x.ApplicationUserId)).Select(x => x.ConnectionId.ToString());
 
-            await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessageFromCustomer", JsonConvert.SerializeObject(newMessage));
-            return Ok(true);
+                await _hub.Clients.Clients(userConnections.ToArray<string>()).SendAsync("ReceiveMessageFromCustomer", JsonConvert.SerializeObject(newMessage));
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
-
+         
 
         // send messaage from clients to customer service 
 
@@ -247,7 +263,9 @@ namespace Travel_Website_System_API_.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                throw new ArgumentException("user not found.");
+
+                //return NotFound();
             }
 
             // Store the message in the database
@@ -275,52 +293,117 @@ namespace Travel_Website_System_API_.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
-                _logger.LogWarning("NotifyUserAsync: User ID is null or empty.");
                 return BadRequest("User ID cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(message))
             {
-                _logger.LogWarning("NotifyUserAsync: Message is null or empty.");
                 return BadRequest("Message cannot be null or empty.");
             }
 
             try
             {
-                _logger.LogInformation($"Notifying user '{userId}' with message: {message}");
                 await _hub.Clients.User(userId).SendAsync("ReceiveNotification", message);
-                _logger.LogInformation("Notification sent successfully.");
                 return Ok("Notification sent successfully.");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "An error occurred while notifying the user.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while notifying the user.");
             }
         }
 
 
 
+
         [HttpPost("JoinGroup")]
-        public async Task<IActionResult> JoinGroup(UserConnection conn)
+        public async Task<IActionResult> JoinGroup(string groupName, string userId)
         {
-            if (conn == null || string.IsNullOrWhiteSpace(conn.ApplicationUser.ToString()))
+            var user = await _context.ApplicationUsers.FindAsync(userId);
+
+            if (user == null)
             {
-                _logger.LogWarning("JoinGroup: Connection or ApplicationUser is null or empty.");
-                return BadRequest("Invalid connection data.");
+                return NotFound();
+            }
+
+            if (string.IsNullOrWhiteSpace(groupName))
+            {
+                return BadRequest("Group name cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest("UserId cannot be null or empty.");
             }
 
             try
             {
-                _logger.LogInformation($"User '{conn.ApplicationUser}' is joining the group.");
-                await _hub.Clients.All.SendAsync("ReceiveMessage", "CustomerService", $"{conn.ApplicationUser} has joined the group");
-                _logger.LogInformation("User joined the group successfully.");
-                return Ok("User joined the group successfully.");
+                // Add the user to the specified group
+                var connectionId = _context.UserConnections
+                                   .Where(uc => uc.ApplicationUserId == userId && uc.IsConnected)
+                                   .Select(uc => uc.ConnectionId)
+                                   .FirstOrDefault();
+
+                await _hub.Groups.AddToGroupAsync(connectionId, groupName);
+
+                // Notify all group members about the new user joining
+                var notification = new
+                {
+                    UserId = userId,
+                    GroupName = groupName,
+                    Message = $"{userId} has joined the group {groupName}.",
+                    Timestamp = DateTime.UtcNow
+                };
+
+                await _hub.Clients.Group(groupName).SendAsync("UserJoinedGroup", JsonConvert.SerializeObject(notification));
+                return Ok(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "An error occurred while joining the group.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while joining the group.");
+            }
+        }
+
+
+
+
+        [HttpPost("SendMessageToGroup")]
+        public async Task<IActionResult> SendMessageToGroup(string groupName, string message, string senderId)
+        {
+            if (string.IsNullOrWhiteSpace(groupName))
+            {
+                return BadRequest("Group name cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return BadRequest("Message cannot be null or empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(senderId))
+            {
+                return BadRequest("SenderId cannot be null or empty.");
+            }
+
+            try
+            {
+                // Store the message in the database
+                var newMessage = new Message
+                {
+                    SenderId = senderId,
+                    Content = message,
+                    Timestamp = DateTime.UtcNow,
+                    GroupName = groupName 
+                };
+                await _context.Messages.AddAsync(newMessage);
+                await _context.SaveChangesAsync();
+
+                // Send the message to the specified group
+                await _hub.Clients.Group(groupName).SendAsync("ReceiveGroupMessage", JsonConvert.SerializeObject(newMessage));
+                return Ok(true);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while sending message to the group.");
             }
         }
 
@@ -338,7 +421,7 @@ namespace Travel_Website_System_API_.Controllers
             }
 
             var chatMessagesDTOs = chats.Select(chat => new ChatMessagesDTO
-            {
+            { 
                 ChatId = chat.Id,
                 ChatName = chat.Name,
                 Messages = chat.Messages.Select(m => new MessageDto
@@ -376,13 +459,11 @@ namespace Travel_Website_System_API_.Controllers
 
 
         //mark for reading status
-
         [HttpPut("MarkMessageAsRead/{messageId}")]
         public async Task<IActionResult> MarkMessageAsRead(int messageId)
         {
             if (messageId <= 0)
             {
-                _logger.LogWarning("MarkMessageAsRead: Invalid messageId provided.");
                 return BadRequest("Invalid messageId.");
             }
 
@@ -391,7 +472,6 @@ namespace Travel_Website_System_API_.Controllers
                 var message = await _context.Messages.FindAsync(messageId);
                 if (message == null)
                 {
-                    _logger.LogWarning($"MarkMessageAsRead: Message with messageId {messageId} not found.");
                     return NotFound("Message not found.");
                 }
 
@@ -399,16 +479,12 @@ namespace Travel_Website_System_API_.Controllers
                 _context.Messages.Update(message);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Message with messageId {messageId} marked as read.");
-
                 await _hub.Clients.User(message.Sender.ToString()).SendAsync("MessageRead", messageId);
-                _logger.LogInformation("Message read notification sent successfully.");
 
                 return Ok(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "An error occurred while marking message as read.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
         }
@@ -416,20 +492,17 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
-        //notify for last seen 
 
         [HttpPost("UpdateUserStatus")]
         public async Task<IActionResult> UpdateUserStatus(int userId, string status)
         {
             if (userId <= 0)
             {
-                _logger.LogWarning("UpdateUserStatus: Invalid userId provided.");
                 return BadRequest("Invalid userId.");
             }
 
             if (string.IsNullOrWhiteSpace(status))
             {
-                _logger.LogWarning("UpdateUserStatus: Status cannot be null or empty.");
                 return BadRequest("Status cannot be null or empty.");
             }
 
@@ -438,7 +511,6 @@ namespace Travel_Website_System_API_.Controllers
                 var user = await _context.Users.FindAsync(userId);
                 if (user == null)
                 {
-                    _logger.LogWarning($"UpdateUserStatus: User with userId {userId} not found.");
                     return NotFound("User not found.");
                 }
 
@@ -448,16 +520,12 @@ namespace Travel_Website_System_API_.Controllers
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"User status updated for userId {userId}. New status: {status}");
-
                 await _hub.Clients.All.SendAsync("UserStatusUpdated", userId, status, user.LastSeen);
-                _logger.LogInformation("User status notification sent successfully.");
 
                 return Ok(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "An error occurred while updating user status.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
         }
@@ -465,14 +533,12 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
-        // notify of typing messages
 
         [HttpGet("NotifyTyping/{userId}")]
         public async Task<IActionResult> NotifyTyping(int userId)
         {
             if (userId <= 0)
             {
-                _logger.LogWarning("NotifyTyping: Invalid userId provided.");
                 return BadRequest("Invalid userId.");
             }
 
@@ -481,21 +547,18 @@ namespace Travel_Website_System_API_.Controllers
                 var user = await _context.Users.FindAsync(userId);
                 if (user == null)
                 {
-                    _logger.LogWarning($"NotifyTyping: User with userId {userId} not found.");
                     return NotFound("User not found.");
                 }
 
-                _logger.LogInformation($"Notifying typing status for userId {userId}.");
                 await _hub.Clients.All.SendAsync("UserTyping", userId);
-                _logger.LogInformation("Typing status notification sent successfully.");
 
                 return Ok(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "An error occurred while notifying typing status.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
         }
+
     }
 }

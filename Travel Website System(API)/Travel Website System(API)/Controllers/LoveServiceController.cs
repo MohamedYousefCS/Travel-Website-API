@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Travel_Website_System_API.Models;
@@ -21,6 +22,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
         [HttpPost]
+         [Authorize(Roles = "client")]
+
         public ActionResult AddLoveService(LoveServiceDTO loveserviceDTO)
         {
             if (loveserviceDTO == null) return BadRequest();
@@ -58,10 +61,10 @@ namespace Travel_Website_System_API_.Controllers
 
         }
 
-
+        //User Services
 
         [HttpGet("user-Services")]
-        public ActionResult GetUserLovePackages()
+        public ActionResult GetUserLoveServices()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();

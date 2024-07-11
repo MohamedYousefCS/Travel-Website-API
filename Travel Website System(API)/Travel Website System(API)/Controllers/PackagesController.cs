@@ -163,7 +163,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
         // POST: api/Packages
-        [Authorize(Roles = "superAdmin, admin")]
+       // [Authorize(Roles = "superAdmin, admin")]
         [HttpPost]
         public ActionResult AddPackage(PackageDTO packageDTO)
         {
@@ -171,18 +171,18 @@ namespace Travel_Website_System_API_.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             // Get the current logged-in user's ID
-            var adminId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var adminId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            // Check if the user is a superAdmin
-            var isSuperAdmin = User.IsInRole("superAdmin");
-            if (isSuperAdmin)
-            {
-                adminId = null;
-            }
-            else if (adminId == null)
-            {
-                return Unauthorized();
-            }
+            //// Check if the user is a superAdmin
+            //var isSuperAdmin = User.IsInRole("superAdmin");
+            //if (isSuperAdmin)
+            //{
+            //    adminId = null;
+            //}
+            //else if (adminId == null)
+            //{
+            //    return Unauthorized();
+            //}
 
             //string uniqueFileName = UploadImage(packageDTO.Image);
             packageDTO.EndDate = packageDTO.startDate?.AddDays(packageDTO.Duration ?? 0);
@@ -201,7 +201,7 @@ namespace Travel_Website_System_API_.Controllers
                 startDate = packageDTO.startDate,
                 Duration = packageDTO.Duration,
                 EndDate = packageDTO.EndDate,
-                adminId = adminId,
+              //  adminId = adminId,
                 BookingTimeAllowed = packageDTO.BookingTimeAllowed,
                 FirstLocation = packageDTO.FirstLocation,
                 SecondLocation = packageDTO.SecondLocation,

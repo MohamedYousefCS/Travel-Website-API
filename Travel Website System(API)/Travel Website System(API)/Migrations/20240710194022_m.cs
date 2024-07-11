@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Travel_Website_System_API_.Migrations
 {
     /// <inheritdoc />
-    public partial class nm : Migration
+    public partial class m : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -290,13 +290,6 @@ namespace Travel_Website_System_API_.Migrations
                     Duration = table.Column<int>(type: "int", nullable: true),
                     BookingTimeAllowed = table.Column<int>(type: "int", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    GoingFlightSource = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GoingFlightDestination = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ComingBackFlightSource = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ComingBackFlightDesination = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HoltelLocation = table.Column<int>(type: "int", nullable: true),
-                    NumberOFAvailableRooms = table.Column<int>(type: "int", nullable: true),
-                    NumberOFPersons = table.Column<int>(type: "int", nullable: true),
                     categoryId = table.Column<int>(type: "int", nullable: true),
                     serviceProviderId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -360,7 +353,8 @@ namespace Travel_Website_System_API_.Migrations
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    GroupName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

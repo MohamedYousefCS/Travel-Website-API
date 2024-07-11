@@ -484,6 +484,9 @@ namespace Travel_Website_System_API_.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GroupName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 

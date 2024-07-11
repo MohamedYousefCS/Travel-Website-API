@@ -90,25 +90,23 @@ namespace Travel_Website_System_API_.Controllers
                 foreach (var service in services)
                 {
 
+
                     servicesDTO.Add(new ServiceDTO
                     {
 
-                        Id = service.Id,
-                        Name = service.Name,
-                        Description = service.Description,
-                        Image = service.Image,
-                        QuantityAvailable = service.QuantityAvailable,
-                        StartDate = service.StartDate,
-                        EndDate = service.EndDate,
-                        price = service.price,
-                        isDeleted = service.isDeleted,
-                        categoryId = service.categoryId,
-                        Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
-                        serviceProviderId = service.serviceProviderId,
-                        BookingTimeAllowed = service.BookingTimeAllowed,
-                        //HoltelLocation = service.HoltelLocation, // Hotels Services
-                        ////NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                        //NumberOFPersons = service.NumberOFPersons // Hotels Services
+                    Id = service.Id,
+                    Name = service.Name,
+                    Description = service.Description,
+                    Image = service.Image,
+                    QuantityAvailable = service.QuantityAvailable,
+                    StartDate = service.StartDate,
+                    EndDate = service.EndDate,
+                    price = service.price,
+                    isDeleted = service.isDeleted,
+                    categoryId = service.categoryId,
+                    Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
+                    serviceProviderId = service.serviceProviderId,
+                    BookingTimeAllowed = service.BookingTimeAllowed,
 
                     });
                
@@ -237,7 +235,6 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
-
         //[Authorize(Roles = "superAdmin, admin")]
         [HttpPost]
         public ActionResult AddService(ServiceDTO serviceDTO)
@@ -298,13 +295,13 @@ namespace Travel_Website_System_API_.Controllers
                 categoryId = serviceDTO.categoryId,
                 serviceProviderId = serviceDTO.serviceProviderId,
                 BookingTimeAllowed = serviceDTO.BookingTimeAllowed,
-                //GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
-                //GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
-                //ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
-                //ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
-                //HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
-                //NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
-                //NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
+            //    GoingFlightDestination = serviceDTO.GoingFlightDestination,// Flight Services 
+            //    GoingFlightSource = serviceDTO.GoingFlightSource,//// Flight Services
+            //    ComingBackFlightSource = serviceDTO.ComingBackFlightSource,// Flight Services
+            //    ComingBackFlightDesination = serviceDTO.ComingBackFlightDesination,// Flight Services
+            //    HoltelLocation = serviceDTO.HoltelLocation,// Hotels Services
+            //    NumberOFAvailableRooms = serviceDTO.NumberOFAvailableRooms, // Hotels Services
+            //    NumberOFPersons = serviceDTO.NumberOFPersons,// Hotels Services
             };
             serviceRepo.Edit(service);
             serviceRepo.Save();

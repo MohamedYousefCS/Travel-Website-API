@@ -35,45 +35,45 @@ namespace Travel_Website_System_API_.Controllers
             _client = new PayPalHttpClient(environment);
         }
 
-       
-            [HttpPost("multiple")]
-            public async Task<IActionResult> CreateOrder([FromBody] PaymentForManyBookin paymentForManyBookin)
+
+        [HttpPost("multiple")]
+        public async Task<IActionResult> CreateOrder([FromBody] PaymentForManyBookin paymentForManyBookin)
+        {
+            // List to store multiple payment responses
+            var paymentResponses = new List<object>();
+
+            // Check if there are BookingPackageIds
+            if (paymentForManyBookin.BookingPackageIds != null && paymentForManyBookin.BookingPackageIds.Any())
             {
-                // List to store multiple payment responses
-                var paymentResponses = new List<object>();
-
-                // Check if there are BookingPackageIds
-                if (paymentForManyBookin.BookingPackageIds != null && paymentForManyBookin.BookingPackageIds.Any())
+                foreach (var bookingPackageId in paymentForManyBookin.BookingPackageIds)
                 {
-                    foreach (var bookingPackageId in paymentForManyBookin.BookingPackageIds)
-                    {
-                        await ProcessPayment(paymentForManyBookin.Amount, paymentForManyBookin.Currency, bookingPackageId, null, paymentResponses);
-                    }
+                    await ProcessPayment(paymentForManyBookin.Amount, paymentForManyBookin.Currency, bookingPackageId, null, paymentResponses);
                 }
-
-                // Check if there are BookingServiceIds
-                if (paymentForManyBookin.BookingServiceIds != null && paymentForManyBookin.BookingServiceIds.Any())
-                {
-                    foreach (var bookingServiceId in paymentForManyBookin.BookingServiceIds)
-                    {
-                        await ProcessPayment(paymentForManyBookin.Amount, paymentForManyBookin.Currency, null, bookingServiceId, paymentResponses);
-                    }
-                }
-
-                return Ok(paymentResponses);
             }
 
-            private async Task ProcessPayment(decimal amount, string currency, int? bookingPackageId, int? bookingServiceId, List<object> paymentResponses)
+            // Check if there are BookingServiceIds
+            if (paymentForManyBookin.BookingServiceIds != null && paymentForManyBookin.BookingServiceIds.Any())
             {
-                try
+                foreach (var bookingServiceId in paymentForManyBookin.BookingServiceIds)
                 {
-                    // Construct order request for each payment
-                    var orderRequest = new OrdersCreateRequest();
-                    orderRequest.Prefer("return=representation");
-                    orderRequest.RequestBody(new OrderRequest
-                    {
-                        CheckoutPaymentIntent = "CAPTURE",
-                        PurchaseUnits = new List<PurchaseUnitRequest>
+                    await ProcessPayment(paymentForManyBookin.Amount, paymentForManyBookin.Currency, null, bookingServiceId, paymentResponses);
+                }
+            }
+
+            return Ok(paymentResponses);
+        }
+
+        private async Task ProcessPayment(decimal amount, string currency, int? bookingPackageId, int? bookingServiceId, List<object> paymentResponses)
+        {
+            try
+            {
+                // Construct order request for each payment
+                var orderRequest = new OrdersCreateRequest();
+                orderRequest.Prefer("return=representation");
+                orderRequest.RequestBody(new OrderRequest
+                {
+                    CheckoutPaymentIntent = "CAPTURE",
+                    PurchaseUnits = new List<PurchaseUnitRequest>
                     {
                         new PurchaseUnitRequest
                         {
@@ -84,64 +84,64 @@ namespace Travel_Website_System_API_.Controllers
                             }
                         }
                     },
-                        ApplicationContext = new ApplicationContext
-                        {
-                            ReturnUrl = "http://localhost:5141/api/Payment/capture",
-                            CancelUrl = "http://localhost:5141/api/Payment/cancel"
-                        }
-                    });
-
-                    var response = await _client.Execute(orderRequest);
-                    var result = response.Result<Order>();
-
-                    if (result.Status == "CREATED")
+                    ApplicationContext = new ApplicationContext
                     {
-                        var approvalLink = result.Links?.Find(link => link.Rel == "approve")?.Href;
+                        ReturnUrl = "http://localhost:5141/api/Payment/capture",
+                        CancelUrl = "http://localhost:5141/api/Payment/cancel"
+                    }
+                });
 
-                        if (approvalLink != null)
+                var response = await _client.Execute(orderRequest);
+                var result = response.Result<Order>();
+
+                if (result.Status == "CREATED")
+                {
+                    var approvalLink = result.Links?.Find(link => link.Rel == "approve")?.Href;
+
+                    if (approvalLink != null)
+                    {
+                        // Save payment details to the database
+                        var payment = new Payment
                         {
-                            // Save payment details to the database
-                            var payment = new Payment
-                            {
-                                Amount = amount,
-                                PaymentDate = DateTime.Now,
-                                Method = "PayPal",
-                                PaymentStatus = "Created",
-                                PayPalOrderId = result.Id,
-                                BookingPackageId = bookingPackageId,
-                                BookingServiceId = bookingServiceId
-                            };
+                            Amount = amount,
+                            PaymentDate = DateTime.Now,
+                            Method = "PayPal",
+                            PaymentStatus = "Created",
+                            PayPalOrderId = result.Id,
+                            BookingPackageId = bookingPackageId,
+                            BookingServiceId = bookingServiceId
+                        };
 
                         unitOFWork.PaymentRepo.Add(payment);
                         unitOFWork.Save();
 
-                            paymentResponses.Add(new { success = true, approvalUrl = approvalLink, bookingId = bookingPackageId ?? bookingServiceId });
-                        }
-                        else
-                        {
-                            paymentResponses.Add(new { success = false, message = "Approval URL not found." });
-                        }
+                        paymentResponses.Add(new { success = true, approvalUrl = approvalLink, bookingId = bookingPackageId ?? bookingServiceId });
                     }
                     else
                     {
-                        paymentResponses.Add(new { success = false, message = $"Order creation failed. Status: {result.Status}" });
+                        paymentResponses.Add(new { success = false, message = "Approval URL not found." });
                     }
                 }
-                catch (HttpException httpException)
+                else
                 {
-                    Console.WriteLine($"HttpException: {httpException.Message}");
-                    Console.WriteLine($"Status Code: {httpException.StatusCode}");
-                    paymentResponses.Add(new { success = false, message = $"Payment failed: {httpException.Message}" });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Exception: {ex.Message}");
-                    paymentResponses.Add(new { success = false, message = "An unexpected error occurred. Please try again later." });
+                    paymentResponses.Add(new { success = false, message = $"Order creation failed. Status: {result.Status}" });
                 }
             }
-        
+            catch (HttpException httpException)
+            {
+                Console.WriteLine($"HttpException: {httpException.Message}");
+                Console.WriteLine($"Status Code: {httpException.StatusCode}");
+                paymentResponses.Add(new { success = false, message = $"Payment failed: {httpException.Message}" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                paymentResponses.Add(new { success = false, message = "An unexpected error occurred. Please try again later." });
+            }
+        }
 
-    [HttpPost]
+
+        [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] PaymentRequest paymentRequest)
         {
             // Create an order using business account credentials
@@ -225,8 +225,92 @@ namespace Travel_Website_System_API_.Controllers
 
             }
         }
-        // this will be done after approval
-        // this will be sent to paypall api
+
+        //// this will be done after approval
+        //// this will be sent to paypall api
+        //[HttpGet("capture")]
+        //public async Task<IActionResult> CaptureOrder([FromQuery] string token)
+        //{
+        //    if (string.IsNullOrEmpty(token))
+        //    {
+        //        return BadRequest(new { success = false, message = "Token is required." });
+        //    }
+
+        //    var captureRequest = new OrdersCaptureRequest(token);
+        //    captureRequest.RequestBody(new OrderActionRequest());
+
+        //    try
+        //    {
+        //        var captureResponse = await _client.Execute(captureRequest);
+        //        var captureResult = captureResponse.Result<Order>();
+
+        //        if (captureResult.Status == "COMPLETED")
+        //        {
+        //            // Update the payment record in the database
+        //            var payment = unitOFWork.PaymentRepo.GetAll().FirstOrDefault(p=>p.PayPalOrderId == captureResult.Id);
+        //            if (payment != null)
+        //            {
+        //                payment.PaymentStatus = "Completed";
+        //                payment.PaymentDate = DateTime.Now;
+
+        //                unitOFWork.PaymentRepo.Update(payment);
+        //                unitOFWork.Save();
+        //            }
+
+        //            return Ok(new { success = true, orderId = captureResult.Id });
+        //        }
+        //        else
+        //        {
+        //            return BadRequest(new { success = false, message = $"Payment not completed. Status: {captureResult.Status}" });
+        //        }
+        //    }
+        //    catch (HttpException httpException)
+        //    {
+        //        Console.WriteLine($"HttpException: {httpException.Message}");
+        //        return BadRequest(new { success = false, message = $"Payment failed: {httpException.Message}" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Exception: {ex.Message}");
+        //        return StatusCode(500, new { success = false, message = "An unexpected error occurred. Please try again later." });
+        //    }
+        //}
+        //[HttpGet("cancel")]
+        //public IActionResult CancelPayment([FromQuery] string token)
+        //{
+        //    if (string.IsNullOrEmpty(token))
+        //    {
+        //        return BadRequest(new { success = false, message = "Token is required." });
+        //    }
+
+        //    try
+        //    {
+        //        // Retrieve the payment record based on the PayPal order ID (token)
+        //        var payment = unitOFWork.PaymentRepo.GetAll().FirstOrDefault(p => p.PayPalOrderId == token);
+        //        if (payment != null)
+        //        {
+        //            // Update the payment status to "Cancelled"
+        //            payment.PaymentStatus = "Cancelled";
+        //            payment.PaymentDate = DateTime.Now;
+
+        //            unitOFWork.PaymentRepo.Update(payment);
+        //            unitOFWork.Save();
+        //        }
+        //        else
+        //        {
+        //            return NotFound(new { success = false, message = "Payment not found." });
+        //        }
+
+        //        return Ok(new { success = true, message = "Payment cancelled successfully." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Exception: {ex.Message}");
+        //        return StatusCode(500, new { success = false, message = "An unexpected error occurred. Please try again later." });
+        //    }
+        //}
+
+
         [HttpGet("capture")]
         public async Task<IActionResult> CaptureOrder([FromQuery] string token)
         {
@@ -245,8 +329,7 @@ namespace Travel_Website_System_API_.Controllers
 
                 if (captureResult.Status == "COMPLETED")
                 {
-                    // Update the payment record in the database
-                    var payment = unitOFWork.PaymentRepo.GetAll().FirstOrDefault(p=>p.PayPalOrderId == captureResult.Id);
+                    var payment = unitOFWork.PaymentRepo.GetAll().FirstOrDefault(p => p.PayPalOrderId == captureResult.Id);
                     if (payment != null)
                     {
                         payment.PaymentStatus = "Completed";
@@ -256,24 +339,28 @@ namespace Travel_Website_System_API_.Controllers
                         unitOFWork.Save();
                     }
 
-                    return Ok(new { success = true, orderId = captureResult.Id });
+                    // return Redirect($"http://localhost:4200/payment-success?orderId={captureResult.Id}");
+                    return Redirect($"http://localhost:4200/payment-success");
                 }
                 else
                 {
-                    return BadRequest(new { success = false, message = $"Payment not completed. Status: {captureResult.Status}" });
+                    //return Redirect($"http://localhost:4200/payment-failed?message=Payment%20not%20completed.%20Status:%20{captureResult.Status}");
+                    return Redirect($"http://localhost:4200/payment-failed");
                 }
             }
             catch (HttpException httpException)
             {
                 Console.WriteLine($"HttpException: {httpException.Message}");
-                return BadRequest(new { success = false, message = $"Payment failed: {httpException.Message}" });
+                return Redirect($"http://localhost:4200/payment-failed?message=Payment%20failed:%20{httpException.Message}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An unexpected error occurred. Please try again later." });
+                // return Redirect($"http://localhost:4200/payment-failed?message=An%20unexpected%20error%20occurred.%20Please%20try%20again%20later.");
+                return Redirect($"http://localhost:4200/payment-failed");
             }
         }
+
         [HttpGet("cancel")]
         public IActionResult CancelPayment([FromQuery] string token)
         {
@@ -284,11 +371,9 @@ namespace Travel_Website_System_API_.Controllers
 
             try
             {
-                // Retrieve the payment record based on the PayPal order ID (token)
                 var payment = unitOFWork.PaymentRepo.GetAll().FirstOrDefault(p => p.PayPalOrderId == token);
                 if (payment != null)
                 {
-                    // Update the payment status to "Cancelled"
                     payment.PaymentStatus = "Cancelled";
                     payment.PaymentDate = DateTime.Now;
 
@@ -300,16 +385,20 @@ namespace Travel_Website_System_API_.Controllers
                     return NotFound(new { success = false, message = "Payment not found." });
                 }
 
-                return Ok(new { success = true, message = "Payment cancelled successfully." });
+                return Redirect("http://localhost:4200/payment-cancelled");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An unexpected error occurred. Please try again later." });
+                return Redirect("http://localhost:4200/payment-failed?message=An%20unexpected%20error%20occurred.%20Please%20try%20again%20later.");
             }
         }
-
     }
 }
+    
+
+
+
+
             
 

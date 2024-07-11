@@ -93,8 +93,8 @@ namespace Travel_Website_System_API_.Controllers
             return BadRequest(ModelState);
         }
 
-        
-       
+
+
 
 
 
@@ -300,37 +300,40 @@ namespace Travel_Website_System_API_.Controllers
 
         // Forget Password endpoint
 
-   [HttpPost("forget-password")]
-    public async Task<IActionResult> ForgotPassword(ForgetPasswordModel model)
-    {
-        if (ModelState.IsValid)
+  
+
+
+
+        [HttpPost("forget-password")]
+        public async Task<IActionResult> ForgotPassword(ForgetPasswordModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
+            if (ModelState.IsValid)
             {
-                return Ok(new { message = "Email not found" });
+                ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    return Ok(new { message = "email not found" });
+                }
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                
+                var resetLink = $"{model.url}?email={model.Email}&token={token}";
+                var emailContent = $" <p>Please reset your password by clicking <a href='{resetLink}'>here</a>.</p>";
+
+                await _emailSender.SendEmailAsync(user.Email, "Password Reset", emailContent);
+
+                return Ok(new { message = " you received a password reset link on your email." });
             }
-
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var encodedToken = WebUtility.UrlEncode(token); // URL-encode the token
-            var resetLink = $"{model.url}?email={model.Email}&token={encodedToken}";
-
-            var emailContent = $" <p>Please reset your password by clicking <a href='{resetLink}'>here</a>.</p>";
-
-                await _emailSender.SendEmailAsync(user.Email, "Verification Code", $"Your verification code is: {token}");
-
-
-                //await _emailSender.SendEmailAsync(user.Email, "Password Reset", emailContent);
-
-            return Ok(new { message = "You received a password reset link on your email." });
+            return BadRequest("can't send Email");
         }
-        return BadRequest("Cannot send email");
-    }
 
 
 
-    // Reset Password endpoint
-    [HttpPost("reset-password")]
+
+
+
+
+        // Reset Password endpoint
+        [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
         {
             if (ModelState.IsValid)
