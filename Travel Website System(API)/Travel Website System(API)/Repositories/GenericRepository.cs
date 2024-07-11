@@ -81,13 +81,6 @@ namespace Travel_Website_System_API_.Repositories
 
 
 
-
-
-
-
-        //
-       
-
             public IQueryable<TEntity> FindWithInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
             {
                 IQueryable<TEntity> query = _dbSet;

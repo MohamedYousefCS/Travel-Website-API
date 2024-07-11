@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Identity.Client;
+using System.Linq.Expressions;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
 using Travel_Website_System_API_.Repositories;
@@ -85,12 +86,13 @@ namespace Travel_Website_System_API_.Controllers
             int totalServices = serviceRepo.GetTotalCount();
 
             List<ServiceDTO> servicesDTO = new List<ServiceDTO>();
-
-            foreach (var service in services)
-            {
-
-                servicesDTO.Add(new ServiceDTO
+           
+                foreach (var service in services)
                 {
+
+
+                    servicesDTO.Add(new ServiceDTO
+                    {
 
                     Id = service.Id,
                     Name = service.Name,
@@ -105,14 +107,9 @@ namespace Travel_Website_System_API_.Controllers
                     Duration = (service.EndDate.Value - service.StartDate.Value).Days + 1, // +1 to include both start and end date
                     serviceProviderId = service.serviceProviderId,
                     BookingTimeAllowed = service.BookingTimeAllowed,
-                    //HoltelLocation = service.HoltelLocation, // Hotels Services
-                    //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                    //NumberOFPersons = service.NumberOFPersons // Hotels Services
-                    //HoltelLocation = service.HoltelLocation, // Hotels Services
-                    //NumberOFAvailableRooms = service.NumberOFAvailableRooms, // Hotels Services
-                    //NumberOFPersons = service.NumberOFPersons // Hotels Services
 
-                });
+                    });
+               
             }
             var response = new PaginatedResponse<ServiceDTO>
             {
@@ -238,9 +235,8 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
+        //[Authorize(Roles = "superAdmin, admin")]
         [HttpPost]
-       // [Authorize(Roles = "superAdmin, admin")]
-
         public ActionResult AddService(ServiceDTO serviceDTO)
         {
             if (serviceDTO == null) return BadRequest();
@@ -288,6 +284,7 @@ namespace Travel_Website_System_API_.Controllers
                 Id = serviceDTO.Id,
                 Name = serviceDTO.Name,
                 Description = serviceDTO.Description,
+
                 Image = serviceDTO.Image,
                 QuantityAvailable = serviceDTO.QuantityAvailable,
                 StartDate = serviceDTO.StartDate,

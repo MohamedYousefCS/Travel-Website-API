@@ -42,9 +42,6 @@ namespace Travel_Website_System_API_.DTO
         public int? BookingTimeAllowed { get; set; }//must <= start date
         public int? Duration { get; set; } = 1; // # nights = days-1,start+end
         public DateTime? EndDate { get; set; }//  choose
-
-
-
         //// for flights
         //public DateTime? GoingFlightTime { get; set; }// = start date of package (calculated) for view in front
         //public DateTime? ComingFlightTime { get; set; }//= end date of pakcage (calculated)
@@ -59,7 +56,7 @@ namespace Travel_Website_System_API_.DTO
 
         //public int? NumberOFAvailableRooms { get; set; }
         //public int? NumberOFPersons { get; set; } = 2;// in each room 2 by default if increased add 1 room
-        //                                              // public decimal? TotalPrice { get; set; }
+       // public decimal? TotalPrice { get; set; }
 
     }
 }

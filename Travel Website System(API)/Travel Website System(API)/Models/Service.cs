@@ -32,7 +32,6 @@ namespace Travel_Website_System_API.Models
         //public string? ComingBackFlightSource { get; set; }
         //public string? ComingBackFlightDesination { get; set; }
 
-
         //// hotels: choose start date , duration
         //public PackageLocationEnum? HoltelLocation { get; set; } // makkah , madinah
         //public int? NumberOFAvailableRooms { get; set; }
