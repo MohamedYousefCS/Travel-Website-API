@@ -44,7 +44,7 @@ namespace Travel_Website_System_API_.Controllers
                     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (adminId != null)
                 {
-                    var clients = _userRepo.GetClientsByAdminId(adminId).Where(c => c.IsDeleted == false);
+                    var clients = _userRepo.GetClientsByAdminId(adminId).Where(c => c.IsDeleted == false && c.IsVerified == true);
                     return Ok(clients);
                 }
             }
