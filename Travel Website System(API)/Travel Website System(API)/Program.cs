@@ -58,22 +58,22 @@ namespace Travel_Website_System_API_
                     Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6  IkpXVCJ9\"",
                 });
 
-          swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
-          {
-          {
-          new OpenApiSecurityScheme
-          {
-          Reference = new OpenApiReference
-          {
-          Type = ReferenceType.SecurityScheme,
-          Id = "Bearer"
-          }
-          },
-          new string[] {}
-          }
-          });
-                  });
-          
+                 swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                 {
+                 {
+                 new OpenApiSecurityScheme
+                 {
+                 Reference = new OpenApiReference
+                 {
+                 Type = ReferenceType.SecurityScheme,
+                 Id = "Bearer"
+                 }
+                 },
+                 new string[] {}
+                 }
+                 });
+                         });
+                 
   
             builder.Services.AddDbContext<ApplicationDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
             builder.Services.Configure<PayPalSettings>(builder.Configuration.GetSection("PayPal"));
