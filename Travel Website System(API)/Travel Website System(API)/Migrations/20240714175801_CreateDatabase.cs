@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Travel_Website_System_API_.Migrations
 {
     /// <inheritdoc />
-    public partial class m : Migration
+    public partial class CreateDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,7 +45,6 @@ namespace Travel_Website_System_API_.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastSeen = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -225,32 +224,38 @@ namespace Travel_Website_System_API_.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Chats",
+                name: "Clients",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    customerServiceId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PassportNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Chats", x => x.Id);
+                    table.PrimaryKey("PK_Clients", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Chats_AspNetUsers_clientId",
-                        column: x => x.clientId,
+                        name: "FK_Clients_AspNetUsers_Id",
+                        column: x => x.Id,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerServices",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerServices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Chats_AspNetUsers_customerServiceId",
-                        column: x => x.customerServiceId,
+                        name: "FK_CustomerServices_AspNetUsers_Id",
+                        column: x => x.Id,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -341,6 +346,170 @@ namespace Travel_Website_System_API_.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Chats",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Logo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    customerServiceId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Chats", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Chats_Clients_clientId",
+                        column: x => x.clientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Chats_CustomerServices_customerServiceId",
+                        column: x => x.customerServiceId,
+                        principalTable: "CustomerServices",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookingServices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    allowingTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    serviceId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookingServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BookingServices_Clients_clientId",
+                        column: x => x.clientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_BookingServices_Services_serviceId",
+                        column: x => x.serviceId,
+                        principalTable: "Services",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LoveServices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    serviceId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoveServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LoveServices_Clients_clientId",
+                        column: x => x.clientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LoveServices_Services_serviceId",
+                        column: x => x.serviceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookingPackages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    quantity = table.Column<int>(type: "int", nullable: true),
+                    allowingTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    packageId = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookingPackages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BookingPackages_Clients_clientId",
+                        column: x => x.clientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_BookingPackages_Packages_packageId",
+                        column: x => x.packageId,
+                        principalTable: "Packages",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LovePackages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    packageId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LovePackages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LovePackages_Clients_clientId",
+                        column: x => x.clientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_LovePackages_Packages_packageId",
+                        column: x => x.packageId,
+                        principalTable: "Packages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PackageService",
+                columns: table => new
+                {
+                    PackageId = table.Column<int>(type: "int", nullable: false),
+                    ServiceId = table.Column<int>(type: "int", nullable: false),
+                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PackageService", x => new { x.PackageId, x.ServiceId });
+                    table.ForeignKey(
+                        name: "FK_PackageService_Packages_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "Packages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PackageService_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Messages",
                 columns: table => new
                 {
@@ -374,141 +543,6 @@ namespace Travel_Website_System_API_.Migrations
                         column: x => x.chatId,
                         principalTable: "Chats",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BookingServices",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Quantity = table.Column<int>(type: "int", nullable: true),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    allowingTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    serviceId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BookingServices", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BookingServices_AspNetUsers_clientId",
-                        column: x => x.clientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BookingServices_Services_serviceId",
-                        column: x => x.serviceId,
-                        principalTable: "Services",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LoveServices",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    serviceId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LoveServices", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LoveServices_AspNetUsers_clientId",
-                        column: x => x.clientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_LoveServices_Services_serviceId",
-                        column: x => x.serviceId,
-                        principalTable: "Services",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BookingPackages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    quantity = table.Column<int>(type: "int", nullable: true),
-                    allowingTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    packageId = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BookingPackages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BookingPackages_AspNetUsers_clientId",
-                        column: x => x.clientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BookingPackages_Packages_packageId",
-                        column: x => x.packageId,
-                        principalTable: "Packages",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LovePackages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    clientId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    packageId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LovePackages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LovePackages_AspNetUsers_clientId",
-                        column: x => x.clientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_LovePackages_Packages_packageId",
-                        column: x => x.packageId,
-                        principalTable: "Packages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PackageService",
-                columns: table => new
-                {
-                    PackageId = table.Column<int>(type: "int", nullable: false),
-                    ServiceId = table.Column<int>(type: "int", nullable: false),
-                    AddedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PackageService", x => new { x.PackageId, x.ServiceId });
-                    table.ForeignKey(
-                        name: "FK_PackageService_Packages_PackageId",
-                        column: x => x.PackageId,
-                        principalTable: "Packages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PackageService_Services_ServiceId",
-                        column: x => x.ServiceId,
-                        principalTable: "Services",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -741,7 +775,13 @@ namespace Travel_Website_System_API_.Migrations
                 name: "BookingServices");
 
             migrationBuilder.DropTable(
+                name: "CustomerServices");
+
+            migrationBuilder.DropTable(
                 name: "Packages");
+
+            migrationBuilder.DropTable(
+                name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "Services");
