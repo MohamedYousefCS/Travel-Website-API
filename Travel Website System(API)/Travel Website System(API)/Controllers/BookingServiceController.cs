@@ -17,7 +17,7 @@ namespace Travel_Website_System_API_.Controllers
             this.unitOFWork = unitOFWork;
         }
         
-        //[Authorize(Roles ="client")]
+       [Authorize(Roles ="client")]
         [HttpPost]
         public IActionResult Add(BookingServiceDTO bookingServiceDTO)//client id , service id 
         {
@@ -116,8 +116,7 @@ namespace Travel_Website_System_API_.Controllers
           //and compared with the quantity in package/service table if are euals make this package/service is deleted = true;
          */
 
-       // [Authorize(Roles = "admin,superAdmin")]
-        [HttpDelete ("{id}")]// delete and get dont have body in request
+        [HttpDelete ("{id}")]
         public IActionResult DeleteBooking(int id)
         {
             var bookingService = unitOFWork.BookingServiceRepo.GetById(id);
@@ -141,11 +140,11 @@ namespace Travel_Website_System_API_.Controllers
             else
             {
                 // Allow booking removal only if allowing time has expired
-                return BadRequest("Booking service cannot be removed as allowing time has not expired yet.");
+                return BadRequest(new { Message = "Booking service cannot be removed as allowing time has not expired yet." });
             }    
         }
 
-        // [Authorize(Roles ="client,admin,superAdmin")]
+        [Authorize(Roles ="admin,superAdmin")]
         [HttpGet("AllPaidBookings/{clientId}")]
         public IActionResult GetAllPaidBookingsForClient(string clientId)
         {
@@ -176,3 +175,8 @@ namespace Travel_Website_System_API_.Controllers
         }
     }
 }
+/*  i added more features and end points in booking package than in bokking service ; in package 
+ *  the user can delete(is deleted = true) booking before payment by himself and can again book the same package again and with another booking object 
+ *  with is deleted = false
+ *  But in booking service the user can not remove booking by himself so i dont edit add in booking service as in booking package 
+ *  */

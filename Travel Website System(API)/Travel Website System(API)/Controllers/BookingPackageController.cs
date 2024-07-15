@@ -26,14 +26,16 @@ namespace Travel_Website_System_API_.Controllers
        
         [HttpPost]
         [Consumes("application/json")]
-        //[Authorize(Roles = "client")]
+        [Authorize(Roles = "client")]
         public ActionResult Add(BookingPackageDTO bookingPackageDTO ) {// get client id , package id , 
             if(ModelState.IsValid)
             {
-                // to check the client has booked this package before or not
+                // to check the client has booked this package before or not 
                 var model = unitOFWork.BookingPackageRepo.GetAll()
-                    .FirstOrDefault(p=>p.clientId==bookingPackageDTO.clientId&& p.packageId==bookingPackageDTO.packageId);
-                if(model!=null)//if exists
+                    .FirstOrDefault(p=>p.clientId==bookingPackageDTO.clientId&& p.packageId==bookingPackageDTO.packageId
+                    && p.IsDeleted == false);
+                //p.IsDeleted == false : as if is deleted == true means the booking is deleted before and user can book the package again
+                if (model!=null)
                 {
                   return BadRequest(new { message = "This client has already booked this package." });
                 }
@@ -59,10 +61,12 @@ namespace Travel_Website_System_API_.Controllers
                     Date = bookingPackageDTO.Date,
                     allowingTime = bookingPackageDTO.allowingTime,
                     packageId = bookingPackageDTO.packageId,
+                    IsDeleted = false,// if the booking is deleted before paymnet  the user can book the same package again 
+                    // and add another booking object with isdeleted = false
                 };
                 unitOFWork.BookingPackageRepo.Add(bookingPackage);
                 unitOFWork.Save();
-                // after adding new booking for the specific package the availablequantity in package table will decreased by 1
+                // after adding new booking for the specific package the availabl equantity in package table will decreased by 1
                 package.QuantityAvailable--;
                 unitOFWork.db.Packages.Update(package);
                 unitOFWork.Save();
@@ -80,7 +84,8 @@ namespace Travel_Website_System_API_.Controllers
                     packageId = savedBooking.packageId,
                     allowingTime = savedBooking.allowingTime,
                     price = package.Price ?? 0,
-                    PackageImage = package.Image ?? " "
+                    PackageImage = package.Image ?? " ",
+                    PackageName = package.Name ?? " "
                 };
                 // will return object in response where i can get it id in ui to pass it in payment
                 return CreatedAtAction(nameof(GetBookingPackageById), new {id = bookingPackage.Id }, bookingPackageDTO);
@@ -111,12 +116,16 @@ namespace Travel_Website_System_API_.Controllers
                 allowingTime = bookingPackage.allowingTime,
                 // clientName = clientName,// i get it for testing only i dont need it now
                 price = bookingPackage.package?.Price ?? 0,
-                PackageImage = bookingPackage.package?.Image ?? " "
+                PackageImage = bookingPackage.package?.Image ?? " ",
+                PackageName = bookingPackage.package.Name?? " "
+
             };
             return Ok(bookingPackageDTO);
         }
 
         // Route for getting all bookings for a  logined client that have no payments
+        //i handle this in front in GetAllBooking componenet
+       [Authorize(Roles = "client,admin,superAdmin")]
         [HttpGet("client/{clientId}")]
         public IActionResult GetAllBookingForClient(string clientId)
         {
@@ -144,14 +153,27 @@ namespace Travel_Website_System_API_.Controllers
                     Date = item.Date,
                     quantity = item.quantity,
                     price = item.package?.Price ?? 0,
+                    PackageImage = item.package?.Image ?? " ",
+                    PackageName = item.package.Name ?? " "
                 });
             }
                 
             return Ok(allClientBookingsDTO);        
-            // i can return list of dto
         }
-        // [Authorize(Roles ="admin,superAdmin")]
-        [HttpDelete("{id}")]
+
+        [Authorize(Roles ="client")]
+        [HttpDelete("{id}")]// i handle this in front in GetAllBooking componenet
+        public IActionResult DeleteBookingForClient(int id)  // client can remove it 
+        {
+            if (id == 0)
+            {
+                return BadRequest(new {Message = "please enter valid id "});
+            }
+            unitOFWork.CustombookingPackageRepo.DeleteBooking(id);
+            return Ok(new {Message ="deleted"});
+        }
+
+        [HttpDelete]// automatic delete
         public IActionResult DeleteBooking(int id)
         {
             var bookingPackage = unitOFWork.BookingPackageRepo.GetById(id);
@@ -162,25 +184,19 @@ namespace Travel_Website_System_API_.Controllers
             //bookingPackage.allowingTime < DateTime.Now: if the date of today is > date of allowingtime
             if (bookingPackage.allowingTime != null && bookingPackage.allowingTime < DateTime.Now)//package start date
             {
-                // get the current package in booking row
-                var package = unitOFWork.db.Packages.SingleOrDefault(s => s.Id == bookingPackage.packageId);
-                package.QuantityAvailable++;
-                unitOFWork.db.Packages.Update(package);// PackageRepo.update(service)
-                bookingPackage.quantity--;
-                unitOFWork.BookingPackageRepo.Delete(bookingPackage.Id);
-                unitOFWork.Save();
-                return Ok("removed");
+                unitOFWork.CustombookingPackageRepo.DeleteBooking(id);
+                return Ok(new { Message = " Removed " });
             }
             else
             {
                 // Allow booking removal only if allowing time has expired
-                return BadRequest("Booking package cannot be removed as allowing time has not expired yet.");
+                return BadRequest(new { Message = "Booking package cannot be removed as allowing time has not expired yet." });
             }
         }
 
-        //[Authorize(Roles ="admin,superAdmin")]
+        [Authorize(Roles ="admin,superAdmin")]
         [HttpGet("AllBookings")]
-        public IActionResult GetAllPackageBooking() // Get all booking for all clients
+        public IActionResult GetAllPackageBooking() // Get all bookings for all clients
         {
             var allPackageBooking = unitOFWork.CustombookingPackageRepo.selectAll();
             if(allPackageBooking == null) { return NotFound("there are no Bookings"); }
@@ -203,10 +219,10 @@ namespace Travel_Website_System_API_.Controllers
 
             return Ok(AllBookingsDTO);
         }
-        // allBookings for a sepecific client
-       // [Authorize(Roles ="client,admin,superAdmin")]
+
+        [Authorize(Roles ="admin,superAdmin")]
         [HttpGet("AllBookings/{clientId}")]
-        public IActionResult GetAllPaidBookingsForClient(string clientId) {
+        public IActionResult GetAllPaidBookingsForClient(string clientId) {    // All Paid Bookings For a specific Client
 
             if (string.IsNullOrEmpty(clientId))
             {
@@ -231,7 +247,8 @@ namespace Travel_Website_System_API_.Controllers
                     });
             }
             return Ok(AllPaidBookingsDTO);
-        }
+        }   
         
     }
+
 }
