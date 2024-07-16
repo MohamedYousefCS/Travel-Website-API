@@ -23,6 +23,8 @@ namespace Travel_Website_System_API_.DTO
         public Decimal  ?price { get; set; }
         public string ? PackageImage { get; set; }
 
+        public string ? PackageName {  get; set; }
+
 
     }
 }

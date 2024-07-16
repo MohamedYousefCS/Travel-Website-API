@@ -152,40 +152,7 @@ namespace Travel_Website_System_API_.Controllers
             }
 
             return NoContent();
-        }
-        [HttpPut("completeInfo/{id}")]//update client data 
-        public async Task<IActionResult> CompleteInfo( [FromForm]UpdateUserDto updateUserDto,string id)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByIdAsync(id);
-                if (user == null)
-                {
-                    return NotFound(new { Message = "User not found" });
-                }
-
-                user.PassportNumber = updateUserDto.PassportNumber;
-                user.PhoneNumber = updateUserDto.PhoneNumber;
-                user.ResidanceCountry = updateUserDto.ResidanceCountry;
-
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    return Ok(new { Message = "User updated successfully" });
-                }
-
-                foreach (var err in result.Errors)
-                {
-                    ModelState.AddModelError("", err.Description);
-                }
-            }
-            return BadRequest(ModelState);
-        }
-
-
-
-
-
+        } 
 
         [HttpPut("completeInfo")]
         public async Task<IActionResult> CompleteInfo(UpdateUserDto updateUserDto)

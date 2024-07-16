@@ -16,6 +16,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Travel_Website_System_API_.DTO.PaymentClasses;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Travel_Website_System_API_.Controllers
 {
@@ -34,8 +35,8 @@ namespace Travel_Website_System_API_.Controllers
             var environment = new SandboxEnvironment(payPalSettings.Value.ClientId, payPalSettings.Value.ClientSecret);
             _client = new PayPalHttpClient(environment);
         }
-
-
+        // i Dont use this end point
+        [Authorize(Roles ="client")]
         [HttpPost("multiple")]
         public async Task<IActionResult> CreateOrder([FromBody] PaymentForManyBookin paymentForManyBookin)
         {
@@ -62,7 +63,6 @@ namespace Travel_Website_System_API_.Controllers
 
             return Ok(paymentResponses);
         }
-
         private async Task ProcessPayment(decimal amount, string currency, int? bookingPackageId, int? bookingServiceId, List<object> paymentResponses)
         {
             try
@@ -140,7 +140,8 @@ namespace Travel_Website_System_API_.Controllers
             }
         }
 
-
+        // I finally used this end point only in paymnet
+        [Authorize(Roles ="client")]
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] PaymentRequest paymentRequest)
         {
@@ -351,13 +352,13 @@ namespace Travel_Website_System_API_.Controllers
             catch (HttpException httpException)
             {
                 Console.WriteLine($"HttpException: {httpException.Message}");
-                return Redirect($"http://localhost:4200/payment-failed?message=Payment%20failed:%20{httpException.Message}");
+                return Redirect($"http://localhost:4200/payment-failure?message=Payment%20failed:%20{httpException.Message}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                // return Redirect($"http://localhost:4200/payment-failed?message=An%20unexpected%20error%20occurred.%20Please%20try%20again%20later.");
-                return Redirect($"http://localhost:4200/payment-failed");
+                return Redirect($"http://localhost:4200/payment-failure?message=An%20unexpected%20error%20occurred.%20Please%20try%20again%20later.");
+               // return Redirect($"http://localhost:4200/payment-failure");
             }
         }
 
@@ -366,7 +367,9 @@ namespace Travel_Website_System_API_.Controllers
         {
             if (string.IsNullOrEmpty(token))
             {
-                return BadRequest(new { success = false, message = "Token is required." });
+                // return BadRequest(new { success = false, message = "Token is required." });
+                return Redirect("http://localhost:4200/payment-failure?message=An%20unexpected%20error%20occurred.%20Please%20try%20again%20later.");
+
             }
 
             try
@@ -385,12 +388,12 @@ namespace Travel_Website_System_API_.Controllers
                     return NotFound(new { success = false, message = "Payment not found." });
                 }
 
-                return Redirect("http://localhost:4200/payment-cancelled");
+                return Redirect("http://localhost:4200/payment-cancel");// in front
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                return Redirect("http://localhost:4200/payment-failed?message=An%20unexpected%20error%20occurred.%20Please%20try%20again%20later.");
+                return Redirect("http://localhost:4200/payment-failure?message=An%20unexpected%20error%20occurred.%20Please%20try%20again%20later.");
             }
         }
     }
