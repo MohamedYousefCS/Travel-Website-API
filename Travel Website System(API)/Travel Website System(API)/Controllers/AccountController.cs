@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using Travel_Website_System_API.Models;
 using Travel_Website_System_API_.DTO;
+using Travel_Website_System_API_.Models;
 using Travel_Website_System_API_.Repositories;
 using Travel_Website_System_API_.viewModels;
 
@@ -67,10 +68,15 @@ namespace Travel_Website_System_API_.Controllers
                     Role = registerDto.Role
                 };
 
-              /*  var verificationCode = Guid.NewGuid().ToString().Substring(0, 6);
-                user.VerificationCode = verificationCode;*/
+                if (registerDto.Role=="client")
+                {
+                    var verificationCode = Guid.NewGuid().ToString().Substring(0, 6);
+                    user.VerificationCode = verificationCode;
 
-               // await _emailSender.SendEmailAsync(user.Email, "Verification Code", $"Your verification code is: {verificationCode}");
+                    await _emailSender.SendEmailAsync(user.Email, "Verification Code", $"Your verification code is: {verificationCode}");
+                }
+
+              
 
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
 
@@ -82,7 +88,12 @@ namespace Travel_Website_System_API_.Controllers
                     {
                         CreateUserAccordingToHisType(user, registerDto.Role);
                     }
-                    return Ok(new { Message = "User registered step1 successfully" });
+                    if (registerDto.Role == "client")
+                    {
+                        return Ok(new { Message = "verification code sent to email" });
+
+                    }
+                    return Ok(new { Message = "User added successfully" });
                 }
 
                 foreach (var err in result.Errors)
@@ -98,7 +109,7 @@ namespace Travel_Website_System_API_.Controllers
 
 
 
-        [HttpPost("email confirmation")]
+        [HttpPost("email-confirmation")]
         public async Task<IActionResult> Verify([FromBody] VerifyVM model)
         {
             if (ModelState.IsValid)
