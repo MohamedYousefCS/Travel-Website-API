@@ -173,6 +173,11 @@ namespace Travel_Website_System_API_.Controllers
         }
 
 
+
+
+
+
+
         // send messaage from customer service to clients
 
         [HttpPost("SendMessageToClient")]
@@ -242,7 +247,7 @@ namespace Travel_Website_System_API_.Controllers
             //    await _hub.Clients.Caller.SendAsync("NoCustomerServiceAvailable");
             //}
             return Ok(true);
-
+            
         }
 
 
@@ -544,7 +549,7 @@ namespace Travel_Website_System_API_.Controllers
 
                 await _hub.Clients.All.SendAsync("UserTyping", userId);
 
-                return Ok(true);
+                return Ok(true); 
             }
             catch (Exception)
             {
