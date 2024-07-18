@@ -389,7 +389,7 @@ namespace Travel_Website_System_API_.Controllers
                     SenderId = senderId,
                     Content = message,
                     Timestamp = DateTime.UtcNow,
-                    GroupName = groupName 
+                    GroupName = groupName
                 };
                 await _context.Messages.AddAsync(newMessage);
                 await _context.SaveChangesAsync();

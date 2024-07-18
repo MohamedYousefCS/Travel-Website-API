@@ -13,7 +13,10 @@ namespace Travel_Website_System_API.Models
         [Key]
 
         public int Id { get; set; }
-
+        public string clientuniqueid { get; set; }
+        public string type { get; set; }
+        public string message { get; set; }
+        public DateTime date { get; set; }
 
         public string status { get; set; }
 

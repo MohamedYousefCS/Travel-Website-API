@@ -14,6 +14,7 @@
     public class ChatHub : Hub
     {
         private readonly ApplicationDBContext _context;
+        private readonly UserRepo _userRepo;
 
         public ChatHub(ApplicationDBContext context )
         {
