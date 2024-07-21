@@ -36,6 +36,8 @@ namespace Travel_Website_System_API.Models
 
         public virtual DbSet<PackageService> PackageService { get; set; }
 
+        public virtual DbSet<Contact> Contacts { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
